@@ -1,6 +1,6 @@
 // import { verifyOtp, registerUser, login, logout, forgetPwd, restPwd } from "../services/auth.js";
 import { NextFunction, Request, Response } from "express";
-import { registerUser, verifyOtp, login } from "../services/userServices";
+import { registerUser, verifyOtp, login, logout, forgetPassword, resetPassword } from "../services/userServices";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -44,67 +44,106 @@ export const handleEmailVerify = async (req: Request, res: Response, next: NextF
 };
 
 
-export const handleLogin = async (req: Request, res: Response, next: NextFunction) => {
-
+export const handleLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            res.status(400).json('email and password are required');
+            res.status(400).json({ message: 'Email and password are required' });
             return;
         }
+
         const { user, tokens } = await login(email, password);
 
-        res.cookie('jwt', tokens.refreshToken, {
+
+        res.cookie('access', tokens.accessToken, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000,
         });
 
-        res.status(200).json({
-            message: ' successfully login in',
-            user,
-            accessToken: tokens.accessToken,
+
+        res.cookie('refresh', tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
+
+
+        res.status(200).json({
+            message: 'Successfully logged in',
+            user,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const handleLogout = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const refreshToken = req.cookies?.refresh;
+        if (!refreshToken) {
+            res.sendStatus(204);
+            return;
+        }
+
+        res.clearCookie('refresh', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        })
+        res.clearCookie('access', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        })
+        await logout(refreshToken)
+        res.status(204);
+       
     } catch (error) {
         next(error);
     }
 }
 
-// export const logoutHandler = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const refreshToken = req.cookies?.jwt;
-//         if (!refreshToken) return res.sendStatus(204);
-//         const userFound = await logout(refreshToken)
+export const handleForgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            res.status(400).json({ success: false, message: 'email required' })
+            return
+        }
+        await forgetPassword(email);
+        res.status(200).json('Password reset email sent ')
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+export const handleResetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { password } = req.body;
+        const { token } = req.params;
+        if (!token) {
+            res.status(404).json({ success: false, message: 'token not found' })
+            return
+        }
+        if (!password) {
+            res.status(400).json({ success: false, message: 'password is required' });
+            return;
+        }
+        if (password.length < 6) {
+            res.status(400).json({ success: false, message: 'password must be at least 6 characters long' })
+            return;
+        }
 
-//         res.clearCookie('jwt', {
-//             httpOnly: true,
-//             // secure: true,
-//             // sameSite: 'None',
-//         })
-
-//         if (!userFound) return res.sendStatus(204)
-//         return res.status(200).json({ message: 'Logged out successfully' });
-//     } catch (error) {
-//         next(error);
-//     }
-// }
-
-// export const forgetPwdHandler = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const { email } = req.body;
-//         if (!email || !email.includes('@')) res.status(400).json({ success: false, message: 'invalid email' })
-//         await forgetPwd(email);
-//         return res.status(200).json('check you email we send it ')
-//     } catch (error) {
-//         next(error);
-//     }
-// }
-// export const resetPwdHandler = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const { pwd } = req.body;
-//         const { token } = req.params;
-//         await restPwd(token, pwd);
-//         return res.status(200).json({ success: true, message: "password reset successfully" })
-//     } catch (error) {
-//         next(error);
-//     }
-// }
+        await resetPassword(token, password);
+        res.status(200).json({ success: true, message: "password reset successfully" })
+    } catch (error) {
+        next(error);
+    }
+}

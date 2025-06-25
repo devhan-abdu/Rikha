@@ -3,6 +3,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/generateToke
 import { randomInt , randomBytes } from 'crypto';
 import prisma from '../config/prisma'
 import bcrypt from 'bcrypt'
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendverificationEmail  ,sendForgetEmail ,sendResetEmail} from '../mailtrap/email';
 import { AppError } from '../utils/AppError';
 
@@ -88,35 +89,64 @@ export async function login(email:string , password:string){
 
 }
 
-// export async function logout(refreshToken) {
-//     const foundUser = userRepo.findUserByRefresh(refreshToken)
-//     if(foundUser){
-//         delete foundUser.refreshToken;
-//         userRepo.updateUser(foundUser);
-//         await userRepo.save();
-//         return true;
-//     }
-//      return false;
-// }
+export async function logout(refreshToken:string) {
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload ;
 
-// export async function forgetPwd(email){
-//     const foundUser= userRepo.findUserByEmail(email)
-//     if(!foundUser) throw new Error('user not found')
-//      const resetToken=randomBytes(20).toString("hex");
-//      const restPwdExpireAt= Date.now()  + 1*60*60*1000;
-//      const currentUser={...foundUser ,resetToken,restPwdExpireAt}
-//       userRepo.updateUser(currentUser);
-//       await userRepo.save();
+        const user = await prisma.user.findUnique({
+        where: { id: decoded.userId }
+    });
+    if (!user) return;
 
-//      await sendForgetEmail(email ,`${process.env.CLIENT_END_POINT}/api/auth/forget-pass/${resetToken}`)  
-// }
-// export async function restPwd(token , pwd){
-//     const foundUser= userRepo.findUserByToken(token)
-//     if(!foundUser || foundUser.restPwdExpireAt < Date.now()) throw new Error('user not found or token expired')
-//      const hashedpwd = await bcrypt.hash(pwd, 10); 
-     
-//      const currentUser= {...foundUser , password:hashedpwd ,resetToken:undefined , restPwdExpireAt:undefined}
-//      userRepo.updateUser(currentUser);
-//      await userRepo.save();
-//      await sendResetEmail(email)  
-// }
+    await prisma.user.update({
+        where: { id: decoded.userId },
+        data: { refreshToken: null }
+    });
+}
+    catch (error) {
+        return;
+    }
+}
+
+export async function forgetPassword(email:string){
+    const user = await prisma.user.findUnique({
+        where:{email:email}
+    })
+    if(!user) throw new AppError('email is incorrect' ,400)
+    if(user.verified === false) throw new AppError('please verify your email first')
+     const resetToken = randomBytes(10).toString('hex');
+    const resetExpires = new Date(Date.now() + 1 * 60 * 60 * 1000);  
+    
+    await prisma.user.update({
+        where:{id:user.id},
+        data:{
+            resetToken,
+            resetExpires
+        }
+    })
+
+     await sendForgetEmail(email ,`${process.env.CLIENT_END_POINT}/api/auth/forget-pass/${resetToken}`) 
+
+}
+export async function resetPassword(token:string , password:string){
+    const user = await prisma.user.findFirst({
+        where:{
+            resetToken:token,
+            resetExpires:{
+                gt:new Date()
+            }
+        }
+    })
+    if(!user) throw new AppError('token invalid or expired' , 400);
+
+   const hashedpassword = await bcrypt.hash(password, 10);
+
+   await prisma.user.update({
+    where:{id:user.id},
+    data:{
+        password:hashedpassword,
+        resetToken:null,
+        resetExpires:null
+    }
+   })
+}
