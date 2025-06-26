@@ -180,7 +180,7 @@ export const updateUserProfile = async (userId: string, name?: string, email?: s
     if (email && email !== user.email) {
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (!existingUser) throw new AppError(' email already in use', 404)
+        if (existingUser) throw new AppError(' email already in use', 404)
         const otp = randomInt(100000, 999999).toString();
         const otpExpires = new Date(Date.now() + 1 * 60 * 60 * 1000);
 
@@ -199,7 +199,15 @@ export const updateUserProfile = async (userId: string, name?: string, email?: s
 
     const updatedUser = await prisma.user.update({
         where: { id: Number(userId) },
-        data: updatedData
+        data: updatedData,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+        }
     })
 
     return updatedUser;
@@ -230,3 +238,36 @@ export const deleteUser = async (userId: string) => {
     })
     return deletedUser;
 }
+
+export const refreshTokenService = async (refreshToken: string) => {
+  const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as JwtPayload;
+
+  const userId = decoded.userId;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) throw new AppError('User not found', 404);
+
+  if (user.refreshToken !== refreshToken) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+    throw new AppError('Refresh token does not match', 403);
+  }
+
+  const newAccessToken = generateAccessToken(user.role, user.id);
+  const newRefreshToken = generateRefreshToken(user.id);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { refreshToken: newRefreshToken },
+  });
+
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
+};

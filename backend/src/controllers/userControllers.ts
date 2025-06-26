@@ -1,9 +1,10 @@
 // import { verifyOtp, registerUser, login, logout, forgetPwd, restPwd } from "../services/auth.js";
 import { NextFunction, Request, Response } from "express";
 import { registerUser, verifyOtp, login, logout, forgetPassword, resetPassword } from "../services/userServices";
-import {  getUserProfile, updateUserProfile, getAllUsers ,deleteUser } from "../services/userServices";
+import { getUserProfile, updateUserProfile, getAllUsers, deleteUser ,refreshTokenService } from "../services/userServices";
 
 import dotenv from 'dotenv';
+import { generateAccessToken, generateRefreshToken } from "../utils/generateToken";
 
 dotenv.config();
 
@@ -157,10 +158,11 @@ export const handleResetPassword = async (req: Request, res: Response, next: Nex
 export const handleprofile = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
 
-        const userId = req.user.id
+        const userId = req.user.userId
+              
         const userInfo = await getUserProfile(userId)
         res.status(200).json({ success: true, user: userInfo });
-
+   
     } catch (error) {
         next(error);
     }
@@ -179,7 +181,7 @@ export const handleUpdateProfile = async (req: AuthenticatedRequest, res: Respon
         //     return;
         // }
 
-        const updateduUser = await updateUserProfile(req.user.id, name, email);
+        const updateduUser = await updateUserProfile(req.user.userId, name, email);
         res.status(200).json({ success: true, message: 'profile updated successfully', user: updateduUser });
 
     } catch (error) {
@@ -197,18 +199,52 @@ export const handleAllUsers = async (req: AuthenticatedRequest, res: Response, n
 }
 
 export const handleDeleteUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-      
+
     try {
         const userId = req.params.id;
-        if(!userId){
+        if (!userId) {
             res.status(400).json({ success: false, message: 'User ID is required' });
             return;
         }
         const deletedUser = await deleteUser(userId);
-       
+
         res.status(200).json({ success: true, message: 'User deleted successfully', user: deletedUser });
-    }catch (error) {
+    } catch (error) {
         next(error);
     }
+
+
 }
+
+export const handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const refreshToken = req.cookies?.refresh;
+    if (!refreshToken) {
+     res.status(401).json({ message: 'No refresh token provided' });
+     return;
+    }
+
+    const tokens = await refreshTokenService(refreshToken);
+
+    res.cookie('access', tokens.accessToken, {
+      httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 min
+    });
+
+    res.cookie('refresh', tokens.refreshToken, {
+      httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+     res.status(200).json({ message: 'Tokens refreshed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 

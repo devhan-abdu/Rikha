@@ -1,6 +1,6 @@
 import express from 'express';
 import { validateRegistration } from '../middleware/validate';
-import { handleEmailVerify, handleRegisterUser,handleLogin, handleForgotPassword, handleLogout, handleUpdateProfile ,handleprofile ,handleAllUsers ,handleResetPassword ,handleDeleteUser} from '../controllers/userControllers';
+import { handleEmailVerify, handleRegisterUser,handleLogin, handleForgotPassword, handleLogout, handleUpdateProfile ,handleprofile ,handleAllUsers ,handleResetPassword ,handleDeleteUser, handleRefreshToken} from '../controllers/userControllers';
 import { isAdmin, isAuth } from '../middleware/isAuth';
 
 const router = express.Router();
@@ -18,6 +18,8 @@ router.put('/profile', isAuth, handleUpdateProfile);
 
 router.get('/users', isAuth,isAdmin, handleAllUsers);
 router.delete('/users/:id', isAuth, isAdmin, handleDeleteUser);
+
+router.post('/refresh-token', handleRefreshToken); // Assuming this is for refreshing tokens, you might want to implement a dedicated handler for it.
 
 
 
