@@ -1,10 +1,15 @@
 // import { verifyOtp, registerUser, login, logout, forgetPwd, restPwd } from "../services/auth.js";
 import { NextFunction, Request, Response } from "express";
 import { registerUser, verifyOtp, login, logout, forgetPassword, resetPassword } from "../services/userServices";
+import {  getUserProfile, updateUserProfile, getAllUsers ,deleteUser } from "../services/userServices";
+
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+export interface AuthenticatedRequest extends Request {
+    user?: any;
+}
 
 export const handleRegisterUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -61,16 +66,16 @@ export const handleLogin = async (
 
         res.cookie('access', tokens.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // sameSite: 'strict',
             maxAge: 15 * 60 * 1000,
         });
 
 
         res.cookie('refresh', tokens.refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000, // 1 day
         });
 
@@ -94,17 +99,17 @@ export const handleLogout = async (req: Request, res: Response, next: NextFuncti
 
         res.clearCookie('refresh', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // sameSite: 'strict',
         })
         res.clearCookie('access', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            // secure: process.env.NODE_ENV === 'production',
+            // sameSite: 'strict',
         })
         await logout(refreshToken)
-        res.status(204);
-       
+        res.sendStatus(204);
+
     } catch (error) {
         next(error);
     }
@@ -118,7 +123,7 @@ export const handleForgotPassword = async (req: Request, res: Response, next: Ne
             return
         }
         await forgetPassword(email);
-        res.status(200).json('Password reset email sent ')
+        res.status(200).json({ success: true, message: 'Password reset email sent' });
         return;
     } catch (error) {
         next(error);
@@ -147,3 +152,63 @@ export const handleResetPassword = async (req: Request, res: Response, next: Nex
         next(error);
     }
 }
+
+// handleUpdateProfile ,handleprofile ,handleAllUsers ,handleResetPassword ,handleDeleteUser
+export const handleprofile = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+
+        const userId = req.user.id
+        const userInfo = await getUserProfile(userId)
+        res.status(200).json({ success: true, user: userInfo });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const handleUpdateProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+        const { name, email }: { name?: string, email?: string } = req.body;
+
+        if (!name && !email) {
+            res.status(400).json({ success: false, message: 'At least one field (name or email) is required' });
+            return;
+        }
+        // if(!req?.user){   not needed middleware already handled it  💪
+        //     res.status(401).json({ success: false, message: 'user not found' });
+        //     return;
+        // }
+
+        const updateduUser = await updateUserProfile(req.user.id, name, email);
+        res.status(200).json({ success: true, message: 'profile updated successfully', user: updateduUser });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const handleAllUsers = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {    // may add later pagination and search functionality
+    try {
+        const users = await getAllUsers();
+        res.status(200).json({ success: true, users });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const handleDeleteUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      
+    try {
+        const userId = req.params.id;
+        if(!userId){
+            res.status(400).json({ success: false, message: 'User ID is required' });
+            return;
+        }
+        const deletedUser = await deleteUser(userId);
+       
+        res.status(200).json({ success: true, message: 'User deleted successfully', user: deletedUser });
+    }catch (error) {
+        next(error);
+    }
+}
+

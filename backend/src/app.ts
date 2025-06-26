@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 
 // Routes
-app.use('/api/user',userRoute)
+app.use('/api',userRoute)
 
 
 // Error handling middleware
