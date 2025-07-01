@@ -1,0 +1,43 @@
+{
+  "name": "voltiva",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/client": "^7.6.0",
+    "@sanity/vision": "^3.95.0",
+    "dotenv": "^17.0.0",
+    "nanoid": "^5.1.5",
+    "react": "^19.1",
+    "react-dom": "^19.1",
+    "sanity": "^3.95.0",
+    "styled-components": "^6.1.18"
+  },
+  "devDependencies": {
+    "@sanity/eslint-config-studio": "^5.0.2",
+    "@types/node": "^24.0.7",
+    "@types/react": "^19.1",
+    "eslint": "^9.28",
+    "prettier": "^3.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "prettier": {
+    "semi": false,
+    "printWidth": 100,
+    "bracketSpacing": false,
+    "singleQuote": true
+  }
+}
