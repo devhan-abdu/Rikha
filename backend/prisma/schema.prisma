@@ -16,11 +16,31 @@ model User {
   verified     Boolean   @default(false)
   otpCode      String?           // Used for email verification
   otpExpires   DateTime?         // Expiry time for OTP
+  resetToken      String?           // Used for email verification
+  resetExpires   DateTime?         // Expiry time for OTP
   refreshToken String?           // Nullable, only after login
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
 
+model productMeta {
+  id       Int @id @default(autoincrement())
+  sanityId  String   @unique
+  price     Int
+  stock     Int
+  rating    Float 
+  numReviews Int 
+
+}
+
+model Review {
+  id         Int @id @default(autoincrement())
+  userId     Int
+  productId  String
+  rating     Int
+  comment    String
+  createdAt  DateTime
+}
 
 
 enum Role {

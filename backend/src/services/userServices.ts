@@ -208,6 +208,7 @@ export const updateUserProfile = async (userId: string, name?: string, email?: s
             createdAt: true,
             updatedAt: true,
         }
+        
     })
 
     return updatedUser;
