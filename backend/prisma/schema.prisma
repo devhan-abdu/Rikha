@@ -1,12 +1,17 @@
-
 generator client {
   provider = "prisma-client-js"
 }
-        
+
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite" // or postgresql in production
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id           Int       @id @default(autoincrement())
   name         String
@@ -14,36 +19,84 @@ model User {
   password     String
   role         Role      @default(USER)
   verified     Boolean   @default(false)
-  otpCode      String?           // Used for email verification
-  otpExpires   DateTime?         // Expiry time for OTP
-  resetToken      String?           // Used for email verification
-  resetExpires   DateTime?         // Expiry time for OTP
-  refreshToken String?           // Nullable, only after login
+  otpCode      String?
+  otpExpires   DateTime?
+  resetToken   String?
+  resetExpires DateTime?
+  refreshToken String?
+  reviews      Review[]
+  cartItems    CartItem[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
 
-model productMeta {
-  id       Int @id @default(autoincrement())
-  sanityId  String   @unique
-  price     Int
-  stock     Int
-  rating    Float 
-  numReviews Int 
-
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  image     String   // Cloudinary URL
+  slug      String   @unique
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+model Product {
+  id           Int      @id @default(autoincrement())
+  title        String
+  image        String
+  images       Json?    // ✅ array of URLs
+  specs        Json?    // ✅ array of strings like ["M3", "Retina"]
+
+  price        Float
+  discount     Float?
+  shortDesc    String
+  longDesc     String
+  brand        String
+  slug         String   @unique
+  stock        Int
+  isFeatured   Boolean  @default(false)
+  isNewArrival Boolean  @default(false)
+  isHot        Boolean  @default(false)
+
+  rating       Float    @default(0)
+  numReviews   Int      @default(0)
+
+  category     Category @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+
+  reviews      Review[]
+  cartItems    CartItem[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 
 model Review {
-  id         Int @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
   userId     Int
-  productId  String
+
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+
   rating     Int
   comment    String
-  createdAt  DateTime
+  createdAt  DateTime @default(now())
 }
 
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
 
-enum Role {
-  USER
-  ADMIN
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+
+  quantity   Int      @default(1)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, productId])
 }
