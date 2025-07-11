@@ -66,7 +66,7 @@ const CategoryPage = ({ categories, initialProducts }: Props) => {
                         <select onChange={(e) => setSortOption(e.target.value)}
                             className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-medium text-sm"
                         >
-                            <option value="relevant" selected>Sort by: Relevance</option>
+                            <option value="relevant" >Sort by: Relevance</option>
                             <option value="price-asc">Price: Low to High</option>
                             <option value="price-desc">Price: High to Low</option>
                             {/* <option value="newest">Newest Arrivals</option>
