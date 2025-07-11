@@ -1,10 +1,30 @@
+'use client'
+
 import Image from "next/image";
 import Link from "next/link";
+import { useAppDispatch } from "@/redux/hooks";
+import { addCartItem } from "@/redux/slices/cartSlice";
+
 
 const ProductCard = ({ product }: { product: any }) => {
+  const dispatch = useAppDispatch();
+
+  const addToCart =() =>{
+     const cartItem ={
+      productId:product.id,
+      title:product.title,
+      desc:product.desc,
+      quantity:product.quantity,
+      image:product.image,
+      price:product.price,
+     }
+     console.log(cartItem , 'hela from cart')
+     dispatch(addCartItem(cartItem))
+  }
+
   return (
     <div className="rounded-lg border p-6 border-gray-300 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 max-w-[330px] mx-auto">
-        <Link href={`/product/${product.slug}`} className="flex items-center justify-center h-[180px] w-full">
+        <Link href={`/category/${product.slug}`} className="flex items-center justify-center h-[180px] w-full">
             <Image
               src={product.image}
               alt={product.title}
@@ -70,8 +90,9 @@ const ProductCard = ({ product }: { product: any }) => {
             ${product.price}
           </p>
           <button
+           onClick={()=>addToCart()}
             type="button"
-            className="inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            className="cursor-pointer inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
           >
             <svg
               className="-ms-2 me-2 h-5 w-5"
