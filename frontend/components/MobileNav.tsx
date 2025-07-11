@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sheet"
 import { Menu, TabletSmartphone } from "lucide-react";
 import Link from "next/link";
-import { navData } from "@/lib/navData";
+import { navData } from "@/constants/index";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 

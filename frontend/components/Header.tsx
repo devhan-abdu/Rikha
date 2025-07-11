@@ -6,16 +6,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useDispatch, useSelector } from "react-redux";
-import { navData } from "@/lib/navData";
+import {  useAppSelector } from "@/redux/hooks";
+import { navData } from '@/constants/index';
 import MobileNav from "./MobileNav";
+import {selectTotalQnt } from '@/redux/slices/cartSlice';
 
 const user = true;
 
 const Header = () => {
   const pathname = usePathname();
-  // const dispatch = useDispatch();
-  // const totalQnt = useSelector(state => state.cart.totalQnt)
+    const totalQnt = useAppSelector(selectTotalQnt)
 
 
   return (
@@ -56,7 +56,7 @@ const Header = () => {
         )}
 
         <div className="relative  flex items-center">
-          <span className="absolute -top-1/2 w-5 h-5 flex items-center justify-center bg-black rounded-full -right-1/2  translate-y-1/4 font-bold text-white">3</span>
+          <span className="absolute -top-1/2 w-5 h-5 flex items-center justify-center bg-black rounded-full -right-1/2  translate-y-1/4 font-bold text-white">{totalQnt}</span>
           <Link href="/cart" className="text-gray-600" ><ShoppingBag className="" /></Link>
         </div>
       </div>
