@@ -1,0 +1,136 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { verifyEmailSchema, VerifyEmailData } from "@/interface";
+import { motion } from "framer-motion";
+import { toast } from 'react-toastify';
+
+
+const EmailVerificationPage = () => {
+	const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
+	const inputRefs = useRef<HTMLInputElement[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
+
+	const {
+		handleSubmit,
+		setValue,
+		setError,
+		formState: { errors },
+	} = useForm<VerifyEmailData>({
+		resolver: zodResolver(verifyEmailSchema),
+	});
+
+	const onSubmit: SubmitHandler<VerifyEmailData> = async ({ otp }) => {
+		try {
+			setIsLoading(true);
+			const email = localStorage.getItem("verify_email");
+			if (!email) throw new Error("No email found in localStorage");
+
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, otp }),
+			});
+
+			const json = await res.json();
+			if (!res.ok) throw new Error(json.message || "Verification failed");
+
+			localStorage.removeItem("verify_email");
+			router.push("/");
+		} catch (error: any) {
+			setError("otp", {
+				type: "manual",
+				message: error.message || "Something went wrong",
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleChange = (index: number, value: string) => {
+		const newCode = [...code];
+		newCode[index] = value.slice(-1);
+		setCode(newCode);
+		setValue("otp", newCode.join(""));
+
+		if (value && index < 5) {
+			inputRefs.current[index + 1]?.focus();
+		}
+	};
+
+	const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Backspace" && !code[index] && index > 0) {
+			inputRefs.current[index - 1]?.focus();
+		}
+	};
+
+	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+		const pasted = e.clipboardData.getData("text").slice(0, 6).split("");
+		const newCode = Array(6).fill("");
+		pasted.forEach((char, i) => (newCode[i] = char));
+		setCode(newCode);
+		setValue("otp", newCode.join(""));
+		const nextIndex = pasted.length >= 6 ? 5 : pasted.length;
+		inputRefs.current[nextIndex]?.focus();
+	};
+
+	useEffect(() => {
+		if (code.every((c) => c !== "")) {
+			handleSubmit(onSubmit)();
+		}
+	}, [code]);
+
+	return (
+		<div className='max-w-md w-full mx-auto my-32'>
+			<motion.div
+				initial={{ opacity: 0, y: -50 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5 }}
+				className='bg-white p-8 rounded-2xl '
+			>
+				<h2 className='text-3xl font-bold text-center mb-6'>Verify Your Email</h2>
+				<p className='text-center text-gray-700 mb-6'>
+					Enter the 6-digit code sent to your email.
+				</p>
+
+				<form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+					<div className='flex justify-between gap-2'>
+						{code.map((digit, index) => (
+							<input
+								key={index}
+								ref={(el) => {inputRefs.current[index] = el!}}
+								type='text'
+								maxLength={1}
+								value={digit}
+								onChange={(e) => handleChange(index, e.target.value)}
+								onKeyDown={(e) => handleKeyDown(index, e)}
+								onPaste={handlePaste}
+								className='w-12 h-12 text-center text-2xl bg-gray-700 text-white rounded border border-gray-500 focus:outline-none focus:ring-2 '
+							/>
+						))}
+					</div>
+
+					{errors.otp && (
+						<p className='text-red-500 text-sm text-center'>{errors.otp.message}</p>
+					)}
+
+					<motion.button
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						type='submit'
+						disabled={isLoading || code.some((c) => c === "")}
+						className='w-full bg-primary text-white py-3 rounded shadow hover:scale-105 disabled:opacity-50'
+					>
+						{isLoading ? "Verifying..." : "Verify Email"}
+					</motion.button>
+				</form>
+			</motion.div>
+		</div>
+	);
+};
+
+export default EmailVerificationPage;
