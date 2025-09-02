@@ -7,26 +7,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { verifyEmailSchema, VerifyEmailData } from "@/interface";
 import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
+import { setUser } from "@/redux/slices/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 
 const EmailVerificationPage = () => {
 	const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
 	const inputRefs = useRef<HTMLInputElement[]>([]);
-	const [isLoading, setIsLoading] = useState(false);
+	const dispatch = useAppDispatch();
 	const router = useRouter();
 
 	const {
 		handleSubmit,
 		setValue,
-		setError,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<VerifyEmailData>({
 		resolver: zodResolver(verifyEmailSchema),
 	});
 
 	const onSubmit: SubmitHandler<VerifyEmailData> = async ({ otp }) => {
 		try {
-			setIsLoading(true);
 			const email = localStorage.getItem("verify_email");
 			if (!email) throw new Error("No email found in localStorage");
 
@@ -40,14 +40,11 @@ const EmailVerificationPage = () => {
 			if (!res.ok) throw new Error(json.message || "Verification failed");
 
 			localStorage.removeItem("verify_email");
+			toast.success('Email verified successfully!');
+			dispatch(setUser(json.user))
 			router.push("/");
 		} catch (error: any) {
-			setError("otp", {
-				type: "manual",
-				message: error.message || "Something went wrong",
-			});
-		} finally {
-			setIsLoading(false);
+			toast.error("Something went wrong");
 		}
 	};
 
@@ -102,7 +99,7 @@ const EmailVerificationPage = () => {
 						{code.map((digit, index) => (
 							<input
 								key={index}
-								ref={(el) => {inputRefs.current[index] = el!}}
+								ref={(el) => { inputRefs.current[index] = el! }}
 								type='text'
 								maxLength={1}
 								value={digit}
@@ -122,10 +119,10 @@ const EmailVerificationPage = () => {
 						whileHover={{ scale: 1.05 }}
 						whileTap={{ scale: 0.95 }}
 						type='submit'
-						disabled={isLoading || code.some((c) => c === "")}
+						disabled={isSubmitting || code.some((c) => c === "")}
 						className='w-full bg-primary text-white py-3 rounded shadow hover:scale-105 disabled:opacity-50'
 					>
-						{isLoading ? "Verifying..." : "Verify Email"}
+						Verify Email
 					</motion.button>
 				</form>
 			</motion.div>
