@@ -1,5 +1,5 @@
-import {sendMail } from './mailtrap.config';
-import { VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } from './mailtrapTemplate';
+import {sendMail } from './nodemailer.config';
+import { VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } from './nodemailerTemplate';
 
 export const sendverificationEmail = async (email:string, verificationCode:string) => {
     
