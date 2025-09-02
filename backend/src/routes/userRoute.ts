@@ -1,26 +1,21 @@
 import express from 'express';
-import { validateRegistration } from '../middleware/validate';
-import { handleEmailVerify, handleRegisterUser,handleLogin, handleForgotPassword, handleLogout, handleUpdateProfile ,handleprofile ,handleAllUsers ,handleResetPassword ,handleDeleteUser, handleRefreshToken} from '../controllers/userControllers';
+import * as authValidation from '../middleware/authValidation'
+import * as  authController from '../controllers/authControllers'
 import { isAdmin, isAuth } from '../middleware/isAuth';
 
 const router = express.Router();
 
-router.post('/auth/register', validateRegistration, handleRegisterUser);
-router.post('/auth/verify-email', handleEmailVerify);
-router.post('/auth/login', handleLogin)
-router.post('/auth/logout' , handleLogout)
+router.post('/auth/register', authValidation.register, authController.register);
+router.post('/auth/verify-email',authValidation.verifyEmail, authController.verifyEmail);
+router.post('/auth/login',authValidation.login, authController.login)
+router.post('/auth/logout' ,authValidation.logout, authController.logout)
 
-router.post('/auth/forgot-password', handleForgotPassword);
-router.put('/auth/reset-password/:token', handleResetPassword);
+router.post('/auth/forgot-password',authValidation.forgetPassword, authController.forgetPassword);
+router.put('/auth/reset-password/:token',authValidation.resetPassword,  authController.resetPassword);
 
-router.get('/profile', isAuth,handleprofile);
-router.put('/profile', isAuth, handleUpdateProfile);
 
-router.get('/users', isAuth,isAdmin, handleAllUsers);
-router.delete('/users/:id', isAuth, isAdmin, handleDeleteUser);
-
-router.post('/refresh-token', handleRefreshToken); // Assuming this is for refreshing tokens, you might want to implement a dedicated handler for it.
+router.post('/refresh-token', authController.refresh); 
 
 
 
-export default router;
+export {router as userRouter};

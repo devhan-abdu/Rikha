@@ -8,7 +8,8 @@ import {
   handleCategory,
   handleCategoryProducts,
   handleAddReview,
-  handleGetReviews
+  handleGetReviews,
+  handleSearch
 } from '../controllers/productsController';
 
 import { isAuth } from '../middleware/isAuth';
@@ -18,16 +19,19 @@ const router = express.Router();
 
 //  Collection Pages
 router.get('/categories', handleCategory);
-router.get('/categories/:slug/products', handleCategoryProducts);
+router.get('/categories/:slug', handleCategoryProducts);
 
-//  Product Info
-router.get('/products', handleAllProducts);
-router.get('/products/:slug', handleProductDetail);  
-router.get('/products/:slug/related', handleRelated);
+
 
 //  Homepage Highlights
 router.get('/products/featured', handleFeaturedProducts);
 router.get('/products/new-arrivals', handleNewArrivalsProducts);
+
+//  Product Info
+router.get('/products', handleAllProducts);
+router.get('/products/search' , handleSearch)
+router.get('/products/:slug', handleProductDetail);  
+router.get('/products/:slug/related', handleRelated);
 
 //  Reviews
 router.get('/products/:productId/reviews', handleGetReviews);
