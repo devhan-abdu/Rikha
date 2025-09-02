@@ -6,6 +6,7 @@ import {SubmitHandler, useForm} from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
 import {useRouter} from 'next/navigation'
 import { motion } from "framer-motion";
+import { toast } from 'react-toastify';
 
 
 const SignUp: FC = () => {
@@ -14,8 +15,7 @@ const SignUp: FC = () => {
   const {
     register,
     handleSubmit,
-    setError,
-    formState: {errors , isSubmitting },
+    formState: {errors},
   } = useForm<SignUpFormData>({
     resolver:zodResolver(signUpSchema)
   })
@@ -37,12 +37,11 @@ const SignUp: FC = () => {
       throw new Error(json.message || "Registration failed");
      }
       localStorage.setItem("verify_email" ,data.email)
+      toast.success('Sign up  successfully! pls verify your email');
+
       router.push('/verify-email')
     } catch(error: any) {
-      console.log("client side error")
-        setError("root", {
-        message:error.message || "Something went wrong",
-      });
+         toast.error("Something went wrong");
     }
   }
 
