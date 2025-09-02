@@ -31,7 +31,6 @@ const ForgetPassword = () => {
             if (!response.ok) {
                 throw new Error(json.message || "unable to send password reste email");
             }
-            localStorage.setItem("reset-email",data.email )
             toast.success("Password reset link sent! Please check your email");
 
         } catch (error: any) {
