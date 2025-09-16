@@ -67,16 +67,16 @@ const verifyEmail = async (email: string, otp: string) => {
 }
 const login = async (email: string, password: string) => {
     const user = await findUserByEmail(email);
-
     if (!user) throw new AppError('user not found', 404);
-    if (user.verified === false) throw new AppError('Please verify your email before logging in', 403);
-    /// problem what happen the user try to login  useing the email which is from the providerr
-    if (!user.password) {
-        throw new AppError('password is not exist', 400);
-    }
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) throw new AppError('password is incorrect', 400);
 
+    if (user.provider === "credentials") {
+        if (!user.password) throw new AppError("Password missing", 400);
+        if (user.verified === false) throw new AppError('Please verify your email before logging in', 403);
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) throw new AppError("Password incorrect", 400);
+    } else {
+        throw new AppError(`Please log in with ${user.provider}`, 400);
+    }
 
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
@@ -123,31 +123,30 @@ const googleCallback = async (code: string) => {
 
     const { email, name } = token_info_data;
 
-    let user = await prisma.user.findUnique({
-        where: { email }
+    const user = await prisma.user.upsert({
+        where: { email },
+        update: {
+            name,
+            verified: true,
+        },
+        create: {
+            name,
+            email,
+            verified: true,
+            provider: "google",
+        }
     })
-
-    if (!user) {
-        user = await prisma.user.create({
-            data: {
-                name,
-                email,
-                verified: true,
-            }
-        })
-    }
 
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
 
-    return {
-        user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-        },
-        tokens: { accessToken, refreshToken },
-    };
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken }
+    })
+
+    return { accessToken, refreshToken };
+
 }
 
 const logout = async (refreshToken: string) => {
