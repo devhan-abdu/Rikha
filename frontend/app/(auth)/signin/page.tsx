@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/authSlice';
+import GoogleButton from '@/components/ui/GoogleButton';
 
 
 
@@ -56,8 +57,8 @@ const SignIn = () => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className='space-y-8 max-w-[430px] mx-auto'>
-        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center'>Sign in to you account</h2>
+        className=' max-w-[430px] mx-auto'>
+        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center my-10'>Sign in to you account</h2>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-5 md:space-y-6 '>
           <input type="email"  {...register("email")} placeholder='your email*' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
           {errors.email && (
@@ -69,10 +70,11 @@ const SignIn = () => {
           )}
           <Link href='/forget-password' className="text-sm font-medium text-primary hover:underline block text-end leading-0">Forgot password ?</Link>
           <button className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel' disabled={isSubmitting}>Sign in</button>
-          <p className="text-md text-gray-900 ">
+        </form>
+        <GoogleButton/>
+         <p className="text-md text-gray-900 text-center my-8">
             Don’t have an account yet? <Link href="/signup" className="font-medium text-primary hover:underline ">Sign up</Link>
           </p>
-        </form>
       </motion.div>
     </div>
   )
