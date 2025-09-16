@@ -59,31 +59,22 @@ const googleAuthRedirect = catchAsync(async (req: Request, res: Response, next: 
 })
 
 const handleGoogleCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const code  = req.query.code as string || undefined;
+    const code = req.query.code as string || undefined;
     if (!code) {
         return res.status(400).json({ error: "Authorization code missing" });
     }
-    const { user, tokens } = await authServices.googleCallback(code);
+    const  { accessToken, refreshToken }  = await authServices.googleCallback(code);
 
-    // how you set cokie based on security u need it 
-    res.cookie('access', tokens.accessToken, {
+    // set cookie properly when u deploy
+    res.cookie('access', accessToken, {
         httpOnly: true,
         maxAge: 15 * 60 * 1000,
     });
-    res.cookie('refresh', tokens.refreshToken, {
+    res.cookie('refresh', refreshToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
     });
-
-    res.status(200).json({
-        success: true,
-        message: 'Login successful via Google',
-        user,
-    });
-
-    // Example in controller
-res.redirect(`${process.env.FRONTEND_URL}/`);
-return;
+    res.redirect(`${process.env.FRONTEND_URL}/`);
 
 })
 
@@ -217,7 +208,7 @@ const refresh = catchAsync(async (req: Request, res: Response, next: NextFunctio
 
 // }
 
-export { register, login, logout, verifyEmail, resetPassword, forgetPassword, refresh,googleAuthRedirect, handleGoogleCallback }
+export { register, login, logout, verifyEmail, resetPassword, forgetPassword, refresh, googleAuthRedirect, handleGoogleCallback }
 
 
 
