@@ -3,13 +3,6 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 
 
 export const validateReview: RequestHandler[] = [
-  body('userId')
-    .isInt({ min: 1 })
-    .withMessage('userId must be a positive integer'),
-  body('productId')
-    .isString()
-    .notEmpty()
-    .withMessage('productId is required'),
   body('rating')
     .isInt({ min: 1, max: 5 })
     .withMessage('rating must be an integer between 1 and 5'),

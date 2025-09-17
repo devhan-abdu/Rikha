@@ -1,14 +1,22 @@
 import express , { Application, Request, Response, NextFunction } from "express";
-import userRoute from "./routes/userRoute"
 import  dotenv from "dotenv"
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/errorhandler";
+import { cartRouter } from "./routes/cartRoute";
+import { productRouter } from "./routes/productRoute";
+import { userRouter } from "./routes/userRoute";
+import cors from 'cors'
 
 
 
 dotenv.config();
 const app:Application =express() 
-console.log()
+
+app.use(cors({
+    origin:'http://localhost:3000',
+    credentials:true
+}))
+
 
 // middleware
 app.use(express.json())
@@ -17,7 +25,9 @@ app.use(cookieParser());
 
 
 // Routes
-app.use('/api',userRoute)
+app.use('/api',userRouter)
+app.use('/api' ,cartRouter)
+app.use('/api' , productRouter)
 
 
 // Error handling middleware
