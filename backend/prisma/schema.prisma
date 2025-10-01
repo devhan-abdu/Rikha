@@ -32,6 +32,7 @@ model User {
   
   reviews        Review[]
   cartItems      CartItem[]
+  order          Order[]
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -73,6 +74,7 @@ model Product {
 
   reviews      Review[]
   cartItems    CartItem[]
+  OrderItem    OrderItem[]
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -106,4 +108,77 @@ model CartItem {
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, productId])
+}
+
+model Order {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int
+
+  items          OrderItem[]
+  shipping       ShippingAddress?
+  payment        PaymentInfo?
+
+  totalAmount    Float
+  status         OrderStatus  @default(PENDING)
+  orderDate      DateTime     @default(now())
+}
+
+model OrderItem {
+  id      Int     @id @default(autoincrement())
+  orderDate   Order     @relation(fields:[orderId], references: [id])
+  orderId   Int
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId   Int
+
+  quantity    Int
+  price     Float
+}
+
+model ShippingAddress {
+  id    Int @id @default(autoincrement())
+  order   Order   @relation(fields: [orderId], references: [id])
+  orderId   Int   @unique
+
+  
+  firstName   String
+  lastName    String
+  country     String
+  subcity     String
+  woreda      String
+  houseNumber String
+  phoneNumber String
+
+}
+
+model PaymentInfo {
+  id      Int @id @default(autoincrement())
+  order   Order     @relation(fields: [orderId], references: [id])
+  orderId     Int   @unique
+
+  method      PaymentMethod
+  status      PaymentStatus @default(PENDING)
+}
+
+
+enum PaymentMethod {
+  CASH
+  TELEBIRR
+  MPSA
+  CBEBIRR
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
 }
