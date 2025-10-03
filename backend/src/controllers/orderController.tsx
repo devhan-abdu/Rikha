@@ -1,26 +1,9 @@
 import { catchAsync } from "../utils/catchAsync"
 import { NextFunction, Response, Request } from "express"
-import prisma from "../config/prisma";
-import { randomBytes } from "crypto";
-import { OrderStatus, PaymentStatus } from "@prisma/client"
-import { OrderBodySchema, OrderItem } from "../types/type";
-import z from "zod";
+import { OrderBodySchema } from "../types/type";
 import * as orderService from "../services/orderService";
 
 
-// steps needed 
-// 1,  validation related to the data done in controller then the controller pass the correct value the service layer do  database related validation and then creat the order then (is call the payment intialize function (question is it controler or function) thne done the database logic and also 
-// 2,   then creating the order 
-// 3, payment integration the user get the url 
-/////////// this all in one endpoint 
-
-// 4, then call backa url
-//1 we need to check if the payment is valid then
-// 2, update the order and payment status
-// then send the order confirmation page (here is it mandatory to have the return url or not )
-
-
-// backend middleware 
 const orderController = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const validationResult = OrderBodySchema.safeParse(req.body);
@@ -40,7 +23,7 @@ const orderController = catchAsync(async (req: Request, res: Response, next: Nex
 
 })
 
-export const verifyTransaction = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+ const verifyTransaction = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { tx_ref } = req.body;
 
     if (!tx_ref) {
@@ -63,3 +46,5 @@ export const verifyTransaction = catchAsync(async (req: Request, res: Response, 
         });
     }
 })
+
+export { orderController, verifyTransaction}
