@@ -48,7 +48,7 @@ const createOrder = async (data: OrderBody) => {
     const tx_ref = `order-${randomBytes(4).toString("hex")}`;
 
     ///  is this need to be in try catch block  and also does it need to retur the order
-    await prisma.$transaction(async (tx) => {
+    const newOrder = await prisma.$transaction(async (tx) => {
 
         for (const item of items) {
             await tx.product.update({
@@ -81,12 +81,12 @@ const createOrder = async (data: OrderBody) => {
                 shipping: true,
             }
         });
-        // return order
+        return order
     }, {
         timeout: 1000,
     })
 
-    const paymentUrl = await createTransaction(tx_ref, serverTotalPrice)
+    const paymentUrl = await createTransaction(tx_ref, serverTotalPrice, newOrder.id)
     return paymentUrl;
 }
 
@@ -102,10 +102,11 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: b
     const result = await verifyRes.json();
     const paymentStatus = result.status;
 
+    const internalOrderId = result.data.customization.order_id;
+
     if (paymentStatus === "success") {
-        // --- PAYMENT SUCCESS LOGIC ---
         const order = await prisma.order.update({
-            where: { tx_ref },
+            where: { id: internalOrderId },
             data: {
                 paymentStatus: PaymentStatus.COMPLETED,
                 orderStatus: OrderStatus.PROCESSING
@@ -120,7 +121,7 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: b
 
                 // is it the correct way to get order items 
                 const orderWithItems = await prisma.order.findUnique({
-                    where: { tx_ref },
+                    where: { id: internalOrderId },
                     select: {
                         id: true, items: true
                     }
