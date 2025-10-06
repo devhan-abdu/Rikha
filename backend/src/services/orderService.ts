@@ -8,12 +8,10 @@ import { createTransaction } from "../utils/createTransaction";
 const createOrder = async (data: OrderBody) => {
     const { items, shippingAddressData, totalAmount, userId, paymentMethod } = data;
 
-    // q is this validation need to done here 
     const user = await prisma.user.findUnique({
         where: { id: userId }
     })
     if (!user) throw new AppError('User not found', 404);
-
     const productId = items.map(item => item.productId);
     const products = await prisma.product.findMany({
         where: {
@@ -36,18 +34,15 @@ const createOrder = async (data: OrderBody) => {
         orderItemsForCreation.push({
             productId: item.productId,
             quantity: item.quantity,
-            price: finalPrice,
         });
     }
     if (Math.abs(serverTotalPrice - totalAmount) > 0.01) {
-        throw new AppError("Price mismatch - possible tampering");
+        throw new AppError(`Total amount mismatch - possible tampering${serverTotalPrice}`);
     }
 
 
-    /// creating the order 
     const tx_ref = `order-${randomBytes(4).toString("hex")}`;
 
-    ///  is this need to be in try catch block  and also does it need to retur the order
     const newOrder = await prisma.$transaction(async (tx) => {
 
         for (const item of items) {
@@ -57,6 +52,15 @@ const createOrder = async (data: OrderBody) => {
             })
         }
 
+        if (shippingAddressData.isDefault) {
+            await tx.userAddress.create({
+                data: {
+                    userId: userId,
+                    ...shippingAddressData
+                }
+            });
+        }
+        const { isDefault, ...shipping } = shippingAddressData
         const order = await tx.order.create({
             data: {
                 userId: userId,
@@ -66,7 +70,7 @@ const createOrder = async (data: OrderBody) => {
                 orderStatus: OrderStatus.PENDING,
                 paymentStatus: PaymentStatus.PENDING,
                 shipping: {
-                    create: shippingAddressData
+                    create: shipping
                 },
 
                 items: {
@@ -91,9 +95,9 @@ const createOrder = async (data: OrderBody) => {
 }
 
 
-const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: boolean; order: any }> => {
+const verifyPaymentAndHandleOrder = async (id: string): Promise<{ success: boolean; order: any }> => {
 
-    const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${tx_ref}`, {
+    const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${id}`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${process.env.CHAPA_SECRET_KEY}`,
@@ -101,12 +105,12 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: b
     });
     const result = await verifyRes.json();
     const paymentStatus = result.status;
+    console.log(id, "the id already ")
 
-    const internalOrderId = result.data.customization.order_id;
 
     if (paymentStatus === "success") {
         const order = await prisma.order.update({
-            where: { id: internalOrderId },
+            where: { tx_ref: id },
             data: {
                 paymentStatus: PaymentStatus.COMPLETED,
                 orderStatus: OrderStatus.PROCESSING
@@ -119,9 +123,8 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: b
         try {
             const rollbackResult = await prisma.$transaction(async (tx) => {
 
-                // is it the correct way to get order items 
                 const orderWithItems = await prisma.order.findUnique({
-                    where: { id: internalOrderId },
+                    where: { tx_ref: id },
                     select: {
                         id: true, items: true
                     }
@@ -138,7 +141,7 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string): Promise<{ success: b
                 }
 
                 const updatedOrder = await tx.order.update({
-                    where: { tx_ref },
+                    where: { tx_ref: id },
                     data: {
                         paymentStatus: PaymentStatus.FAILED,
                         orderStatus: OrderStatus.PENDING,
