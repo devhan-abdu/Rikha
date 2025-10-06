@@ -24,13 +24,13 @@ const orderController = catchAsync(async (req: Request, res: Response, next: Nex
 })
 
  const verifyTransaction = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { tx_ref } = req.body;
+    const id = req.params.id
 
-    if (!tx_ref) {
+    if (!id) {
         return res.status(400).json({ success: false, message: "Transaction reference is required." });
     }
 
-    const { success, order } = await orderService.verifyPaymentAndHandleOrder(tx_ref);
+    const { success, order } = await orderService.verifyPaymentAndHandleOrder(id);
 
     if (success === true) {
         res.status(200).json({
