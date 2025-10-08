@@ -1,12 +1,15 @@
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 import prisma from "../config/prisma";
-import { OrderBody, OrderItem } from "../types/type";
+import { ExtendedOrderBody, OrderBody, OrderItem } from "../types/type";
 import { AppError } from "../utils/AppError";
-import { randomBytes } from 'crypto'
+import { randomUUID } from 'crypto'
 import { createTransaction } from "../utils/createTransaction";
 
-const createOrder = async (data: OrderBody) => {
-    const { items, shippingAddressData, totalAmount, userId, paymentMethod } = data;
+type Props = {
+
+}
+const createOrder = async (data: ExtendedOrderBody) => {
+    const { userId, items, shippingAddressData, paymentMethod } = data;
 
     const user = await prisma.user.findUnique({
         where: { id: userId }
@@ -36,22 +39,23 @@ const createOrder = async (data: OrderBody) => {
             quantity: item.quantity,
         });
     }
-    if (Math.abs(serverTotalPrice - totalAmount) > 0.01) {
-        throw new AppError(`Total amount mismatch - possible tampering${serverTotalPrice}`);
-    }
 
-
-    const tx_ref = `order-${randomBytes(4).toString("hex")}`;
+    const tx_ref = `order-${randomUUID()}`;
 
     const newOrder = await prisma.$transaction(async (tx) => {
 
         for (const item of items) {
-            await tx.product.update({
-                where: { id: item.productId },
+            const updatedProduct = await tx.product.update({
+                where: { id: item.productId, stock: { gte: item.quantity } },
                 data: { stock: { decrement: item.quantity } }
             })
+
+            if (!updatedProduct) {
+                throw new AppError(`Insufficient stock for product ID ${item.productId}. Transaction aborted.`, 400);
+            }
         }
 
+        ///this case how to handle new address and also what happen when isDefault is true for more than one record
         if (shippingAddressData.isDefault) {
             await tx.userAddress.create({
                 data: {
@@ -87,7 +91,7 @@ const createOrder = async (data: OrderBody) => {
         });
         return order
     }, {
-        timeout: 1000,
+        timeout: 5000,
     })
 
     const paymentUrl = await createTransaction(tx_ref, serverTotalPrice, newOrder.id)
@@ -160,4 +164,41 @@ const verifyPaymentAndHandleOrder = async (id: string): Promise<{ success: boole
     }
 }
 
-export { createOrder, verifyPaymentAndHandleOrder }
+
+const orderStatus = async (txRef: string, userId: number): Promise<{ success: boolean; order: any }> => {
+    const order = await prisma.order.findUnique({
+        where: {
+            tx_ref: txRef,
+            userId: userId,
+        },
+        select: {
+            id: true,
+            userId: true,
+            orderStatus: true,
+            paymentStatus: true
+        }
+    })
+
+    if (order) {
+        return { success: true, order }
+    } else {
+        return { success: false, order: null }
+    }
+}
+
+const getOrdersByUserId = async (userId: number) => {
+    const orders = await prisma.order.findMany({
+        where: { userId },
+        include: {
+            items: true
+        },
+        orderBy: {
+            orderDate: 'desc'
+        }
+    })
+
+    return orders;
+}
+
+
+export { createOrder, verifyPaymentAndHandleOrder, orderStatus, getOrdersByUserId }
