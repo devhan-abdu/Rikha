@@ -34,29 +34,7 @@ const ProductCard = ({ product }: { product: any }) => {
             />
         </Link>
 
-      <div className=" pt-2 flex flex-col justify-between h-full">
-        <div className="flex items-end justify-end gap-1">
-          <button
-            type="button"
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            <svg
-              className="h-5 w-5"
-              aria-hidden="true"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 6C6.5 1 1 8 5.8 13l6.2 7 6.2-7C23 8 17.5 1 12 6Z"
-              />
-            </svg>
-          </button>
-        </div>
-
+      <div className=" pt-2 mt-2 flex flex-col justify-between h-full">
         <Link
           href={`/product/${product.slug}`}
           className="text-md font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
