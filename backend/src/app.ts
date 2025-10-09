@@ -6,6 +6,7 @@ import { cartRouter } from "./routes/cartRoute";
 import { productRouter } from "./routes/productRoute";
 import { userRouter } from "./routes/userRoute";
 import cors from 'cors'
+import { orderRouter } from "./routes/orderRoute";
 
 
 
@@ -17,7 +18,6 @@ app.use(cors({
     credentials:true
 }))
 
-
 // middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -28,6 +28,8 @@ app.use(cookieParser());
 app.use('/api',userRouter)
 app.use('/api' ,cartRouter)
 app.use('/api' , productRouter)
+app.use('/api', orderRouter)
+
 
 
 // Error handling middleware
