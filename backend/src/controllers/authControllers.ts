@@ -27,14 +27,8 @@ const verifyEmail = catchAsync(async (req: Request, res: Response, next: NextFun
     const { email, otp } = req.body;
     const { user, tokens } = await authServices.verifyEmail(email, otp);
 
-    res.cookie('access', tokens.accessToken, {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000,
-    });
-    res.cookie('refresh', tokens.refreshToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie('access', tokens.accessToken, getCookieOptions(true));
+    res.cookie('refresh', tokens.refreshToken, getCookieOptions(false));
 
     res.status(200).json({
         success: true,
@@ -63,23 +57,13 @@ const handleGoogleCallback = catchAsync(async (req: Request, res: Response, next
     if (!code) {
         return res.status(400).json({ error: "Authorization code missing" });
     }
-    const  { accessToken, refreshToken }  = await authServices.googleCallback(code);
+    const { accessToken, refreshToken } = await authServices.googleCallback(code);
 
-    // set cookie properly when u deploy
-    res.cookie('access', accessToken, {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000,
-    });
-    res.cookie('refresh', refreshToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie('access', accessToken, getCookieOptions(true));
+    res.cookie('refresh', refreshToken, getCookieOptions(false));
     res.redirect(`${process.env.FRONTEND_URL}/`);
 
 })
-
-
-
 
 
 const login = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -87,9 +71,9 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 
     const { user, tokens } = await authServices.login(email, password);
 
-    res.cookie('access', tokens.accessToken, getCookieOptions())
-    res.cookie('refresh', tokens.refreshToken, getCookieOptions())
-
+    res.cookie('access', tokens.accessToken, getCookieOptions(true))
+    res.cookie('refresh', tokens.refreshToken, getCookieOptions(false))
+    console.log(res.getHeaders()['set-cookie']);
     res.status(200).json({
         success: true,
         message: 'Login successful',
@@ -100,8 +84,8 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    res.clearCookie('refresh', getCookieOptions());
-    res.clearCookie('access', getCookieOptions());
+    res.clearCookie('refresh', getCookieOptions(true));
+    res.clearCookie('access', getCookieOptions(false));
 
     await authServices.logout(req.cookies.refresh)
 
@@ -136,8 +120,8 @@ const refresh = catchAsync(async (req: Request, res: Response, next: NextFunctio
 
     const tokens = await authServices.refresh(req.cookies?.refresh);
 
-    res.cookie('access', tokens.accessToken, getCookieOptions())
-    res.cookie('refresh', tokens.refreshToken, getCookieOptions())
+    res.cookie('access', tokens.accessToken, getCookieOptions(true))
+    res.cookie('refresh', tokens.refreshToken, getCookieOptions(false))
 
     res.status(200).json({
         success: true,
@@ -168,7 +152,7 @@ const refresh = catchAsync(async (req: Request, res: Response, next: NextFunctio
 //             res.status(400).json({ success: false, message: 'At least one field (name or email) is required' });
 //             return;
 //         }
-//         // if(!req?.user){   not needed middleware already handled it  💪
+//         // if(!req?.user){   💪
 //         //     res.status(401).json({ success: false, message: 'user not found' });
 //         //     return;
 //         // }
