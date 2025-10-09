@@ -18,6 +18,7 @@ model User {
   email          String    @unique
   password       String?   
   provider       String    @default("credentials")  
+  addresses      UserAddress[]
 
   
   role           Role      @default(USER)
@@ -61,7 +62,7 @@ model Product {
   longDesc     String
   brand        String
   slug         String   @unique
-  stock        Int
+  stock        Int      @default(1)
   isFeatured   Boolean  @default(false)
   isNewArrival Boolean  @default(false)
   isHot        Boolean  @default(false)
@@ -114,28 +115,48 @@ model Order {
   id             Int          @id @default(autoincrement())
   user           User         @relation(fields: [userId], references: [id])
   userId         Int
+  tx_ref         String     @unique
 
   items          OrderItem[]
   shipping       ShippingAddress?
-  payment        PaymentInfo?
+  paymentMethod  PaymentMethod
 
   totalAmount    Float
-  status         OrderStatus  @default(PENDING)
+  orderStatus    OrderStatus  @default(PENDING)
+  paymentStatus  PaymentStatus
   orderDate      DateTime     @default(now())
 }
 
 model OrderItem {
   id      Int     @id @default(autoincrement())
-  orderDate   Order     @relation(fields:[orderId], references: [id])
+  order   Order     @relation(fields:[orderId], references: [id])
   orderId   Int
 
   product   Product @relation(fields: [productId], references: [id])
   productId   Int
 
   quantity    Int
-  price     Float
 }
 
+model UserAddress {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  
+  firstName   String
+  lastName    String
+  country     String
+  subcity     String
+  woreda      String
+  houseNumber String
+  phoneNumber String
+  
+  isDefault   Boolean   @default(false)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+}
 model ShippingAddress {
   id    Int @id @default(autoincrement())
   order   Order   @relation(fields: [orderId], references: [id])
@@ -151,16 +172,6 @@ model ShippingAddress {
   phoneNumber String
 
 }
-
-model PaymentInfo {
-  id      Int @id @default(autoincrement())
-  order   Order     @relation(fields: [orderId], references: [id])
-  orderId     Int   @unique
-
-  method      PaymentMethod
-  status      PaymentStatus @default(PENDING)
-}
-
 
 enum PaymentMethod {
   CASH
