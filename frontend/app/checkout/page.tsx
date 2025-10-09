@@ -1,21 +1,21 @@
 "use client"
-import Common from '@/components/Common'
-import { createTransaction, fetchFeaturedProducts } from '@/lib/featchers'
 import { useAppSelector } from '@/redux/hooks'
 import { selectCartItems, selectTotalPrice, selectTotalQnt } from '@/redux/slices/cartSlice'
-import { ArrowDown, ArrowLeft, ArrowUp, Check, ChevronDown, ChevronLeft, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronUp } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { Cart, CheckoutSchema, CheckoutData, signUpSchema } from '@/interface'
+import { ShippingSchema, ShippingData } from '@/interface'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-// import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { selectUser } from '@/redux/slices/authSlice'
+import { toast } from 'react-toastify'
+
 
 const OrderSummery = () => {
   const totalPrice = useAppSelector(selectTotalPrice)
@@ -80,33 +80,51 @@ const OrderSummery = () => {
 const page = () => {
   const cartItems = useAppSelector(selectCartItems)
   const totalPrice = useAppSelector(selectTotalPrice)
-  const totalQuantity = useAppSelector(selectTotalQnt)
   const router = useRouter();
-  const [defaultValue, setDefaultValue] = useState(true);
   const [show, setShow] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState("cash");
-  const h = 120
-  const create = async () => {
-    const url = await createTransaction("hanabdu@gmail.com", 2000)
-    router.push(url)
-  }
+
 
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<CheckoutData>({
-    resolver: zodResolver(CheckoutSchema),
-    defaultValues: { country: "Ethiopia", payment: "cash" },
-
+  } = useForm<ShippingData>({
+    resolver: zodResolver(ShippingSchema),
+    defaultValues: { country: "Ethiopia", paymentMethod: "CASH" },
   })
 
-  const onSubmit: SubmitHandler<CheckoutData> = async (data: CheckoutData) => {
+  
+   if(cartItems.length === 0 ) {
+      return (
+        <div>
+          no cart item
+        </div>
+      )
+   }
+  const onSubmit: SubmitHandler<ShippingData> = async (data: ShippingData) => {
     try {
+      const orderItems = cartItems.map(({ productId, quantity }) => ({ productId, quantity }));
+      const { paymentMethod, ...shippingAddressData } = data
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: orderItems, shippingAddressData, paymentMethod }),
+        credentials: 'include'
+      })
+
+      if (!res.ok) {
+        toast.error("Something went wrong  unable to make order");
+        return;
+      }
+      const result = await res.json();
+      if (result.success)
+        router.push(result.url)
 
     } catch (error) {
-
+      toast.error("Something went wrong unable to make the order");
     }
   }
   const subcityOptions = [
@@ -122,18 +140,18 @@ const page = () => {
     "Yeka",
     "Lemi Kura"
   ]
-  const inputClass = "w-full block border border-black/20 shadow-md rounded-sm py-2.5 px-2 text-base text-black placeholder:text-black/60 focus:outline-none sm:text-sm/6";
+  const inputClass = "w-full block border border-black/20 shadow-md rounded-sm py-3 px-2 text-base text-black placeholder:text-black/60 focus:outline-none sm:text-sm/6";
   const selectTriggerClass = "w-full border border-black/20 shadow-md rounded-sm py-6 px-2 pr-3 pl-1 text-base focus:outline-none sm:text-sm/6";
   const errorClass = "text-sm text-red-500 mt-1";
 
-  type FieldName = keyof CheckoutData;
+  type FieldName = keyof ShippingData;
   const ErrorMessage = ({ field }: { field: FieldName }) =>
     errors[field] ? <p className={errorClass}>{(errors[field]?.message as string) || ''}</p> : null;
 
   return (
     <div className='md:px-6 '>
-      <div className='flex flex-col md:flex-row justify-between gap-4 '>
-        <div className='bg-[#fafafa] md:hidden px-4 md:px-6 w-full md:w-full'>
+      <div className='flex flex-col md:flex-row justify-center gap-4 '>
+        <div className='bg-[#fafafa] md:hidden px-4 md:px-6 w-full '>
           <button className='flex items-center gap-2 w-full outline-none focus:outline-1  rounded-md py-4 px-2 md:px-4 border border-black/10 shadow-sm' onClick={() => setShow(!show)}>
             <span className='text-lg'>
               Order summery
@@ -166,24 +184,24 @@ const page = () => {
             <h3 className="font-cinzel text-2xl font-semibold">Shipping Address</h3>
 
             {/* Country */}
-              <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="country" className="text-sm text-black/40">First Name</label>
-                <input
-                  type="text"
-                  id="country"
-                  {...register("country")}
-                  placeholder="First name"
-                  className={inputClass}
-                  value={"Ethiopia"}
-                  disabled
-                />
-                <ErrorMessage field="country" />
-              </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <label htmlFor="country" className="text-sm text-black">First Name</label>
+              <input
+                type="text"
+                id="country"
+                {...register("country")}
+                placeholder="First name"
+                className={inputClass}
+                value={"Ethiopia"}
+                disabled
+              />
+              <ErrorMessage field="country" />
+            </div>
 
             {/* First & Last Name */}
             <div className="flex items-center gap-4 justify-between">
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="firstName" className="text-sm text-black/40">First Name</label>
+                <label htmlFor="firstName" className="text-sm text-black">First Name</label>
                 <input
                   type="text"
                   id="firstName"
@@ -194,7 +212,7 @@ const page = () => {
                 <ErrorMessage field="firstName" />
               </div>
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="lastName" className="text-sm text-black/40">Last Name</label>
+                <label htmlFor="lastName" className="text-sm text-black">Last Name</label>
                 <input
                   type="text"
                   id="lastName"
@@ -208,7 +226,7 @@ const page = () => {
 
             {/* Sub City */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="subcity" className="text-sm text-black/40">
+              <label htmlFor="subcity" className="text-sm text-black">
                 Sub City
               </label>
               <Controller
@@ -237,7 +255,7 @@ const page = () => {
             {/* Woreda & House Number */}
             <div className="flex items-center gap-4 justify-between">
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="woreda" className="text-sm text-black/40">Woreda</label>
+                <label htmlFor="woreda" className="text-sm text-black">Woreda</label>
                 <input
                   type="text"
                   id="woreda"
@@ -248,9 +266,9 @@ const page = () => {
                 <ErrorMessage field="woreda" />
               </div>
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="houseNumber" className="text-sm text-black/40">House Number / Postal Code</label>
+                <label htmlFor="houseNumber" className="text-sm text-black">House Number </label>
                 <input
-                  type="text" // Changed to text for flexibility (e.g., leading zeros)
+                  type="text" 
                   id="houseNumber"
                   {...register("houseNumber")}
                   placeholder="e.g., 1000"
@@ -262,7 +280,7 @@ const page = () => {
 
             {/* Phone Number */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="phoneNumber" className="text-sm text-black/40">Phone Number</label>
+              <label htmlFor="phoneNumber" className="text-sm text-black">Phone Number</label>
               <input
                 type="tel" // Better semantic for phone
                 id="phoneNumber"
@@ -276,7 +294,7 @@ const page = () => {
             {/* Set as Default */}
             <div className="flex items-center gap-2">
               <input type='checkbox' id="setAsDefault" {...register("setAsDefault")} />
-              <label htmlFor="setAsDefault" className="text-sm text-black/40">
+              <label htmlFor="setAsDefault" className="text-sm text-black">
                 Set as default address
               </label>
             </div>
@@ -285,59 +303,70 @@ const page = () => {
           {/* Payment Method Section */}
           <div className="space-y-4">
             <h3 className="font-cinzel text-2xl font-semibold">Payment Method</h3>
-            <RadioGroup value={selectedPayment} onValueChange={setSelectedPayment} className="space-y-3">
-              {/* Cash on Delivery */}
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cash" id="cash" {...register("payment")} />
-                <label htmlFor="cash" className="text-sm text-black/40">Cash on Delivery</label>
-              </div>
+            <Controller
+              name='paymentMethod'
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className='space-y-3'
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="CASH" id="cash" />
+                    <label htmlFor="cash">Cash on Delivery</label>
+                  </div>
 
-              {/* Digital Payments */}
-              <div className="flex items-center gap-3">
-                {/* Telebirr */}
-                <div className="relative">
-                  <RadioGroupItem value="telebirr" id="telebirr" className="sr-only" {...register("payment")} />
-                  <label
-                    htmlFor="telebirr"
-                    className={
-                      `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black/40 ` +
-                      (selectedPayment === "telebirr" ? "border-primary " : "border-gray-200")
-                    }
-                  >
-                    <Image alt="Telebirr" src="/images/Telebirr.png" width={40} height={40} />
-                  </label>
-                </div>
+                  <div className="flex items-center gap-3">
+                    {/* Telebirr */}
+                    <div className="relative">
+                      <RadioGroupItem value="telebirr" id="telebirr" className="sr-only" {...register("paymentMethod")} />
+                      <label
+                        htmlFor="telebirr"
+                        className={
+                          `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black ` +
+                          (selectedPayment === "telebirr" ? "border-primary " : "border-gray-200")
+                        }
+                      >
+                        <Image alt="Telebirr" src="/images/Telebirr.png" width={40} height={40} />
+                      </label>
+                    </div>
 
-                {/* Mpsa */}
-                <div className="relative">
-                  <RadioGroupItem value="mpsa" id="mpsa" className="sr-only" {...register("payment")} />
-                  <label
-                    htmlFor="mpsa"
-                    className={
-                      `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black/40 ` +
-                      (selectedPayment === "mpsa" ? "border-primary bg-primary/5" : "border-gray-200")
-                    }
-                  >
-                    <Image alt="Mpsa" src="/images/Mpsa.png" width={40} height={40} />
-                  </label>
-                </div>
+                    {/* Mpsa */}
+                    <div className="relative">
+                      <RadioGroupItem value="mpsa" id="mpsa" className="sr-only" {...register("paymentMethod")} />
+                      <label
+                        htmlFor="mpsa"
+                        className={
+                          `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black ` +
+                          (selectedPayment === "mpsa" ? "border-primary bg-primary/5" : "border-gray-200")
+                        }
+                      >
+                        <Image alt="Mpsa" src="/images/Mpsa.png" width={40} height={40} />
+                      </label>
+                    </div>
 
-                {/* CBEbirr */}
-                <div className="relative">
-                  <RadioGroupItem value="cbebirr" id="cbebirr" className="sr-only" {...register("payment")} />
-                  <label
-                    htmlFor="cbebirr"
-                    className={
-                      `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black/40 ` +
-                      (selectedPayment === "cbebirr" ? "border-primary bg-primary/5" : "border-gray-200")
-                    }
-                  >
-                    <Image alt="CBEbirr" src="/images/cbebirr.png" width={40} height={40} />
-                  </label>
-                </div>
-              </div>
-            </RadioGroup>
-            <ErrorMessage field="payment" />
+                    {/* CBEbirr */}
+                    <div className="relative">
+                      <RadioGroupItem value="cbebirr" id="cbebirr" className="sr-only" {...register("paymentMethod")} />
+                      <label
+                        htmlFor="cbebirr"
+                        className={
+                          `relative flex h-12 w-12 cursor-pointer items-center justify-center rounded border bg-white hover:scale-105 hover:border-gray-300 p-1 text-sm text-black ` +
+                          (selectedPayment === "cbebirr" ? "border-primary bg-primary/5" : "border-gray-200")
+                        }
+                      >
+                        <Image alt="CBEbirr" src="/images/cbebirr.png" width={40} height={40} />
+                      </label>
+                    </div>
+                  </div>
+
+                </RadioGroup>
+              )}
+            >
+
+            </Controller>
+            <ErrorMessage field="paymentMethod" />
           </div>
 
           {/* Actions */}

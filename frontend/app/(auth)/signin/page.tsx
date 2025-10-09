@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { SignInFormData, signInSchema } from '@/interface';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/authSlice';
 import GoogleButton from '@/components/ui/GoogleButton';
@@ -16,11 +16,12 @@ import GoogleButton from '@/components/ui/GoogleButton';
 const SignIn = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
-    formState: { errors  , isSubmitting}
+    formState: { errors, isSubmitting }
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema)
   })
@@ -40,10 +41,13 @@ const SignIn = () => {
       if (!response.ok) {
         throw new Error(json.message || "Login failed")
       }
+      console.log(json, "sign in json ")
 
       toast.success("Login Successfully!");
       dispatch(setUser(json.user));
+      const redirectTo = searchParams.get('redirect') || '/';
       router.push('/')
+
 
     } catch (error: any) {
       toast.error("Something went wrong");
@@ -65,16 +69,16 @@ const SignIn = () => {
             <p className='text-red-500 text-sm text-center'>{errors.email.message}</p>
           )}
           <input type="password"  {...register("password")} placeholder='password' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-           {errors.password && (
+          {errors.password && (
             <p className='text-red-500 text-sm text-center'>{errors.password.message}</p>
           )}
           <Link href='/forget-password' className="text-sm font-medium text-primary hover:underline block text-end leading-0">Forgot password ?</Link>
           <button className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel' disabled={isSubmitting}>Sign in</button>
         </form>
-        <GoogleButton/>
-         <p className="text-md text-gray-900 text-center my-8">
-            Don’t have an account yet? <Link href="/signup" className="font-medium text-primary hover:underline ">Sign up</Link>
-          </p>
+        <GoogleButton />
+        <p className="text-md text-gray-900 text-center my-8">
+          Don’t have an account yet? <Link href="/signup" className="font-medium text-primary hover:underline ">Sign up</Link>
+        </p>
       </motion.div>
     </div>
   )

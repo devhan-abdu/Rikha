@@ -18,7 +18,7 @@ export default async function Home() {
             <h1 className="font-cinzel text-3xl  lg:text-4xl   font-semibold text-black/80 capitalize leading-8 lg:leading-12"> Professional tone that inspires <span className="text-primary">confidence</span></h1>
             <p className="text-xl">Explore iPhones, AirPods, iPads, Macs, and more premium devices for work, play, and everything in between </p>
             <div className="flex items-center gap-6 mt-3">
-              <Link href='/category' className="font-cinzel bg-primary text-white px-3 py-2  rounded-sm text-lg  capitalize font-extrabold  ">Shop Now</Link>
+              <Link href='/category' className="font-cinzel bg-primary text-white px-3 py-2  rounded-sm text-lg  capitalize font-extrabold z-10 ">Shop Now</Link>
               <Link href='#category-section' className="font-cinzel text-primary border-2 border-primary px-3 py-1.5  rounded-sm text-lg  capitalize font-extrabold z-10">Explore More</Link>
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function RootLayout({
         className={`${inter.variable} ${cinzel.variable} antialiased dark:bg-forground flex min-h-screen flex-col`}
       >
         <StoreProvider>
-        <ToastContainer position="top-right" />
+        <ToastContainer position="bottom-right" theme="dark"/>
         <Header/>
         {children}
         </StoreProvider>
