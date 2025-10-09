@@ -11,19 +11,20 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
             body: JSON.stringify({
                 amount,
                 currency: "ETB",
+                orderId: orderId,
                 tx_ref,
-                "callback_url": "http://localhost:5000/api/verify-transaction",
-                "return_url": "http://localhost:3000/payment-success",
+                "callback_url": `http://localhost:5000/api/verify-payment/${tx_ref}`,
+                "return_url": `http://localhost:3000/order-status?tx_ref=${tx_ref}`,
                 customization: {
                     title: "Rikha",
                     description: `Payment for ${tx_ref}`,
-                    order_id: orderId,
                 },
             })
         });
 
         if (!response.ok) {
-            throw new AppError(`Payment gateway failed to initialize transaction. Status: ${response.status}`);
+            const errorBody = await response.text();
+            throw new AppError(`Payment gateway failed to initialize transaction. Status: ${response.status}. Body: ${errorBody}`);
         }
 
         const data = await response.json();
@@ -37,7 +38,7 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
 
         return data.data.checkout_url
 
-    } catch (error) {
-        throw new AppError("An unexpected error occurred during payment initialization.");
+    } catch (error: any) {
+        throw new AppError(`An unexpected error occurred during payment initialization.${error}`);
     }
 }
