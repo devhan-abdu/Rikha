@@ -5,9 +5,6 @@ import { AppError } from "../utils/AppError";
 import { randomUUID } from 'crypto'
 import { createTransaction } from "../utils/createTransaction";
 
-type Props = {
-
-}
 const createOrder = async (data: ExtendedOrderBody) => {
     const { userId, items, shippingAddressData, paymentMethod } = data;
 
