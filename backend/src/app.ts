@@ -7,6 +7,7 @@ import { productRouter } from "./routes/productRoute";
 import { userRouter } from "./routes/userRoute";
 import cors from 'cors'
 import { orderRouter } from "./routes/orderRoute";
+import { addressRouter } from "./routes/addressRoute";
 
 
 
@@ -29,6 +30,8 @@ app.use('/api',userRouter)
 app.use('/api' ,cartRouter)
 app.use('/api' , productRouter)
 app.use('/api', orderRouter)
+app.use('/api', addressRouter)
+
 
 
 
