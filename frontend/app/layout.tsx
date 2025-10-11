@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { StoreProvider } from '@/redux/storeProvider'
 import { ToastContainer } from 'react-toastify';
+import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
 
 
 const inter = Inter({ subsets: ['latin'],variable:'--font-inter' });
@@ -28,16 +29,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" >
+    <html lang="en">
       <body
-        className={`${inter.variable} ${cinzel.variable} antialiased dark:bg-forground flex min-h-screen flex-col`}
+        className="antialiased dark:bg-foreground flex min-h-screen flex-col font-cinzel"
       >
         <StoreProvider>
-        <ToastContainer position="bottom-right" theme="dark"/>
-        <Header/>
-        {children}
+          <ReactQueryProvider>
+            <ToastContainer position="bottom-right" theme="dark" />
+            <Header />
+            {children}
+          </ReactQueryProvider>
+          <Footer />
         </StoreProvider>
-        <Footer/>
       </body>
     </html>
   );
