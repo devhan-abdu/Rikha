@@ -126,15 +126,16 @@ export const ResetPasswordSchema = z.object({
 });
 
 export const ShippingSchema = z.object({
+  id:z.number().optional(),
   country: z.string().min(1, "Country is required"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  name: z.string().min(1, "First name is required"),
+  city: z.string().min(1, "city is required"),
   subcity: z.string().min(1, "Sub city is required"),
   woreda: z.string().min(1, "Woreda is required"),
   houseNumber: z.string().min(1, "House number/postal code is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
-  setAsDefault: z.boolean().optional(),
-  paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"], { message: "Payment method is required" }),
+  isDefault: z.boolean().optional(),
+  // paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"], { message: "Payment method is required" }),
 });
 
 
