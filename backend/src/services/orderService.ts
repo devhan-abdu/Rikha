@@ -6,62 +6,60 @@ import { randomUUID } from 'crypto'
 import { createTransaction } from "../utils/createTransaction";
 
 const createOrder = async (data: ExtendedOrderBody) => {
-    const { userId, items, shippingAddressData, paymentMethod } = data;
+    const { userId, items, paymentMethod, addressId } = data;
 
     const user = await prisma.user.findUnique({
         where: { id: userId }
     })
     if (!user) throw new AppError('User not found', 404);
-    const productId = items.map(item => item.productId);
-    const products = await prisma.product.findMany({
-        where: {
-            id: { in: productId }
-        }
-    });
-    const productsMap = new Map(products.map(p => [p.id, p]))
-    let serverTotalPrice = 0;
-    const orderItemsForCreation: OrderItem[] = [];
 
-    for (const item of items) {
-        const product = productsMap.get(item.productId);
+    const userAddress = await prisma.userAddress.findUnique({
+        where: { id: addressId }
+    })
+    if (!userAddress) throw new AppError('Address not found', 404);
 
-        if (!product) throw new AppError(`Product with ID ${item.productId} not found.`);
-        if (product.stock < item.quantity) throw new AppError(`Insufficient stock for product ${product.title}.`);
-
-        const finalPrice = product.discount ? product.price * (1 - product.discount) : product.price;
-        serverTotalPrice += finalPrice * item.quantity;
-
-        orderItemsForCreation.push({
-            productId: item.productId,
-            quantity: item.quantity,
-        });
-    }
+    const shippingData = {
+        name: userAddress.name,
+        country: userAddress.country,
+        city: userAddress.city,
+        subcity: userAddress.subcity,
+        woreda: userAddress.woreda,
+        houseNumber: userAddress.houseNumber,
+        phoneNumber: userAddress.phoneNumber,
+    };
 
     const tx_ref = `order-${randomUUID()}`;
 
     const newOrder = await prisma.$transaction(async (tx) => {
+        const productId = items.map(item => item.productId);
+        const products = await prisma.product.findMany({
+            where: {
+                id: { in: productId }
+            }
+        });
+        const productsMap = new Map(products.map(p => [p.id, p]))
+        let serverTotalPrice = 0;
 
         for (const item of items) {
-            const updatedProduct = await tx.product.update({
-                where: { id: item.productId, stock: { gte: item.quantity } },
-                data: { stock: { decrement: item.quantity } }
-            })
+            const product = productsMap.get(item.productId)
+            if (!product) throw new AppError(`Product with ID ${item.productId} not found.`);
+            if (product.stock < item.quantity)
+                throw new AppError(`Insufficient stock for product ${product.title}.`);
 
-            if (!updatedProduct) {
-                throw new AppError(`Insufficient stock for product ID ${item.productId}. Transaction aborted.`, 400);
-            }
-        }
 
-        ///this case how to handle new address and also what happen when isDefault is true for more than one record
-        if (shippingAddressData.isDefault) {
-            await tx.userAddress.create({
-                data: {
-                    userId: userId,
-                    ...shippingAddressData
-                }
+            await tx.product.update({
+                where: { id: product.id },
+                data: { stock: { decrement: item.quantity } },
             });
+
+            const finalPrice = product.discount
+                ? product.price * (1 - product.discount)
+                : product.price;
+
+            serverTotalPrice += finalPrice * item.quantity;
+
         }
-        const { isDefault, ...shipping } = shippingAddressData
+
         const order = await tx.order.create({
             data: {
                 userId: userId,
@@ -70,13 +68,10 @@ const createOrder = async (data: ExtendedOrderBody) => {
                 paymentMethod: paymentMethod,
                 orderStatus: OrderStatus.PENDING,
                 paymentStatus: PaymentStatus.PENDING,
-                shipping: {
-                    create: shipping
-                },
-
+                shipping: { create: shippingData},
                 items: {
                     createMany: {
-                        data: orderItemsForCreation
+                        data: items
                     },
                 },
             },
@@ -91,7 +86,7 @@ const createOrder = async (data: ExtendedOrderBody) => {
         timeout: 5000,
     })
 
-    const paymentUrl = await createTransaction(tx_ref, serverTotalPrice, newOrder.id)
+    const paymentUrl = await createTransaction(tx_ref, newOrder.totalAmount, newOrder.id)
     return paymentUrl;
 }
 
@@ -106,7 +101,6 @@ const verifyPaymentAndHandleOrder = async (id: string): Promise<{ success: boole
     });
     const result = await verifyRes.json();
     const paymentStatus = result.status;
-    console.log(id, "the id already ")
 
 
     if (paymentStatus === "success") {
