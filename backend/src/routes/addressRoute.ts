@@ -13,4 +13,4 @@ router.put('/address/:id', isAuth, update)
 router.delete('/address/:id', isAuth, deleteAddress)
 
 
-export { router as orderRouter }
+export { router as addressRouter }
