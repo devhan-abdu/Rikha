@@ -34,23 +34,24 @@ export const OrderItemSchema = z.object({
 
 export const OrderBodySchema = z.object({
   items: z.array(OrderItemSchema),
-  shippingAddressData: z.object({
-    country: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    subcity: z.string(),
-    woreda: z.string(),
-    houseNumber: z.string(),
-    phoneNumber: z.string().regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
-    isDefault: z.boolean().optional(),
-  }),
-  paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"]),
-  
+  addressId: z.number(),
+  paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"]), 
 })
 
-
+export const AddressSchema = z.object({
+  id:z.number().optional(),
+  country: z.string().min(1, "Country is required"),
+  name: z.string().min(1, "First name is required"),
+  city: z.string().min(1, "city is required"),
+  subcity: z.string().min(1, "Sub city is required"),
+  woreda: z.string().min(1, "Woreda is required"),
+  houseNumber: z.string().min(1, "House number/postal code is required"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
+  isDefault: z.boolean().optional(),
+});
 
 export type OrderItem = z.infer<typeof OrderItemSchema>
 export type OrderBody = z.infer<typeof OrderBodySchema>
 export type ExtendedOrderBody = OrderBody & { userId: number };
+export type AddressData = z.infer<typeof AddressSchema>;
 
