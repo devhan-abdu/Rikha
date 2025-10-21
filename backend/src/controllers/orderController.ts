@@ -14,13 +14,13 @@ const orderController = catchAsync(async (req: AuthenticatedRequest, res: Respon
     if (!validationResult.success) {
         res.status(404).json({
             success: false,
-            message: "bad request "
+            message: "bad request"
         })
         return
     }
-    const { items, shippingAddressData, paymentMethod } = validationResult.data;
+    const { items, paymentMethod, addressId  } = validationResult.data;
 
-    const paymentUrl = await orderService.createOrder({ items, shippingAddressData, paymentMethod, userId })
+    const paymentUrl = await orderService.createOrder({ items, paymentMethod, addressId , userId })
 
     res.status(200).json({
         success: true,
@@ -28,7 +28,6 @@ const orderController = catchAsync(async (req: AuthenticatedRequest, res: Respon
     });
 
 })
-
 const verifyTransaction = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
 
