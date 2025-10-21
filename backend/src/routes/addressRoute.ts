@@ -6,7 +6,7 @@ import { getAll, getDefault, create, update, setDefault, deleteAddress } from ".
 const router = express.Router();
 
 router.post('/address', isAuth, create);
-router.get('/address', isAuth, getAll)
+router.get('/addresses', isAuth, getAll)
 router.get('/address/default', isAuth, getDefault)
 router.patch('/address/:id/default', isAuth, setDefault)
 router.put('/address/:id', isAuth, update)
