@@ -23,11 +23,11 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     const { email, otp } = req.body;
     const { accessToken, refreshToken, user } = await authServices.verifyEmail(email, otp);
 
-    res.cookie('refresh', refreshToken, getCookieOptions());
+    res.cookie('access', accessToken, getCookieOptions(true));
+    res.cookie('refresh', refreshToken, getCookieOptions(false));
 
     res.status(200).json({
         success: true,
-        accessToken,
         user
     });
 })
@@ -37,19 +37,21 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
     const { accessToken, refreshToken, user } = await authServices.login(email, password);
 
-    res.cookie('refresh', refreshToken, getCookieOptions())
+    res.cookie('access', accessToken, getCookieOptions(true))
+    res.cookie('refresh', refreshToken, getCookieOptions(false))
+
     res.status(200).json({
         success: true,
-        accessToken,
         user
     });
 
 })
 
 const logout = catchAsync(async (req: Request, res: Response) => {
-    const cookies = req.cookies;
-    if (!cookies?.refresh) return res.sendStatus(204)
-    res.clearCookie('refresh', getCookieOptions());
+
+    res.clearCookie('access', getCookieOptions(true));
+    res.clearCookie('refresh', getCookieOptions(false));
+
     res.json({ message: 'Cookie cleared' });
 })
 
@@ -69,11 +71,12 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { token } = req.params;
 
     const { accessToken, refreshToken, user } = await authServices.resetPassword(email, token, password);
-    res.cookie('refresh', refreshToken, getCookieOptions())
+   
+    res.cookie('access', accessToken, getCookieOptions(true))
+    res.cookie('refresh', refreshToken, getCookieOptions(false))
 
     res.status(200).json({
         success: true,
-        accessToken,
         user
     })
 })
@@ -86,9 +89,10 @@ const refresh = catchAsync(async (req: Request, res: Response) => {
 
     const accessToken = await authServices.refresh(refreshToken);
 
+    res.cookie('access', accessToken, getCookieOptions(true))
+
     res.status(200).json({
         success: true,
-        accessToken
     });
 })
 
@@ -110,9 +114,10 @@ const googleAuthRedirect = catchAsync(async (req: Request, res: Response) => {
 const handleGoogleCallback = catchAsync(async (req: Request, res: Response) => {
     const code = req.query.code as string || undefined;
     if (!code) throw new AppError("Authorization code missing", 400);
-    const refreshToken = await authServices.googleCallback(code);
+    const { accessToken, refreshToken} = await authServices.googleCallback(code);
 
-    res.cookie('refresh', refreshToken, getCookieOptions());
+    res.cookie('access', accessToken, getCookieOptions(true));
+    res.cookie('refresh', refreshToken, getCookieOptions(false));
     res.redirect(`${process.env.FRONTEND_URL}`);
 })
 
