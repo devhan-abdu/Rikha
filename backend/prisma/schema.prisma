@@ -143,8 +143,8 @@ model UserAddress {
   user        User      @relation(fields: [userId], references: [id])
   userId      Int
   
-  firstName   String
-  lastName    String
+  name        String 
+  city        String    
   country     String
   subcity     String
   woreda      String
@@ -163,8 +163,8 @@ model ShippingAddress {
   orderId   Int   @unique
 
   
-  firstName   String
-  lastName    String
+  name        String  @default("")
+  city        String  @default("Addis ")  
   country     String
   subcity     String
   woreda      String
