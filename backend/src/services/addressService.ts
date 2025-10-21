@@ -28,8 +28,11 @@ const getDefault = async (userId: number): Promise<AddressData | null> => {
     const address = await prisma.userAddress.findFirst({
         where: {
             userId: userId,
-            isDefault: true
         },
+        orderBy: [
+            { isDefault: 'desc' },
+            { createdAt: 'desc' },
+        ],
         select: {
             id: true,
             userId: true,
@@ -68,15 +71,15 @@ const create = async (userId: number, data: AddressData): Promise<AddressData> =
     }
 }
 
-const update = async (userId: number, id: number,  data: AddressData): Promise<AddressData> => {
+const update = async (userId: number, id: number, data: AddressData): Promise<AddressData> => {
 
-    const address = await prisma.userAddress.findUnique({ where: { id} })
+    const address = await prisma.userAddress.findUnique({ where: { id } })
     if (!address || address.userId !== userId) {
         throw new AppError("Address not found or unauthorized")
     }
 
     const updateAddress = await prisma.userAddress.update({
-        where: { id},
+        where: { id },
         data: {
             ...data
         }
@@ -92,7 +95,7 @@ const setDefault = async (userId: number, id: number): Promise<AddressData> => {
         throw new AppError("Address not found or unauthorized")
     }
 
-   const defaultAddress =  await prisma.$transaction([
+    const defaultAddress = await prisma.$transaction([
         prisma.userAddress.updateMany({ where: { userId }, data: { isDefault: false } }),
         prisma.userAddress.update({ where: { id }, data: { isDefault: true } }),
     ]);
