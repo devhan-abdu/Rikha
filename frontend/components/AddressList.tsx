@@ -11,12 +11,13 @@ import {
     RadioGroupItem,
 } from "@/components/ui/radio-group";
 import { Button } from "./ui/button";
-import { MapPin, Edit3, CheckCircle2 } from "lucide-react";
+import { MapPin, CheckCircle2 } from "lucide-react";
 import { AddressModal } from "./AddressModal";
 import { ShippingData } from "@/interface";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useAddresses } from "@/lib/query/hook/useAddresses";
 import { useDelete, useSetDefault } from "@/lib/query/mutations/useAddressMutations";
+import { toast } from "react-toastify";
 
 
 type Props = {
@@ -44,8 +45,23 @@ const AddressList = ({ isListOpen, setIsListOpen, selectedAddress, setSelectedAd
         } else {
             setIsEdit(false)
         }
-
     }
+    const handleDelete = (id: number) => {
+        deleteAddress.mutate(id, {
+            onSuccess: () => {
+
+                if (id === selectedAddress?.id) {
+                    const defaultAddr = addresses.find(addr => addr.isDefault && addr.id !== id);
+                    const newAddresses = addresses.filter(addr => addr.id !== id);
+                    const addr = defaultAddr || (newAddresses.length > 0 ? newAddresses[0] : null);
+                    setSelectedAddress(addr);
+                    setIsListOpen(false);
+                    toast.success("Address deleted successfully");
+                }
+            }
+        });
+    }
+
 
     return (
         <Dialog open={isListOpen} onOpenChange={setIsListOpen}>
@@ -102,7 +118,7 @@ const AddressList = ({ isListOpen, setIsListOpen, selectedAddress, setSelectedAd
                                 <div className="flex sm:flex-col items-center sm:items-end gap-2 mt-3 sm:mt-0">
                                     <Button variant="ghost" className='text-blue-500 font-bold ' onClick={() => handleClick(true, item)}> Edit
                                     </Button>
-                                    <Button variant="ghost" className='text-red-500 font-bold ' onClick={() => deleteAddress.mutate(item.id!)}> Delete
+                                    <Button variant="ghost" className='text-red-500 font-bold ' onClick={() => handleDelete(item.id!)}> Delete
                                     </Button>
                                     {(!item.isDefault && item?.id) && (
                                         <Button
