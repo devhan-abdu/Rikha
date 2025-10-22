@@ -10,22 +10,11 @@ import Image from 'next/image'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import AddressList from '@/components/AddressList'
 import { Button } from '@/components/ui/button'
-import { useDefaultAddress } from '@/lib/query/hook/useAddresses'
+import { useAddresses } from '@/lib/query/hook/useAddresses'
 import { AddressModal } from '@/components/AddressModal'
 import { ShippingData } from '@/interface'
 
-const items = {
-  id: 3,
-  name: "Fatuma Nur",
-  phoneNumber: "+251930112233",
-  woreda: "02",
-  subcity: "Lideta",
-  city: "Addis Ababa",
-  houseNumber: "C-78",
-  country: "Ethiopia",
-  isDefault: false,
-  paymentMethod: "CBEBIRR",
-}
+type PaymentMethodType = "CASH" | "TELEBIRR" | "MPSA" | "CBEBIRR";
 
 const CheckoutPage = () => {
   const totalPrice = useAppSelector(selectTotalPrice)
@@ -33,15 +22,16 @@ const CheckoutPage = () => {
   const [show, setShow] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState("CASH")
-  const { data: defaultAddress, isLoading } = useDefaultAddress();
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("CASH")
+  const { data: addresses, isLoading } = useAddresses();
   const [selectedAddress, setSelectedAddress] = useState<ShippingData | null>(null)
 
   useEffect(() => {
-    if (defaultAddress) {
-      setSelectedAddress(defaultAddress);
+    if (addresses && addresses.length > 0 && !selectedAddress) {
+      const defaultAddr = addresses.find(addr => addr.isDefault);
+      setSelectedAddress(defaultAddr || addresses[0]);
     }
-  }, [defaultAddress]);
+  }, [addresses]);
 
 
   if (cartItems.length === 0) {
@@ -73,7 +63,7 @@ const CheckoutPage = () => {
                 show ? "h-max" : "h-0"
               )}
             >
-              <OrderSummery />
+              <OrderSummery addressId={selectedAddress?.id ?? null} paymentMethod={paymentMethod} />
             </div>
           }
 
@@ -90,16 +80,16 @@ const CheckoutPage = () => {
                 <div className='bg-gray-200 animate-pulse duration-500 w-24 h-3' />
 
               </div>
-            ) : defaultAddress ? (
+            ) : selectedAddress ? (
               <div className='flex justify-between flex-wrap'>
 
                 <div>
-                  <p className="font-semibold text-gray-800">{defaultAddress.name}</p>
-                  <p className="text-gray-500 text-sm">{defaultAddress.phoneNumber}</p>
+                  <p className="font-semibold text-gray-800">{selectedAddress.name}</p>
+                  <p className="text-gray-500 text-sm">{selectedAddress.phoneNumber}</p>
                   <p className="text-gray-600 text-sm">
-                    {defaultAddress.subcity}, Woreda {defaultAddress.woreda}, {defaultAddress.city}
+                    {selectedAddress.subcity}, Woreda {selectedAddress.woreda}, {selectedAddress.city}
                   </p>
-                  <p className="text-gray-500 text-sm">House No: {defaultAddress.houseNumber}</p>
+                  <p className="text-gray-500 text-sm">House No: {selectedAddress.houseNumber}</p>
                 </div>
                 <div className='flex flex-col'>
                   <Button variant="ghost" className='text-blue-500' onClick={() => setIsOpen(true)}>
@@ -118,7 +108,7 @@ const CheckoutPage = () => {
             <h3 className="font-cinzel text-2xl font-semibold mb-6 border-b pb-3">Payment Method</h3>
             <RadioGroup
               value={paymentMethod}
-              onValueChange={setPaymentMethod}
+              onValueChange={(value) => setPaymentMethod(value as PaymentMethodType)}
               defaultValue="CASH"
               className='space-y-2 px-1'
             >
@@ -158,7 +148,7 @@ const CheckoutPage = () => {
           </div>
         </div>
         <div className='bg-[#fff] shadow-lg hidden md:block px-4 py-6  self-start w-full md:w-1/2'>
-          <OrderSummery />
+          <OrderSummery addressId={selectedAddress?.id ?? null} paymentMethod={paymentMethod} />
         </div>
       </div>
       <AddressList
