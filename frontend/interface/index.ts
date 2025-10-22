@@ -135,11 +135,18 @@ export const ShippingSchema = z.object({
   houseNumber: z.string().min(1, "House number/postal code is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
   isDefault: z.boolean().optional(),
-  // paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"], { message: "Payment method is required" }),
 });
 
+export const OrderItemSchema = z.object({
+  productId: z.number(),
+  quantity: z.number(),
+});
 
-
+export const OrderSchema = z.object({
+  items: z.array(OrderItemSchema),
+  addressId: z.number(),
+  paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"]), 
+})
 
 
 
@@ -149,3 +156,4 @@ export type SignInFormData = z.infer<typeof signInSchema>;
 export type ForgetPasswordData = z.infer<typeof ForgetPasswordSchema>;
 export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
 export type ShippingData = z.infer<typeof ShippingSchema>;
+export type OrderData = z.infer<typeof OrderSchema>;
