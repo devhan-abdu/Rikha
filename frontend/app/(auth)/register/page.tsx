@@ -7,12 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from 'next/navigation'
 import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
-import  GoogleButton  from '@/components/ui/GoogleButton'
+import GoogleButton from '@/components/ui/GoogleButton'
+import api from '@/lib/api'
 
 
 
 
-const SignUp: FC = () => {
+const Register: FC = () => {
   const router = useRouter();
 
   const {
@@ -26,25 +27,14 @@ const SignUp: FC = () => {
   const onSubmit: SubmitHandler<SignUpFormData> = async (data: SignUpFormData) => {
     try {
       const { confirmPassword, ...sanitizedData } = data
+       await api.post("/auth/register", sanitizedData)
+       localStorage.setItem("verify_email", data.email)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(sanitizedData),
-      });
-
-      const json = await response.json();
-      if (!response.ok) {
-        throw new Error(json.message || "Registration failed");
-      }
-      localStorage.setItem("verify_email", data.email)
       toast.success('Sign up  successfully! pls verify your email');
-
       router.push('/verify-email')
     } catch (error: any) {
-      toast.error("Something went wrong");
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
     }
   }
 
@@ -98,4 +88,4 @@ const SignUp: FC = () => {
   )
 }
 
-export default SignUp
+export default Register

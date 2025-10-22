@@ -10,10 +10,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/authSlice';
 import GoogleButton from '@/components/ui/GoogleButton';
+import api from '@/lib/api';
 
 
 
-const SignIn = () => {
+const Login = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -28,27 +29,12 @@ const SignIn = () => {
 
   const onSubmit: SubmitHandler<SignInFormData> = async (data: SignInFormData) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data)
-      })
-
-      const json = await response.json();
-
-      if (!response.ok) {
-        throw new Error(json.message || "Login failed")
-      }
-      console.log(json, "sign in json ")
-
+      const res = await api.post('/auth/login', data)
+      const {user} = res.data;
+      dispatch(setUser(user))
       toast.success("Login Successfully!");
-      dispatch(setUser(json.user));
       const redirectTo = searchParams.get('redirect') || '/';
-      router.push('/')
-
-
+      router.push(redirectTo)
     } catch (error: any) {
       toast.error("Something went wrong");
     }
@@ -77,11 +63,11 @@ const SignIn = () => {
         </form>
         <GoogleButton />
         <p className="text-md text-gray-900 text-center my-8">
-          Don’t have an account yet? <Link href="/signup" className="font-medium text-primary hover:underline ">Sign up</Link>
+          Don’t have an account yet? <Link href="/register" className="font-medium text-primary hover:underline ">Sign up</Link>
         </p>
       </motion.div>
     </div>
   )
 }
 
-export default SignIn
+export default Login
