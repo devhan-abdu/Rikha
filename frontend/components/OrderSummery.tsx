@@ -2,11 +2,45 @@ import Image from "next/image"
 import { useAppSelector } from "@/redux/hooks"
 import { selectCartItems, selectTotalPrice } from "@/redux/slices/cartSlice"
 import { Button } from "./ui/button"
+import { useCreate } from "@/lib/query/mutations/useOrderMutation"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "react-toastify"
 
 
-export const OrderSummery = () => {
+ type Props = {
+  paymentMethod: "CASH" | "TELEBIRR" | "MPSA" | "CBEBIRR",
+  addressId: number | null
+}
+export const OrderSummery = ({paymentMethod, addressId}: Props) => {
   const totalPrice = useAppSelector(selectTotalPrice)
   const cartItems = useAppSelector(selectCartItems)
+  const [error, setError] = useState<string | null>(null);
+  const {mutateAsync , isPending} = useCreate();
+  const router = useRouter();
+
+  const handlePlaceOrder = async () => {
+
+    if (addressId === null) {
+        setError("Please select a shipping address before placing the order.");
+        return; 
+    }
+
+    const orderData = {
+      items: cartItems.map(item => ({productId:item.productId, quantity: item.quantity})),
+      paymentMethod,
+      addressId: addressId
+    }
+
+    try {
+        const url = await mutateAsync(orderData);
+        if(url){ 
+          router.push(url);
+        }
+    } catch (error) {
+        toast.error("Order creation failed:");
+    }
+  }
 
 
   return (
@@ -60,9 +94,10 @@ export const OrderSummery = () => {
           <span className='font-semibold text-lg'>$4555</span>
         </div>
       </div>
-      <Button className="text-white text-lg bg-primary w-full">
+      <Button className="text-white text-lg bg-primary w-full" disabled= {isPending || !addressId} onClick={handlePlaceOrder} >
          Place Order
       </Button>
+      {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   )
 }
