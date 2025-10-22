@@ -6,7 +6,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { ShippingData, ShippingSchema } from "@/interface"
@@ -15,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ChevronLeft, MapPin } from "lucide-react"
 import Link from "next/link"
 import { useCreate, useUpdate } from "@/lib/query/mutations/useAddressMutations"
+import { toast } from "react-toastify"
+import { useEffect } from "react"
 
 type Props = {
     isEdit: boolean,
@@ -47,12 +48,20 @@ export function AddressModal({ isEdit, data, isOpen, onOpenChange }: Props) {
     const {
         register,
         handleSubmit,
+        reset,
         control,
         formState: { errors },
     } = useForm<ShippingData>({
         resolver: zodResolver(ShippingSchema),
-        defaultValues: isEdit ? data : data,
+        defaultValues: isEdit && data ? data : {},
     })
+
+    useEffect(() => {
+    if (isEdit && data) {
+        reset(data);
+    }
+}, [isEdit, data, reset]);
+
 
     type FieldName = keyof ShippingData;
     const ErrorMessage = ({ field }: { field: FieldName }) =>
@@ -61,17 +70,30 @@ export function AddressModal({ isEdit, data, isOpen, onOpenChange }: Props) {
 
     const onSubmit: SubmitHandler<ShippingData> = async (data: ShippingData) => {
         if (isEdit && data.id) {
-            updateAddress({ id:data.id, data })
+            updateAddress({ id: data.id, data }, {
+                onSuccess: () => {
+                    toast.success("Address updated successfully");
+                    onOpenChange(false);
+                    reset();
+                }
+            })
         } else {
-            createAddress(data)
+            createAddress(data, {
+                onSuccess: () => {
+                    toast.success("Address saved successfully");
+                    onOpenChange(false);
+                    reset()
+                }
+            })
         }
+        onOpenChange(false)
     }
 
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <form className="" onSubmit={handleSubmit(onSubmit)}>
-                <DialogContent className="max-w-2xl rounded-2xl p-6 sm:p-8 overflow-y-auto bg-gradient-to-b from-white to-gray-50 shadow-xl">
+            <DialogContent className="max-w-2xl rounded-2xl p-6 sm:p-8 overflow-y-auto bg-gradient-to-b from-white to-gray-50 shadow-xl">
+                <form className="" onSubmit={handleSubmit(onSubmit)}>
 
 
                     <DialogHeader>
@@ -219,8 +241,9 @@ export function AddressModal({ isEdit, data, isOpen, onOpenChange }: Props) {
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
                     </DialogFooter>
-                </DialogContent>
-            </form >
+                </form >
+
+            </DialogContent>
         </Dialog >
     )
 }
