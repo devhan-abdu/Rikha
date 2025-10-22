@@ -6,6 +6,7 @@ import { ForgetPasswordData, ForgetPasswordSchema } from '@/interface'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { toast } from 'react-toastify'
+import api from '@/lib/api'
 
 const ForgetPassword = () => {
 
@@ -19,21 +20,9 @@ const ForgetPassword = () => {
 
     const onSubmit: SubmitHandler<ForgetPasswordData> = async (data: ForgetPasswordData) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data)
-            });
-
-            const json = await response.json();
-            if (!response.ok) {
-                throw new Error(json.message || "unable to send password reste email");
-            }
+            await api.post('/auth/forgot-password', data)
             toast.success("Password reset link sent! Please check your email");
-
-        } catch (error: any) {
+        } catch (error) {
             toast.error("Something went wrong ")
         }
     }

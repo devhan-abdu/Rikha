@@ -1,20 +1,24 @@
 "use client"
 import { motion } from "framer-motion";
 import { useForm, SubmitHandler } from "react-hook-form"
-import { ResetPasswordData, ResetPasswordSchema, SignInFormData, signInSchema, } from '@/interface';
+import { ResetPasswordData, ResetPasswordSchema, } from '@/interface';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useSearchParams,useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
+import api from "@/lib/api";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/slices/authSlice";
 
 const ResetPassword = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');  
+  const token = searchParams.get('token');
   const email = searchParams.get('email');
-    if (!token || !email) {
-        return <div className="text-center mt-10">Invalid password reset link.</div>;
-    }
+  const dispatch = useAppDispatch();
+
+  if (!token || !email) {
+    return <div className="text-center mt-10">Invalid password reset link.</div>;
+  }
 
   const {
     register,
@@ -24,20 +28,12 @@ const ResetPassword = () => {
     resolver: zodResolver(ResetPasswordSchema),
   });
 
-  const onSubmit: SubmitHandler<ResetPasswordData> = async ({password}) => {
+  const onSubmit: SubmitHandler<ResetPasswordData> = async ({ password }) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password/${token}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({email,password})
-      });
-      if (!response.ok) {
-        throw new Error("Failed to reset password");
-      }
-      router.push('/signin');
-      toast.success("Password reset successful! Please sign in with your new password.");
+      const res = await api.put(`/auth/reset-password/${token}`, { email, password });
+      const { user } = res.data;
+      dispatch(setUser(user))
+      toast.success("Password reset successful");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     }

@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
 import { setUser } from "@/redux/slices/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
+import api from "@/lib/api";
 
 
 const EmailVerificationPage = () => {
@@ -29,19 +30,11 @@ const EmailVerificationPage = () => {
 		try {
 			const email = localStorage.getItem("verify_email");
 			if (!email) throw new Error("No email found in localStorage");
-
-			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, otp }),
-			});
-
-			const json = await res.json();
-			if (!res.ok) throw new Error(json.message || "Verification failed");
+			const res = await api.post('/auth/verify-email', { email, otp });
 
 			localStorage.removeItem("verify_email");
 			toast.success('Email verified successfully!');
-			dispatch(setUser(json.user))
+			dispatch(setUser(res.data.user))
 			router.push("/");
 		} catch (error: any) {
 			toast.error("Something went wrong");
