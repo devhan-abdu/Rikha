@@ -14,11 +14,9 @@ export const useCreate = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["address/default"] });
-            toast.success("Address saved successfully");
         },
         onError: (error) => {
             console.log(error)
-            toast.error("Failed to create address");
             toast.error("Failed to create address");
         }
     })
