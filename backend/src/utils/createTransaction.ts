@@ -1,4 +1,6 @@
 import { AppError } from "./AppError";
+import dotenv from "dotenv"
+dotenv.config();
 
 export const createTransaction = async (tx_ref: string, amount: number, orderId: number): Promise<string | null> => {
     try {
@@ -13,8 +15,8 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
                 currency: "ETB",
                 orderId: orderId,
                 tx_ref,
-                "callback_url":`http://localhost:5000/api/verify-payment/${tx_ref}`,
-                "return_url":`http://localhost:3000/order-status?tx_ref=${tx_ref}`,
+                "callback_url":`${process.env.BACKEND_URL}/api/verify-payment/${tx_ref}`,
+                "return_url":`${process.env.FRONTEND_URL}/order-status?tx_ref=${tx_ref}`,
                 customization: {
                     title: "Rikha",
                     description: `Payment`,
