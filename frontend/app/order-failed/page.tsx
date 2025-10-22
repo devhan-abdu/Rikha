@@ -1,11 +1,20 @@
-import React from 'react'
+"use client"
+import OrderCard from "@/components/OrderCard";
+import { useRouter } from "next/navigation";
 
-const page = () => {
+export default function OrderSuccess() {
+  const router = useRouter();
   return (
-    <div>
-      Failed
-    </div>
-  )
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <OrderCard
+        status="failed"
+        title="Payment Failed"
+        message="Your transaction was unsuccessful. Please try again."
+        primaryAction={{
+          label: "Try Again",
+          action: () => router.push("/checkout"),
+        }}
+      />
+    </main>
+  );
 }
-
-export default page
