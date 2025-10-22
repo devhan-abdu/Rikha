@@ -6,12 +6,11 @@ import { isAuth } from '../middleware/isAuth';
 
 const router = express.Router();
 
-router.use(isAuth)
 
 router.route("/user/me")
-.get(userController.getUser)
-.put(userController.updateUser)
-.delete(userController.deleteUser);
+.get(isAuth,userController.getUser)
+.put(isAuth,userController.updateUser)
+.delete(isAuth,userController.deleteUser);
 
 
 

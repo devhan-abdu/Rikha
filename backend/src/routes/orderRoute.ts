@@ -5,11 +5,9 @@ import { isAuth } from "../middleware/isAuth";
 const router = express.Router();
 
 router.get('/verify-payment/:id' ,verifyTransaction)
-router.use(isAuth)
-
-router.post('/order',orderController);
-router.get('/order/status',orderStatusController )
-router.get('/orders',getUserOrdersController  )
+router.post('/order',isAuth,orderController);
+router.get('/order/status',isAuth,orderStatusController )
+router.get('/orders',isAuth,getUserOrdersController)
 
 
 export {router as orderRouter}
