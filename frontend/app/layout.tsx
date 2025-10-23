@@ -1,10 +1,8 @@
 import 'react-toastify/dist/ReactToastify.css';
+import "./globals.css";
 
 import type { Metadata } from "next";
-import "./globals.css";
 import {Inter ,Cinzel , Poppins} from 'next/font/google'
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { StoreProvider } from '@/redux/storeProvider'
 import { ToastContainer } from 'react-toastify';
 import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
@@ -36,10 +34,8 @@ export default function RootLayout({
         <StoreProvider>
           <ReactQueryProvider>
             <ToastContainer position="bottom-right" theme="dark" />
-            <Header />
             {children}
           </ReactQueryProvider>
-          <Footer />
         </StoreProvider>
       </body>
     </html>

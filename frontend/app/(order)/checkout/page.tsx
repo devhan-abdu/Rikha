@@ -42,7 +42,7 @@ const CheckoutPage = () => {
 
 
   return (
-    <div className='px-4 py-12 '>
+    <div className='px-4 pt-6 pb-12 '>
       <div className='flex flex-col md:flex-row justify-center gap-6 '>
         <div className='bg-[#fff] shadow-lg  md:hidden px-4 md:px-6 w-full  border border-black/10'>
           <button className='flex items-center gap-2 w-full outline-none focus:outline-1  rounded-md py-4 px-2 md:px-4 ' onClick={() => setShow(!show)}>

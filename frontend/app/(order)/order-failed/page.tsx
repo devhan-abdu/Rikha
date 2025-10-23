@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export default function OrderSuccess() {
   const router = useRouter();
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main className="min-h-screen flex items-center justify-center">
       <OrderCard
         status="failed"
         title="Payment Failed"
