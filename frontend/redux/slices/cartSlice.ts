@@ -7,12 +7,20 @@ export interface CartSlice {
     cartItems: Cart[];
     totalQnt: number;
     totalPrice: number;
+    totalDiscount: number;
 }
 
 const initialState: CartSlice = {
     cartItems: [],
     totalQnt: 0,
-    totalPrice: 0
+    totalPrice: 0,
+    totalDiscount: 0,
+}
+
+const calculateTotals = (state: CartSlice) => {
+    state.totalQnt = state.cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    state.totalPrice = state.cartItems.reduce((acc, item) => acc + item.price, 0);
+    state.totalDiscount = state.cartItems.reduce((acc, item) => acc + item.price * item.discount * item.quantity, 0)
 }
 
 const cartSlice = createSlice({
@@ -28,22 +36,19 @@ const cartSlice = createSlice({
             else {
                 state.cartItems.push({ ...item, quantity: 1 })
             }
-            state.totalQnt += 1;
-            state.totalPrice += item.price;
+            calculateTotals(state);
         },
         removeCartItem: (state, action: PayloadAction<number>) => {
             const id = action.payload
             state.cartItems = state.cartItems.filter((i) => id !== i.productId)
-            state.totalQnt = state.cartItems.reduce((count, item) => count + item.quantity, 0)
-            state.totalPrice = state.cartItems.reduce((count, item) => count + item.quantity * item.price, 0)
+            calculateTotals(state);
         },
         increaseCartQuantity: (state, action: PayloadAction<number>) => {
             const id = action.payload;
             const existingItem = state.cartItems.find(item => item.productId === id);
             if (!existingItem) return;
             existingItem.quantity += 1;
-            state.totalQnt += 1;
-            state.totalPrice += existingItem.price;
+            calculateTotals(state);
 
         },
         decreaseCartQuantity: (state, action: PayloadAction<number>) => {
@@ -56,15 +61,16 @@ const cartSlice = createSlice({
             else {
                 state.cartItems = state.cartItems.filter((i) => id !== i.productId)
             }
-            state.totalQnt -= 1;
-            state.totalPrice -= existingItem.price;
+            calculateTotals(state);
         },
+        clearCart: () => initialState
     }
 })
 
 export const selectCartItems = (state: RootState) => state.cart.cartItems;
 export const selectTotalQnt = (state: RootState) => state.cart.totalQnt;
 export const selectTotalPrice = (state: RootState) => state.cart.totalPrice;
+export const selectDiscount = (state: RootState) => state.cart.totalDiscount
 
 export const { addCartItem, removeCartItem, increaseCartQuantity, decreaseCartQuantity } = cartSlice.actions;
 export default cartSlice.reducer;
