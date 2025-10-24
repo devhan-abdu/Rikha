@@ -13,12 +13,12 @@ const ProductCard = ({ product }: { product: any }) => {
      const cartItem ={
       productId:product.id,
       title:product.title,
-      desc:product.desc,
+      desc:product.shortDesc,
       quantity:product.quantity,
       image:product.image,
       price:product.price,
+      discount: product.discount,
      }
-     console.log(cartItem , 'hela from cart')
      dispatch(addCartItem(cartItem))
   }
 
