@@ -47,6 +47,7 @@ export interface Cart {
   quantity: number;
   price: number;
   productId: number;
+  discount: number;
 }
 
 
