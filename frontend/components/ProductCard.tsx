@@ -2,19 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useAppDispatch } from "@/redux/hooks";
-import { addCartItem } from "@/redux/slices/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { addCartItem, selectCartItems } from "@/redux/slices/cartSlice";
 
 
 const ProductCard = ({ product }: { product: any }) => {
   const dispatch = useAppDispatch();
+
+  const cartItems = useAppSelector(selectCartItems);
+  const existingCartItem = cartItems.find(item => item.productId === product.id);
+  const canAdd = !existingCartItem || existingCartItem.quantity < product.stock 
 
   const addToCart = () => {
     const cartItem = {
       productId: product.id,
       title: product.title,
       desc: product.shortDesc,
-      quantity: product.quantity,
+      quantity: 1,
       image: product.image,
       price: product.price,
       discount: product.discount,
@@ -90,9 +94,9 @@ const ProductCard = ({ product }: { product: any }) => {
         <button
           onClick={() => addToCart()}
           type="button"
-          disabled={product.stock <= 0}
+          disabled={ !canAdd || product.stock <= 0}
           className={`ml-auto inline-flex items-center rounded-lg mt-4  px-4 py-2 text-sm font-medium text-white 
-            ${product.stock <= 0 ? "cursor-not-allowed bg-gray-300 text-gray-600" : "cursor-pointer bg-primary hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300  "
+            ${(!canAdd || product.stock <= 0) ? "cursor-not-allowed bg-gray-300 text-gray-600" : "cursor-pointer bg-primary hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300  "
             }
             `}
         >
@@ -110,7 +114,7 @@ const ProductCard = ({ product }: { product: any }) => {
               d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
             />
           </svg>
-          {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
+          {(!canAdd || product.stock <= 0) ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </div>
