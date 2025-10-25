@@ -1,104 +1,105 @@
 'use client'
-import React from 'react'
-import Image from 'next/image';
+import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { selectTotalPrice, selectTotalQnt, selectCartItems } from '@/redux/slices/cartSlice'
-import { removeCartItem, decreaseCartQuantity, increaseCartQuantity } from '@/redux/slices/cartSlice'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { clearCart, selectCartItems, selectTotalQnt } from '@/redux/slices/cartSlice';
+import CartCard from '@/components/CartCard';
+import Empty from '@/components/Empty';
+import { clearSelcted, selectAll, selectSelectedIds } from '@/redux/slices/selectedItemsSlice';
+import { selectCheckoutTotals } from '@/redux/selectors';
+import { Checkbox } from '@/components/ui/checkbox';
 import Common from '@/components/Common';
 
-const page = () => {
-    const dispatch = useAppDispatch();
+
+const CartPage = () => {
     const cartItems = useAppSelector(selectCartItems)
-    const totalPrice = useAppSelector(selectTotalPrice)
-    const totalQnt = useAppSelector(selectTotalQnt)
+    const selectedItems = useAppSelector(selectSelectedIds)
+    const cartTotalQnt = useAppSelector(selectTotalQnt)
+    const { totalQnt, totalPrice, totalDiscount } = useAppSelector(selectCheckoutTotals);
+    const dispatch = useAppDispatch();
+
+    if (cartItems.length === 0) {
+        return <Empty />
+    }
 
     return (
-        <>
-            <Common header="Your Cart" image="/images/cart.png" />
+        <div className="container mx-auto p-4 md:p-8 relative">
+            <Common header={`Cart (${cartTotalQnt})`} />
 
-            <div className='flex items-center justify-between gap-4 pt-12 pb-6 px-6'>
-                <div className="inline-flex items-center gap-4">
-                    <h4 className='font-cinzel text-2xl font-bold'>Cart Items</h4>
-                    <p className='text-gray-500 text-lg'>{totalQnt} Items</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-3">
+
+                <div className="lg:col-span-2">
+                    <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-y-2  border-b pb-4 mb-4'>
+                        <div className='flex items-center justify-start gap-6'>
+                            <div className='flex items-center'>
+
+                                <Checkbox className='rounded-full w-5 h-5 text-white border border-slate-400' checked={selectedItems.length === cartItems.length}
+                                    onCheckedChange={(checked) =>
+                                        checked
+                                            ? dispatch(selectAll(cartItems.map(item => item.productId)))
+                                            : dispatch(clearSelcted())
+                                    }
+                                />
+                                <span className='ml-2 text-gray-700'>Select all items</span>
+                            </div>
+                            <button className='text-blue-600 hover:text-blue-800 text-sm cursor-pointer' onClick={() => dispatch(clearCart())}>
+                                Delete cart items
+                            </button>
+                        </div>
+                        <Link href='/checkout' className='ml-auto'>
+                            <button className=' bg-primary text-white font-bold py-2 px-4 rounded-sm hover:scale-95 transition duration-300 cursor-pointer'>
+                                Checkout ({totalQnt})
+                            </button>
+                        </Link>
+                    </div>
+                    <CartCard />
                 </div>
-                <div className="inline-flex items-center justify-center gap-6">
-                    <p className='text-gray-500 text-lg'>Total</p>
-                    <h4 className=' text-2xl font-bold'>${totalPrice}</h4>
+
+                <div className="lg:col-span-1 border border-slate-400  rounded-lg p-6 bg-white shadow-sm h-fit lg:sticky top-20 max-w-sm">
+                    <h2 className='text-xl font-semibold mb-6'>Summary</h2>
+                    <div className='space-y-3 text-sm'>
+                        <div className='flex justify-between'>
+                            <span>Items total</span>
+                            <span className='font-medium'>ETB {totalPrice.toFixed(2)}</span>
+                        </div>
+                        <div className='flex justify-between text-red-600'>
+                            <span>Items discount</span>
+                            <span className='font-medium'>- ETB {totalDiscount.toFixed(2)}</span>
+                        </div>
+                        <div className='flex justify-between border-t pt-3'>
+                            <span>Subtotal</span>
+                            <span className='font-medium'>ETB {(totalPrice - totalDiscount).toFixed(2)}</span>
+                        </div>
+                        <div className='flex justify-between'>
+                            <span>Shipping</span>
+                            <span className='font-medium'> free </span>
+                        </div>
+                    </div>
+
+                    <div className='flex justify-between items-center mt-4 pt-4 border-t border-gray-300'>
+                        <span className='text-lg font-semibold'>Estimated total</span>
+                        <span className='text-xl font-bold'>ETB {(totalPrice - totalDiscount).toFixed(2)}</span>
+                    </div>
+
+                    <Link href='/checkout' className='block mt-6'>
+                        <button className='w-full bg-primary text-white font-bold py-3 rounded-lg hover:scale-95 transition duration-300'>
+                            Checkout ({totalQnt})
+                        </button>
+                    </Link>
+
                 </div>
+
             </div>
-            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase  dark:bg-gray-700 dark:text-gray-400 border-y-2 border-gray-200">
-                        <tr>
-                            <th scope="col" className="px-6 py-6">
-                                Product
-                            </th>
-                            <th scope="col" className="px-6 py-6">
-                                Quantity
-                            </th>
-                            <th scope="col" className="px-6 py-6">
-                                Price
-                            </th>
-                            <th scope="col" className="px-6 py-6">
-                                Subtotal
-                            </th>
 
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        {
-                            cartItems.map(item => (
-                                <tr key={item.productId} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200  hover:bg-gray-50 dark:hover:bg-gray-600">
-                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white flex items-center justify-start gap-3">
-                                        <Image
-                                            src={item.image}
-                                            alt="Picture of the author "
-                                            width={80}
-                                            height={80}
-                                        />
-                                        <div className='flex flex-col'>
-                                            <h4 className=' text-xl bold'>{item.title}</h4>
-                                            <p className="text-gray-600 text-base">{item.desc}</p>
-                                            <button className='text-red-500  bold self-start text-base cursor-pointer' onClick={() => dispatch(removeCartItem(item.productId))}>Remove</button>
-
-                                        </div>
-                                    </th>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center border rounded p-1 w-fit space-x-2">
-                                            <button className="text-gray-500 hover:text-black px-1" onClick={() => dispatch(decreaseCartQuantity(item.productId))}>−</button>
-                                            <span className="w-6 text-center">{item.quantity}</span>
-                                            <button className="text-gray-500 hover:text-black px-1" onClick={() => dispatch(increaseCartQuantity(item.productId))}>+</button>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        ${item.price}
-                                    </td>
-                                    <td className="px-6 py-4 font-bold">
-                                        ${item.price * item.quantity}
-                                    </td>
-
-                                </tr>
-                            ))
-                        }
-
-                    </tbody>
-                </table>
-            </div>
-            <div className='flex items-center justify-between p-12 '>
-                <Link href='/category' className='text-base font-bold font-cinzel hover:scale-105  flex items-center gap-2'>
-                    <ArrowLeft />
+            <div className='flex justify-start p-4 border-t mt-8'>
+                <Link href='/category' className='text-base font-bold text-gray-600 hover:text-gray-900 flex items-center gap-1'>
+                    <ArrowLeft className='h-4 w-4' />
                     <span>Continue Shopping</span>
                 </Link>
-                <Link href='/checkout' className='text-base font-bold font-cinzel hover:scale-105 py-2 px-3 flex items-center gap-2 bg-primary rounded-lg  text-white'>
-                    Procced to checkout
-                </Link>
             </div>
-        </>
-
-    )
+        </div>
+    );
 }
 
-export default page
+export default CartPage;
