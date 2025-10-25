@@ -9,10 +9,9 @@ export default function OrderSuccess() {
       <OrderCard
         status="success"
         title="Order Confirmed!"
-        message="We’ve sent a confirmation email. You’ll be notified once it ships."
-        primaryAction={{
+        message="We&apos;ve sent a confirmation email. You&apos;ll be notified once it ships." primaryAction={{
           label: "Continue Shopping",
-          action: () => router.push("/"),
+          action: () => router.push("/category"),
         }}
         secondaryAction={{
           label: "View Orders",
