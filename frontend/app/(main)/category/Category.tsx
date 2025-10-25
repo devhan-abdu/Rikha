@@ -41,11 +41,11 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
     return (
 
         <>
-            <div className="flex flex-col lg:flex-row justify-between  gap-2  px-4 relative ">
+            <div className="flex flex-col justify-between  gap-2  px-4 relative ">
 
-                <div className="p-6 md:border border-gray-500 shadow-md lg:shadow-xl rounded-lg lg:sticky lg:mt-16  top-12 h-fit">
+                <div className="p-6 shadow-md  rounded-lg w-fit ">
                     <h2 className="text-2xl font-bold mb-6 font-montserrat">Category</h2>
-                    <div className="flex flex-wrap lg:flex-col gap-4 items-start ">
+                    <div className="flex flex-wrap  gap-4 items-start ">
                         {categories.map((item) => (
                             <button
                                 key={item.slug}
@@ -63,7 +63,7 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
                         ))}
                     </div>
                 </div>
-                <div className='flex-1 mx-auto px-2 py-4'>
+                <div className='flex-1 container mx-auto  px-2 py-4'>
                     <div className="flex justify-between gap-12 my-6 mb-8 ">
                         <p className="sm:text-4xl text-2xl  capitalize font-cinzel font-bold">Products</p>
 
@@ -79,7 +79,7 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
 
                     </div>
 
-                    <div className="  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  items-center justify-center gap-x-4 gap-y-6">
+                    <div className="max-w-fit mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-6">
 
                         {isLoading
                             ? Array.from({ length: 6 }).map((_, i) => (

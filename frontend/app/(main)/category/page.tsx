@@ -18,7 +18,7 @@ const Collection = async ({searchParams}:{searchParams:{slug?: string}}) => {
 
     return (
         <div>
-         <Common header="Browse by Category"image="/images/hero1.png"/>  
+         <Common header="Browse by Category"/>  
             <CategoryPage
                 categories={categories}
                 initialProducts={initialProducts}
