@@ -48,6 +48,7 @@ export interface Cart {
   price: number;
   productId: number;
   discount: number;
+  stock: number;
 }
 
 
@@ -146,7 +147,7 @@ export const OrderItemSchema = z.object({
 export const OrderSchema = z.object({
   items: z.array(OrderItemSchema),
   addressId: z.number(),
-  paymentMethod: z.enum(["CASH", "TELEBIRR", "MPSA", "CBEBIRR"]), 
+  paymentMethod: z.enum(["TELEBIRR", "MPSA", "CBEBIRR"]), 
 })
 
 
