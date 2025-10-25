@@ -19,8 +19,8 @@ const initialState: CartSlice = {
 
 const calculateTotals = (state: CartSlice) => {
     state.totalQnt = state.cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    state.totalPrice = state.cartItems.reduce((acc, item) => acc + item.price, 0);
-    state.totalDiscount = state.cartItems.reduce((acc, item) => acc + item.price * item.discount * item.quantity, 0)
+    state.totalPrice = state.cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    state.totalDiscount = state.cartItems.reduce((acc, item) => acc + (item.price *( item.discount ?? 0) * item.quantity), 0)
 }
 
 const cartSlice = createSlice({
@@ -72,5 +72,5 @@ export const selectTotalQnt = (state: RootState) => state.cart.totalQnt;
 export const selectTotalPrice = (state: RootState) => state.cart.totalPrice;
 export const selectDiscount = (state: RootState) => state.cart.totalDiscount
 
-export const { addCartItem, removeCartItem, increaseCartQuantity, decreaseCartQuantity } = cartSlice.actions;
+export const { addCartItem, removeCartItem, increaseCartQuantity, decreaseCartQuantity, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
