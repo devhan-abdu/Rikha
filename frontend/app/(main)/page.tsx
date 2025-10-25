@@ -63,7 +63,7 @@ export default async function Home() {
       </section>
       <section className="p-6 pt-10 pb-20   space-y-12 bg-gray-50">
         <h2 className="text-2xl lg:text-3xl font-cinzel text-left">Featured Products</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-x-4 gap-y-6">
+      <div className="max-w-fit mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-6">
         {featured.length === 0 ? (
           <p className="text-gray-500"> No Featured Product Found</p>
 
@@ -83,7 +83,7 @@ export default async function Home() {
 
        <section className="px-6 pb-12 pt-18  space-y-12 bg-gray-50">
         <h2 className="text-2xl lg:text-3xl font-cinzel text-left">New Arrival Products</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center jsutify-center gap-x-4 gap-y-6">
+      <div className="max-w-fit mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center jsutify-center gap-6">
         {newArrivals.length === 0 ? (
           <p className="text-gray-500"> No New Arrival Product Found</p>
 
