@@ -13,16 +13,17 @@ import { Button } from '@/components/ui/button'
 import { useAddresses } from '@/lib/query/hook/useAddresses'
 import { AddressModal } from '@/components/AddressModal'
 import { ShippingData } from '@/interface'
+import { selectCheckoutItems, selectCheckoutTotals } from '@/redux/selectors'
 
-type PaymentMethodType = "CASH" | "TELEBIRR" | "MPSA" | "CBEBIRR";
+type PaymentMethodType =  "TELEBIRR" | "MPSA" | "CBEBIRR";
 
 const CheckoutPage = () => {
-  const totalPrice = useAppSelector(selectTotalPrice)
-  const cartItems = useAppSelector(selectCartItems)
+  const { totalPrice } = useAppSelector(selectCheckoutTotals)
+  const checkoutItems = useAppSelector(selectCheckoutItems)
   const [show, setShow] = useState(false)
   const [isOpen, setIsOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("CASH")
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("TELEBIRR")
   const { data: addresses, isLoading } = useAddresses();
   const [selectedAddress, setSelectedAddress] = useState<ShippingData | null>(null)
 
@@ -34,7 +35,7 @@ const CheckoutPage = () => {
   }, [addresses]);
 
 
-  if (cartItems.length === 0) {
+  if (checkoutItems.length === 0) {
     return (
       <Empty />
     )
@@ -112,14 +113,6 @@ const CheckoutPage = () => {
               defaultValue="CASH"
               className='space-y-2 px-1'
             >
-              <div className="flex items-center space-x-4  rounded-lg cursor-pointer">
-                <RadioGroupItem value="CASH" id="cash" />
-                <label htmlFor="cash" className="flex-1 font-medium cursor-pointer">
-                  Cash on Delivery
-                </label>
-              </div>
-
-
               <div className="flex items-center space-x-4  rounded-lg cursor-pointer">
                 <RadioGroupItem value="TELEBIRR" id="telebirr" />
                 <label htmlFor="telebirr" className="flex-1 flex items-center gap-4 cursor-pointer">
