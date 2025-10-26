@@ -1,10 +1,22 @@
+import { UserProvider } from "@/components/providers/UserProvider";
+import { fetchMe } from "@/lib/auth/fetchMe";
 import { TabletSmartphone } from "lucide-react";
+import { redirect } from "next/navigation";
 
-export default function RootLayout({
+
+export default async function OrderLayout({
     children,
+    pathname,
 }: Readonly<{
     children: React.ReactNode;
+    pathname: string;
 }>) {
+    const user = await fetchMe();
+
+    if (!user) {
+        if (!user) redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
+    }
+
     return (
         <>
             <div className="flex justify-between items-center py-4 shadow-lg  px-4 md:px-12 ">
@@ -16,7 +28,7 @@ export default function RootLayout({
                 </div>
             </div>
             <main>
-                {children}
+                <UserProvider user={user}>{children}</UserProvider>
             </main>
         </>
     );

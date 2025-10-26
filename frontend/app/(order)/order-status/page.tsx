@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startOrderPolling } from "@/lib/startOrderPolling";
 import OrderCard from "@/components/OrderCard";
+import OrderLayout from "../layout";
 
 const OrderStatus = () => {
   const [status, setStatus] = useState<
@@ -31,27 +32,29 @@ const OrderStatus = () => {
   }, [txRef]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      {status === "pending" && (
-        <OrderCard
-          status="pending"
-          title="Processing Payment..."
-          message="Please do not close this window. We are confirming your order status."
-        />
-      )}
+    <OrderLayout pathname="/order-status">
+      <div className="min-h-screen flex items-center justify-center">
+        {status === "pending" && (
+          <OrderCard
+            status="pending"
+            title="Processing Payment..."
+            message="Please do not close this window. We are confirming your order status."
+          />
+        )}
 
-      {status === "error" && (
-        <OrderCard
-          status="error"
-          title="Error Confirming Payment"
-          message={`There was a network issue or timeout. Please check your email or contact support with reference: ${txRef}.`}
-          primaryAction={{
+        {status === "error" && (
+          <OrderCard
+            status="error"
+            title="Error Confirming Payment"
+            message={`There was a network issue or timeout. Please check your email or contact support with reference: ${txRef}.`}
+            primaryAction={{
             label: "Try Again",
-            action: () => router.refresh(),
-          }}
-        />
-      )}
-    </div>
+            path: "/checkout"
+            }}
+          />
+        )}
+      </div>
+    </OrderLayout>
   );
 };
 

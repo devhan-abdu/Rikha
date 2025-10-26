@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import { CheckCircle, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface OrderCardProps {
   status: "success" | "failed" | "pending" | "error";
@@ -11,12 +12,12 @@ interface OrderCardProps {
   message: string;
   primaryAction?: {
     label: string;
-    action: () => void;
+    path: string;
     variant?: "default" | "outline";
   };
   secondaryAction?: {
     label: string;
-    action: () => void;
+    path?: string;
     variant?: "default" | "outline";
   };
 }
@@ -35,6 +36,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
   primaryAction,
   secondaryAction,
 }) => {
+
+  const router = useRouter();
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -51,7 +54,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
           {primaryAction && (
             <Button
               className="text-white"
-              onClick={primaryAction.action}
+              onClick={() => router.push(primaryAction.path)}
             >
               {primaryAction.label}
             </Button>
@@ -59,7 +62,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
           {secondaryAction && (
             <Button
               variant="outline"
-              onClick={secondaryAction.action}
+              onClick={() => secondaryAction.path && router.push(secondaryAction.path)}
             >
               {secondaryAction.label}
             </Button>
