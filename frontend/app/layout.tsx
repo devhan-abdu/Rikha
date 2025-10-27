@@ -6,6 +6,7 @@ import {Inter ,Cinzel , Poppins} from 'next/font/google'
 import { StoreProvider } from '@/redux/storeProvider'
 import { ToastContainer } from 'react-toastify';
 import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
+import { UserProvider } from '@/components/provider/UserProvider';
 
 
 const inter = Inter({ subsets: ['latin'],variable:'--font-inter' });
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   description: "E-commerce website",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -34,7 +35,7 @@ export default function RootLayout({
         <StoreProvider>
           <ReactQueryProvider>
             <ToastContainer position="bottom-right" theme="dark" />
-            {children}
+            <UserProvider>{children}</UserProvider>
           </ReactQueryProvider>
         </StoreProvider>
       </body>
