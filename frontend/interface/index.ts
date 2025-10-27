@@ -51,6 +51,15 @@ export interface Cart {
   stock: number;
 }
 
+export type UserDetails = {
+  id: number;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'USER' 
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 
 
 const passwordSchema = z.object({
