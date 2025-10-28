@@ -14,10 +14,10 @@ export type sanityCategory = {
   image?: any;
 }
 
-export type review = {
-  userId: number,
-  productId: string,
-  rating: number,
+export type CreateReviewInput = {
+  userId: number
+  productId: number | string
+  rating: number
   comment: string
 }
 export type ShippingSchema = {
