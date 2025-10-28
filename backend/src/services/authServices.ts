@@ -15,7 +15,6 @@ const findUserByEmail = async (email: string,) => {
 
 
 const register = async (name: string, password: string, email: string) => {
-    console.log(1)
 
     const user = await findUserByEmail(email)
     if (user) throw new AppError('User already exists with this email', 409);
