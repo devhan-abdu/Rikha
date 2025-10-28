@@ -1,5 +1,4 @@
 import express from 'express';
-import * as authValidation from '../middleware/authValidation'
 import * as  userController from '../controllers/userController'
 import { isAuth } from '../middleware/isAuth';
 
