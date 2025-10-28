@@ -1,34 +1,13 @@
-'use client'
-
 import Image from "next/image";
 import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { addCartItem, selectCartItems } from "@/redux/slices/cartSlice";
+import AddToCartButton from "./AddToCartButton";
+import { Product } from "@/interface";
 
 
-const ProductCard = ({ product }: { product: any }) => {
-  const dispatch = useAppDispatch();
-
-  const cartItems = useAppSelector(selectCartItems);
-  const existingCartItem = cartItems.find(item => item.productId === product.id);
-  const canAdd = !existingCartItem || existingCartItem.quantity < product.stock 
-
-  const addToCart = () => {
-    const cartItem = {
-      productId: product.id,
-      title: product.title,
-      desc: product.shortDesc,
-      quantity: 1,
-      image: product.image,
-      price: product.price,
-      discount: product.discount,
-      stock: product.stock,
-    }
-    dispatch(addCartItem(cartItem))
-  }
+const ProductCard = ({ product }: { product: Product }) => {
 
   return (
-    <div className="relative rounded-lg border p-6 border-slate-300 bg-white shadow-sm w-[310px] mx-auto overflow-hidden">
+    <div className="relative rounded-lg border p-6 border-slate-300 bg-white shadow-sm w-[300px] mx-auto overflow-hidden">
       <Link href={`/category/${product.slug}`} className="flex items-center justify-center h-[180px] w-full">
         <Image
           src={product.image}
@@ -51,8 +30,6 @@ const ProductCard = ({ product }: { product: any }) => {
           Out of Stock
         </span>
       )}
-
-
 
       <div className=" pt-2 mt-2 flex flex-col justify-between h-full">
         <Link
@@ -91,31 +68,9 @@ const ProductCard = ({ product }: { product: any }) => {
             ETB {(product.price * (1 - product.discount)).toFixed(2)}
           </span>
         </div>
-        <button
-          onClick={() => addToCart()}
-          type="button"
-          disabled={ !canAdd || product.stock <= 0}
-          className={`ml-auto inline-flex items-center rounded-lg mt-4  px-4 py-2 text-sm font-medium text-white 
-            ${(!canAdd || product.stock <= 0) ? "cursor-not-allowed bg-gray-300 text-gray-600" : "cursor-pointer bg-primary hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300  "
-            }
-            `}
-        >
-          <svg
-            className="-ms-2 me-2 h-5 w-5"
-            aria-hidden="true"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-            />
-          </svg>
-          {(!canAdd || product.stock <= 0) ? "Out of Stock" : "Add to Cart"}
-        </button>
+        <div className='ml-auto mt-2'>
+            <AddToCartButton product={product} />
+          </div>
       </div>
     </div>
   );

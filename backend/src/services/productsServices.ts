@@ -1,42 +1,43 @@
 
 import prisma from "../config/prisma"
-import { SanityProduct, sanityCategory, review } from '../types/type'
+import { CreateReviewInput } from "../types/type"
 import { AppError } from "../utils/AppError"
 
 
 
 export const getProductDetail = async (slug: string) => {
   const productDetail = await prisma.product.findUnique({
-    where:{slug},
-     select: {
+    where: { slug },
+    select: {
       image: true,
       title: true,
       price: true,
-      stock:true,
-      discount:true,
+      stock: true,
+      discount: true,
       specs: true,
       rating: true,
       numReviews: true,
       shortDesc: true,
-      longDesc:true,
+      longDesc: true,
       id: true,
       slug: true,
       categoryId: true,
-      reviews:{
-        select:{
-          id:true,
-          rating:true,
-          comment:true,
-          user:{
-            select:{
-              name:true,
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          user: {
+            select: {
+              name: true,
+              id: true
             }
           }
         }
       }
     }
   })
-    if (!productDetail) throw new AppError("empty products", 404)
+  if (!productDetail) throw new AppError("empty products", 404)
   return productDetail;
 }
 export const getAllProducts = async () => {
@@ -52,10 +53,11 @@ export const getAllProducts = async () => {
       shortDesc: true,
       id: true,
       slug: true,
-      categoryId: true
+      categoryId: true,
+      stock: true,
+      discount: true,
     }
   });
-  if (!allProducts || allProducts.length === 0) throw new AppError("empty products", 404)
   return allProducts;
 
 }
@@ -64,7 +66,6 @@ export const getCategory = async () => {
 
   const categories = await prisma.category.findMany({
     select: {
-
       id: true,
       name: true,
       image: true,
@@ -72,7 +73,6 @@ export const getCategory = async () => {
 
     }
   });
-  if (!categories) throw new AppError("empty category", 404)
   return categories;
 }
 
@@ -92,60 +92,25 @@ export const getProductsByCategory = async (slug: string) => {
       shortDesc: true,
       id: true,
       slug: true,
-      categoryId: true
+      categoryId: true,
+      stock: true,
+      discount: true,
     }
   });
-  if (!productCategory) throw new AppError("empty product category", 404)
   return productCategory;
 
 }
 
 export const getRelatedProducts = async (slug: string) => {
+  const product = await prisma.product.findUnique({ where: { slug } })
+  if (!product) throw new AppError("Product not found", 404);
 
-  const relatedProduct = await prisma.product.findMany({
-    where: { categoryId: Number(slug) },
-    select: {
-      image: true,
-      title: true,
-      price: true,
-      specs: true,
-      rating: true,
-      numReviews: true,
-      shortDesc: true,
-      id: true,
-      slug: true,
-      categoryId: true
-    }
-  })
-  if (!relatedProduct) throw new AppError("no related products found", 404);
-  return relatedProduct;
-}
-
-export const getFeaturedProducts = async () => {
-  const featuredProduct = await prisma.product.findMany({
-    where: { isFeatured: true },
-    take: 4,
-    select: {
-      image: true,
-      title: true,
-      price: true,
-      specs: true,
-      rating: true,
-      numReviews: true,
-      shortDesc: true,
-      id: true,
-      slug: true,
-      categoryId: true
-    }
-  }); /// how to make this to get only six product
-  if (!featuredProduct) throw new AppError("no featured products found", 404);
-  return featuredProduct;
-}
-export const getNewArrivalsProducts = async () => {
-
-  const newArrivalsProduct = await prisma.product.findMany({
-    where: { isFeatured: true },
-    take: 4,
+  const related = await prisma.product.findMany({
+    where: {
+      categoryId: product.categoryId,
+      NOT: { slug: product.slug }
+    },
+    take: 6,
     select: {
       image: true,
       title: true,
@@ -157,42 +122,107 @@ export const getNewArrivalsProducts = async () => {
       id: true,
       slug: true,
       categoryId: true,
-      stock: true
+      stock: true,
+      discount: true,
     }
-  }); /// how to make this to get only six product
-  if (!newArrivalsProduct) throw new AppError("no new arrivals products found", 404);
+  })
+  return related;
+}
+
+export const getFeaturedProducts = async () => {
+  const featuredProduct = await prisma.product.findMany({
+    where: { isFeatured: true },
+    take: 6,
+    select: {
+      image: true,
+      title: true,
+      price: true,
+      specs: true,
+      rating: true,
+      numReviews: true,
+      shortDesc: true,
+      id: true,
+      slug: true,
+      categoryId: true,
+      stock: true,
+      discount: true,
+    }
+  });
+  return featuredProduct;
+}
+export const getNewArrivalsProducts = async () => {
+
+  const newArrivalsProduct = await prisma.product.findMany({
+    where: { isNewArrival: true },
+    take: 6,
+    select: {
+      image: true,
+      title: true,
+      price: true,
+      specs: true,
+      rating: true,
+      numReviews: true,
+      shortDesc: true,
+      id: true,
+      slug: true,
+      categoryId: true,
+      stock: true,
+      discount: true,
+    }
+  });
   return newArrivalsProduct;
 }
-export const getReviews = async (slug: string) => {
-  //   const reviews = await prisma.review.findMany(
-  //     {
-  //       where: { productId: slug }
-  //     }
-  //   )
-  //   if (!reviews) throw new AppError("no reviews found", 404)
-  //   return reviews
-  // }
-  // export const addReviews = async (reviewData: review) => {
-  //   await prisma.review.create(
-  //     {
-  //       data: reviewData
-  //     }
-  //   )
-  //   return true;
+export const getReviews = async (productId: string) => {
+  const reviews = await prisma.review.findMany({
+    where: { productId: Number(productId) },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  })
+
+  return reviews
+}
+export const addReviews = async (reviewData: CreateReviewInput) => {
+  const { userId, productId, rating, comment } = reviewData;
+
+  const existing = await prisma.review.findFirst({
+    where: { userId, productId: Number(productId) }
+  });
+
+  if (existing) throw new AppError("You already reviewed this product", 400);
+
+  const newReview = await prisma.review.create({
+    data: {
+      userId: userId,
+      productId: Number(productId),
+      comment,
+      rating
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          id: true
+        }
+      }
+    }
+  })
+  return newReview;
 }
 
 export const getSearch = async (query: string) => {
   const products = await prisma.product.findMany({
     where: {
       OR: [
-        { title: { contains: query } },        
-        { brand: { contains: query } },        
-        { shortDesc: { contains: query } },    
-        // { specs: { has: query } },            
+        { title: { contains: query } },
+        { brand: { contains: query } },
+        { shortDesc: { contains: query } },
       ],
     },
     select: {
-      title:true,
+      title: true,
       id: true,
       image: true,
       price: true,
@@ -208,56 +238,6 @@ export const getSearch = async (query: string) => {
 
   return products;
 };
-
-
-
-
-
-// admin related services
-
-// export const addProduct = async (sanityId: string, price: string, stock: string) => {
-//   // for the first time add how do i make the reviw part
-//   await prisma.productMeta.create({
-//     data: {
-//       sanityId,
-//       price: Number(price),
-//       stock: Number(stock),
-//       rating: 0.0,
-//       numReviews: 0
-//     }
-//   })
-// }
-
-// export const updateProduct = async (sanityId: string, price?: string, stock?: string) => {
-//   const foundProduct = await prisma.productMeta.findUnique({
-//     where: { sanityId }
-//   })
-//   if (!foundProduct) throw new AppError("the product is not exist", 404);
-
-//   let updatedProduct: Prisma.productMetaUpdateInput = {};
-//   if (price) updatedProduct.price = Number(price);
-//   if (stock) updatedProduct.stock = Number(stock);
-
-//   await prisma.productMeta.update({
-//     where: { id: foundProduct.id },
-//     data: updatedProduct
-//   })
-// }
-// export const deleteProduct = async (sanityId: string) => {
-//   const foundProduct = await prisma.productMeta.findUnique({
-//     where: { sanityId }
-//   });
-//   if (!foundProduct) throw new AppError("the product is not exist", 404);
-
-//   await prisma.productMeta.delete({
-//     where: { id: foundProduct.id }
-//   });
-
-//   //  what about when the sanity the product not exist
-//   await client.delete(sanityId).catch((error) => {
-//   console.warn("Sanity delete failed:", error.message);
-// })
-// }
 
 
 

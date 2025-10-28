@@ -56,29 +56,19 @@ const orderStatusController = catchAsync(async (req: AuthenticatedRequest, res: 
 
     const txRef = req.query.tx_ref as string;
     const userId = req.user?.userId;
-
     if (!txRef || !userId) {
         return res.status(400).json({
             success: false,
             message: "Transaction reference and user authentication are required."
         });
     }
-
-    const { success, order } = await orderService.orderStatus(txRef, userId);
-
-    if (!success) {
-        res.status(404).json({
-            success: false,
-            message: "Order not found or access denied."
-        })
-    } else {
+    const order = await orderService.orderStatus(txRef, userId);
+  
         res.status(200).json({
-            success: order.orderStatus,
-            orderId: order.id
+            success: true,
+            order
         })
-    }
-
-
+    
 })
 
 const getUserOrdersController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

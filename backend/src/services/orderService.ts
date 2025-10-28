@@ -170,11 +170,10 @@ const orderStatus = async (txRef: string, userId: number): Promise<{ success: bo
         }
     })
 
-    if (order) {
-        return { success: true, order }
-    } else {
-        return { success: false, order: null }
+    if (!order) {
+        throw new AppError("Order not found", 404);
     }
+    return order;
 }
 
 const getOrdersByUserId = async (userId: number) => {

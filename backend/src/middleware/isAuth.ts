@@ -18,7 +18,7 @@ export const isAuth = (req: Request, res: Response, next: NextFunction) => {
     req.user = { userId: decoded.userId, role: decoded.role };
     next();
   } catch (err) {
-    return res.status(403).json({ message: "Forbidden or token expired" });
+    return res.status(401).json({ message: "Unauthorized" })
   }
 }
 

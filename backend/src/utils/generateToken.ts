@@ -26,7 +26,7 @@ dotenv.config();
     const refreshtoken = jwt.sign(
         { 'userId': id },
         secret,
-        { expiresIn: '1d' }
+        { expiresIn: '30d' }
     )
 
     return refreshtoken;
