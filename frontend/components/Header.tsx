@@ -21,11 +21,11 @@ const Header = () => {
 
 
   return (
-    <div className="flex justify-between items-center py-4 px-4 md:px-12 w-full max-w-[1200px] mx-auto z-[9999] ">
-      <div className={`font-cinzel text-primary font-bold  flex items-center gap-1  order-2 md:order-1`}>
+    <div className="flex justify-between items-center py-4 px-4 md:px-12 lg:px-24 w-full  z-[9999] ">
+      <Link  href ="/" className={`font-cinzel text-primary font-bold  flex items-center gap-1  order-2 md:order-1`}>
         <TabletSmartphone className='text-6xl' />
         <p className='text-2xl md:text-4xl'>Rikha</p>
-      </div>
+      </Link> 
       <nav className="hidden items-center justify-between gap-16 md:flex md:order-2 xl:text-lg ">
         <ul className="flex items-center justify-center gap-6 no-underline  flex-1">
           {

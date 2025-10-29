@@ -7,7 +7,8 @@ import { fetchProductDetail } from '@/lib/featchers';
 import AddToCartButton from '@/components/AddToCartButton';
 
 const ProductDetail = async ({ params }: { params: { slug: string } }) => {
-  const product = await fetchProductDetail(params.slug);
+  const { slug } = await params
+  const product = await fetchProductDetail(slug);
 
   return (
     <div className="py-6 font-poppins container mx-auto">

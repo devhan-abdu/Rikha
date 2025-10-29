@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Category, Product } from '@/interface'
 import { useState } from 'react'
 import ProductCard from '@/components/ProductCard'
-import { fetchProductsByCategory } from '@/lib/featchers'
+import { fetchAllProducts, fetchProductsByCategory } from '@/lib/featchers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
@@ -16,14 +16,15 @@ type Props = {
 }
 
 const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) => {
-    const [selected, setSelected] = useState(defaultCategory)
+    const [selected, setSelected] = useState(defaultCategory || "all")
     const [sortOption, setSortOption] = useState('relevant');
     const shouldFetch = selected !== '';
 
     const categoryKey = `/api/category/${selected}`;
     const { data: products, isLoading } = useSWR(
         shouldFetch ? categoryKey : null,
-        () => fetchProductsByCategory(selected),
+        selected === "all" ? () => fetchAllProducts()
+            : () => fetchProductsByCategory(selected),
     )
 
     const displayProducts = shouldFetch ? products ?? [] : initialProducts;
@@ -39,61 +40,56 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
     }, [sortOption, displayProducts])
 
     return (
-
-        <>
-            <div className="flex flex-col justify-between  gap-2  px-4 relative ">
-
-                <div className="p-6 shadow-md  rounded-lg w-fit ">
-                    <h2 className="text-2xl font-bold mb-6 font-montserrat">Category</h2>
-                    <div className="flex flex-wrap  gap-4 items-start ">
-                        {categories.map((item) => (
-                            <button
-                                key={item.slug}
-                                className={cn(
-                                    "cursor-pointer uppercase text-sm md:text-base  pr-4 md:pr-0",
-
-                                    item.slug === selected
-                                        ? "text-primary"
-                                        : "text-gray-900"
-                                )}
-                                onClick={() => setSelected(item.slug)}
-                            >
-                                {item.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <div className='flex-1 container mx-auto  px-2 py-4'>
-                    <div className="flex justify-between gap-12 my-6 mb-8 ">
-                        <p className="sm:text-4xl text-2xl  capitalize font-cinzel font-bold">Products</p>
-
-                        <Select onValueChange={(value) => setSortOption(value)} >
-                            <SelectTrigger className="w-[200px] focus:ring-primary"> 
-                                <SelectValue placeholder="Sort by price" />
-                            </SelectTrigger>
-                            <SelectContent className='bg-white shadow-2xl z-[999]'>
-                                <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                                <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                    </div>
-
-                    <div className="max-w-fit mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-6">
-
-                        {isLoading
-                            ? Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="w-full h-[300px] bg-gray-200 animate-pulse rounded-lg" />
-                            )) : (
-                                sortedProducts.map((product) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))
+        <div className=" px-4 md:px-6 py-6 ">
+            <div className="my-4 p-4 shadow-sm border border-slate-200 rounded-md w-fit ">
+                <h2 className="text-2xl font-semibold mb-6 ">Category</h2>
+                <div className="flex flex-wrap  gap-4 items-start ">
+                    {[{name: "All", slug:"all"},...categories].map((item) => (
+                        <button
+                            key={item.slug}
+                            className={cn(
+                                "cursor-pointer uppercase text-sm md:text-base",
+                                item.slug === selected
+                                    ? "text-primary"
+                                    : "text-gray-900"
                             )}
-                    </div>
-
+                            onClick={() => setSelected(item.slug)}
+                        >
+                            {item.name}
+                        </button>
+                    ))}
                 </div>
             </div>
-        </>
+            <div className=' space-y-8 mt-12'>
+                <div className="flex justify-between gap-12">
+                    <p className=" text-2xl sm:text-3xl capitalize font-cinzel font-bold">Products</p>
+
+                    <Select onValueChange={(value) => setSortOption(value)} >
+                        <SelectTrigger className="w-[200px] focus:ring-primary">
+                            <SelectValue placeholder="Sort by price" />
+                        </SelectTrigger>
+                        <SelectContent className='bg-white shadow-2xl z-[999]'>
+                            <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                            <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                </div>
+
+                <div className="max-w-fit mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-x-6 gap-y-8 mt-12">
+
+                    {isLoading
+                        ? Array.from({ length: 6 }).map((_, i) => (
+                            <div key={i} className="w-full h-[300px] bg-gray-200 animate-pulse rounded-lg" />
+                        )) : (
+                            sortedProducts.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))
+                        )}
+                </div>
+
+            </div>
+        </div>
     )
 }
 

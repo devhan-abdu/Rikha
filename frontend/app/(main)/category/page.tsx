@@ -1,19 +1,20 @@
-import { fetchFeaturedProducts, fetchCategories, fetchProductsByCategory } from '@/lib/featchers'
+import { fetchCategories, fetchProductsByCategory, fetchAllProducts } from '@/lib/featchers'
 import CategoryPage from "./Category";
 import Common from '@/components/Common';
 
 
-const Collection = async ({searchParams}:{searchParams:{slug?: string}}) => {
+const Category = async ({searchParams}:{searchParams:{slug?: string}}) => {
     const categories = await fetchCategories();
+    const { slug } = await searchParams
 
     let initialProducts , defaultCategory;
-    if(!searchParams.slug) {
-       initialProducts = await fetchFeaturedProducts();
-         defaultCategory="";
+    if(!slug) {
+       initialProducts = await fetchAllProducts();
+        defaultCategory="";
        
     } else {
-        initialProducts = await fetchProductsByCategory(searchParams.slug);
-        defaultCategory= searchParams.slug;
+        initialProducts = await fetchProductsByCategory(slug);
+        defaultCategory= slug;
     }
 
     return (
@@ -28,4 +29,4 @@ const Collection = async ({searchParams}:{searchParams:{slug?: string}}) => {
     )
 }
 
-export default Collection
+export default Category
