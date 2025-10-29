@@ -82,7 +82,7 @@ const EmailVerificationPage = () => {
 				transition={{ duration: 0.5 }}
 				className='bg-white p-8 rounded-2xl '
 			>
-				<h2 className='text-3xl font-bold text-center mb-6'>Verify Your Email</h2>
+				<h2 className='text-3xl font-bold text-center font-cinzel'>Verify Your Email</h2>
 				<p className='text-center text-gray-700 mb-6'>
 					Enter the 6-digit code sent to your email.
 				</p>
@@ -111,12 +111,13 @@ const EmailVerificationPage = () => {
 					<motion.button
 						whileHover={{ scale: 1.05 }}
 						whileTap={{ scale: 0.95 }}
-						type='submit'
+						type="submit"
 						disabled={isSubmitting || code.some((c) => c === "")}
-						className='w-full bg-primary text-white py-3 rounded shadow hover:scale-105 disabled:opacity-50'
+						className="w-full bg-primary text-white py-3 rounded shadow disabled:opacity-50"
 					>
-						Verify Email
+						{isSubmitting ? "Verifying..." : "Verify Email"}
 					</motion.button>
+
 				</form>
 			</motion.div>
 		</div>

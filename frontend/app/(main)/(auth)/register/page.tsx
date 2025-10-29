@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
 import GoogleButton from '@/components/ui/GoogleButton'
 import api from '@/lib/api'
+import { Button } from '@/components/ui/button'
 
 
 
@@ -19,7 +20,7 @@ const Register: FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema)
   })
@@ -27,8 +28,8 @@ const Register: FC = () => {
   const onSubmit: SubmitHandler<SignUpFormData> = async (data: SignUpFormData) => {
     try {
       const { confirmPassword, ...sanitizedData } = data
-       await api.post("/auth/register", sanitizedData)
-       localStorage.setItem("verify_email", data.email)
+      await api.post("/auth/register", sanitizedData)
+      localStorage.setItem("verify_email", data.email)
 
       toast.success('Sign up  successfully! pls verify your email');
       router.push('/verify-email')
@@ -72,7 +73,13 @@ const Register: FC = () => {
               <div className='text-red-500 -mt-5'>{errors.confirmPassword.message}</div>
             )
           }
-          <button type='submit' className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel'>Create an account</button>
+          <Button
+            type="submit"
+            className="cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating an account..." : "Create an account"}
+          </Button>
           {
             errors.root && (
               <div className='text-red-500 -mt-5'>{errors.root.message}</div>
