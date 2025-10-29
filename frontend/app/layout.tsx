@@ -9,12 +9,12 @@ import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
 import { UserProvider } from '@/components/provider/UserProvider';
 
 
-const inter = Inter({ subsets: ['latin'],variable:'--font-inter' });
 const cinzel = Cinzel({
   subsets:['latin'],
-  weight:['700'],
+  weight:['600'],
   variable:'--font-cinzel'
 })
+
 
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased dark:bg-foreground flex min-h-screen flex-col font-cinzel"
+        className={`antialiased  flex min-h-screen flex-col  ${cinzel.variable} `}
       >
         <StoreProvider>
           <ReactQueryProvider>
