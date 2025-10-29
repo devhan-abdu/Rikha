@@ -222,21 +222,26 @@ export const getSearch = async (query: string) => {
       ],
     },
     select: {
-      title: true,
-      id: true,
       image: true,
+      title: true,
       price: true,
       specs: true,
-      reviews: true,
+      rating: true,
       numReviews: true,
+      shortDesc: true,
+      id: true,
+      slug: true,
+      categoryId: true,
+      stock: true,
+      discount: true,
     },
     take: 10,
     orderBy: {
-      createdAt: "desc",
-    },
+    createdAt: "desc",
+  },
   });
 
-  return products;
+return products;
 };
 
 
