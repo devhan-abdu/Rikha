@@ -21,6 +21,7 @@ const AddToCartButton = ({ product }: { product: ProductDetail | Product }) => {
             price: product.price,
             discount: product.discount,
             stock: product.stock,
+            slug: product.slug
         }
         dispatch(addCartItem(cartItem))
     }
@@ -29,7 +30,7 @@ const AddToCartButton = ({ product }: { product: ProductDetail | Product }) => {
             onClick={() => addToCart()}
             type="button"
             disabled={!canAdd || product.stock <= 0}
-            className={`w-full flex items-center justify-center gap-2 rounded-lg  px-4 py-2.5 text-sm font-medium text-white 
+            className={`w-full flex items-center justify-center gap-2 rounded-lg  px-4 py-2 text-sm font-medium text-white 
             ${(!canAdd || product.stock <= 0) ? "cursor-not-allowed bg-gray-300 text-gray-600" : "cursor-pointer bg-primary hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300  "
                 }
             `}

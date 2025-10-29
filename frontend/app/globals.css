@@ -4,29 +4,19 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/** Colors **/
 
 
-/** Theme Setup **/
 @theme inline {
 
-  /* //font */
    --color-primary:#C7326A;
-   --color-forground:#FFFFF0;
-  --font-inter: var(--font-inter);
+  --color-forground:#FFFFF0;
   --font-cinzel: var(--font-cinzel);
-  --font-poppins:var(--font-poppins);
 }
- 
-
-
-/** Smooth scroll **/
 html {
   scroll-behavior: smooth;
 }
 body {
   font-family: var(--font-poppins);
 }
-/*---break---*/
 
 

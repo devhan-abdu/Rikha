@@ -6,6 +6,7 @@ import { decreaseCartQuantity, increaseCartQuantity, removeCartItem, selectCartI
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectSelectedIds, toggleSelectItem } from "@/redux/slices/selectedItemsSlice";
 import { Checkbox } from "./ui/checkbox";
+import Link from "next/link";
 
 
 
@@ -35,9 +36,11 @@ const CartCard = () => {
                     </div>
 
                     <div className="flex-1 min-w-0 ml-4 sm:p-4  self-start">
-                        <h2 className="line-clamp-2 text-base font-medium text-gray-900">
-                            {item.title}
-                        </h2>
+                        <Link href={`/category/${item.slug}`}>
+                            <h2 className="line-clamp-2 text-base font-medium text-gray-900">
+                                {item.title}
+                            </h2>
+                        </Link>
                         <p className="text-sm text-gray-500 mt-1 line-clamp-1">
                             {item.desc}
                         </p>

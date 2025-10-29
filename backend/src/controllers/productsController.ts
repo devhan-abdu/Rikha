@@ -78,12 +78,5 @@ export const handleSearch = catchAsync(async (req: Request, res: Response, next:
         return;
     }
     const products = await getSearch(query)
-    if (!products || products.length === 0) {
-        return res.status(200).json({
-            success: true,
-            products: []
-        });
-    }
-
     res.status(200).json({ success: true, data: products })
 })

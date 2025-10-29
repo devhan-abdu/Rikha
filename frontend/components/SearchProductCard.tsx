@@ -1,29 +1,14 @@
-'use client'
 import React from 'react'
 import Image from 'next/image'
 import { Product } from '@/interface'
-import { useAppDispatch } from "@/redux/hooks";
-import { addCartItem } from "@/redux/slices/cartSlice";
 import Link from 'next/link';
+import AddToCartButton from './AddToCartButton';
 
 const SearchProductCard = ({ product }: { product: Product }) => {
-    const dispatch = useAppDispatch();
 
-    const addToCart = () => {
-        const cartItem = {
-            productId: product.id,
-            title: product.title,
-            desc: product.shortDesc,
-            quantity: 1,
-            image: product.image,
-            price: product.price,
-        }
-        console.log(cartItem, 'hela from cart')
-        dispatch(addCartItem(cartItem))
-    }
     return (
-        <div className='flex flex-col px-5 md:flex-row md:px-0  gap-4 border-2 border-gray-200 bg- shadow-lg py-3 bg-white' key={product.id}>
-            <Link  href={`/category/${product.slug}`}  className='md:w-[25%] h-[100px] cursor-pointer '>
+        <div className='flex flex-col px-5 md:flex-row md:px-0 gap-4 border border-slate-200 shadow-sm py-3 ' key={product.id}>
+            <Link href={`/category/${product.slug}`} className='md:w-[25%] h-[100px] cursor-pointer '>
                 <Image
                     src={product.image}
                     alt={product.title}
@@ -33,7 +18,9 @@ const SearchProductCard = ({ product }: { product: Product }) => {
                 />
             </Link >
             <div className='flex flex-1 flex-col gap-1 items-start'>
-                <h4 className='text-black font-bold leading-6 text-xl font-cinzel'>{product.title}</h4>
+                <Link href={`/category/${product.slug}`}>
+                    <h4 className='text-lg'>{product.title}</h4>
+                </Link>
                 <div className="mt-2 flex items-center gap-2">
                     <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
@@ -60,29 +47,16 @@ const SearchProductCard = ({ product }: { product: Product }) => {
                 </div>
             </div>
             <div className='md:pr-2 flex flex-col gap-4 justify-between'>
-                <p className='font-bold text-lg font-serif text-start md:text-end leading-2 '>${product.price}</p>
-                <button
-                    onClick={() => addToCart()}
-                    type="button"
-                    className="cursor-pointer inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                >
-                    <svg
-                        className="-ms-2 me-2 h-5 w-5"
-                        aria-hidden="true"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                        />
-                    </svg>
-                    Add to cart
-                </button>     
-               </div>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-sm text-gray-400 line-through">
+                        ETB {product.price.toFixed(2)}
+                    </span>
+                    <span className="text-md font-semibold text-gray-900">
+                        ETB {(product.price * (1 - product.discount)).toFixed(2)}
+                    </span>
+                </div>
+                <AddToCartButton product={product} />
+            </div>
         </div>
     )
 }

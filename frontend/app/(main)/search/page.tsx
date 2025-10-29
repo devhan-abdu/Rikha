@@ -1,36 +1,79 @@
-import {Suspense} from 'react'
 import Search from '@/components/Search';
-import SearchTable from '@/components/SearchTable';
-import { List ,LayoutGrid  } from 'lucide-react';
+import { Frown } from 'lucide-react';
+import { fetchFeaturedProducts, fetchSearchProducts } from '@/lib/featchers';
+import SearchProductCard from '@/components/SearchProductCard';
 
-export default async function Page(props:{
-    searchParams?:Promise<{
-        query?:string;
-    }>;
-}) { 
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+  }>;
+}) {
 
-   const searchParams = await props.searchParams;
-   const query = searchParams?.query || '';
- 
-  return (
-    <div className=''>
+  const searchParams = await props.searchParams;
+  const query = (searchParams?.query || '').trim();
+  const products = query === "" ? [] : await fetchSearchProducts(query);
+  const featured = await fetchFeaturedProducts()
+
+
+  if (query === "") {
+    return (
+      <div>
         <Search />
+        <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
+          <div className=" flex flex-col gap-12 w-full ">
+            <h1 className="text-[24px] font-cinzel font-light text-center ">Get to know
+              Rikha Bestsellers</h1>
+            <div className='space-y-4 md:space-y-2  '>
+              {featured?.map(product => (
+                <SearchProductCard product={product} key={product.id} />
+              ))
+
+              }
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (products?.length === 0 || !products) {
+    return (
+      <div>
+        <Search />
+        <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
+          <div className="flex flex-col items-center justify-center gap-12 ">
+            <div className="text-xl  w-max p-8 pb-0 flex flex-wrap items-center justify-center gap-1">
+              <p className="">  Oops, No results to match your search. </p>
+              <Frown className="text-4xl" />
+            </div>
+            <div className=" flex flex-col gap-12 w-full ">
+              <h1 className="text-[24px] font-cinzel font-light text-center ">Get to know
+                Rikha Bestsellers</h1>
+              <div className='space-y-4 md:space-y-2  '>
+                {featured?.map(product => (
+                  <SearchProductCard product={product} key={product.id} />
+                ))
+
+                }
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <Search />
       <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
-        {/* <div className="flex items-center justify-between ga-6 pb-6 ">
-            <div className='text-gray-600 bg-gray-100  rounded-md border border-gray-300 flex items-center gap-1'>
-                <p className='text-black bg-white py-2 px-2 border border-gray-300 rounded-md'>Sort by date</p>
-                <p className=' p-2'>Sort by price</p>
-            </div>
-            <div className='text-gray-600 bg-gray-50  rounded-md border border-gray-300 hidden md:flex items-center gap-1'>
-                <p className='text-black bg-white px-3 py-2 border border-gray-300 shadow-2xl rounded-md inline-flex items-center gap-1'> <List/> <span>List</span></p>
-                <p className='px-3 py-2 inline-flex items-center gap-1'><LayoutGrid/> <span>Grid</span></p>
-            </div>
-        </div> */}
-     <Suspense key={query} fallback={<div>Loading....</div>}>
-      <SearchTable query={query}/>
-      </Suspense>
+        <div className='space-y-4 md:space-y-2  '>
+          {products?.map(product => (
+            <SearchProductCard product={product} key={product.id} />
+          ))
+          }
+        </div>
       </main>
-    
     </div>
   )
 }
