@@ -16,27 +16,36 @@ model User {
   id             Int       @id @default(autoincrement())
   name           String?
   email          String    @unique
-  password       String?   
-  provider       String    @default("credentials")  
-  addresses      UserAddress[]
-
-  
+  password       String?    
   role           Role      @default(USER)
   verified       Boolean   @default(false)
+  avatarUrl       String?
   
   otpCode        String?
   otpExpires     DateTime?
   resetToken     String?
   resetExpires   DateTime?
-  
-  refreshToken   String?   
-  
+    
   reviews        Review[]
   cartItems      CartItem[]
   order          Order[]
+  addresses      UserAddress[]
+  oauthAccounts   OAuthAccount[]
+
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+
+model OAuthAccount {
+  id         Int      @id @default(autoincrement())
+  provider   String  
+  providerId String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+
+  createdAt DateTime @default(now())
 }
 
 
