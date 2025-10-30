@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendverificationEmail, sendForgetEmail, sendResetEmail } from '../nodemailer/email';
 import { AppError } from '../utils/AppError';
-
+import { checkAccount } from '../utils/checkAccount';
 
 const findUserByEmail = async (email: string,) => {
     return await prisma.user.findUnique({
@@ -13,14 +13,12 @@ const findUserByEmail = async (email: string,) => {
     })
 }
 
-
 const register = async (name: string, password: string, email: string) => {
 
-    const user = await findUserByEmail(email)
-    if (user) throw new AppError('User already exists with this email', 409);
+    const existingUser = await findUserByEmail(email.toLowerCase())
+    if (existingUser) throw new AppError("Email already exists. Please login instead.", 409);
 
     const hashedpwd = await bcrypt.hash(password, 10);
-
     const { code, expires } = generateOTP()
 
     await prisma.user.create({
@@ -33,7 +31,6 @@ const register = async (name: string, password: string, email: string) => {
             otpExpires: expires,
         }
     })
-    console.log(code)
     await sendverificationEmail(email, code)
 }
 
@@ -64,16 +61,12 @@ const verifyEmail = async (email: string, otp: string) => {
 }
 const login = async (email: string, password: string) => {
     const user = await findUserByEmail(email);
-    if (!user) throw new AppError('user not found', 404);
+    if (!user) throw new AppError("Invalid email or password.", 401);
+    if (!user.password) throw new AppError("This account uses Google or GitHub login.", 400);
 
-    if (user.provider === "credentials") {
-        if (!user.password) throw new AppError("Password missing", 400);
-        if (user.verified === false) throw new AppError('Please verify your email before logging in', 403);
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) throw new AppError("Password incorrect", 400);
-    } else {
-        throw new AppError(`Please log in with ${user.provider}`, 400);
-    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new AppError("Invalid email or password.", 401);
+
 
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
@@ -85,7 +78,7 @@ const login = async (email: string, password: string) => {
 const forgetPassword = async (email: string) => {
     const user = await findUserByEmail(email)
 
-    if (!user) throw new AppError('User not found', 401)
+    if (!user) throw new AppError('Invalid email', 401)
     const { token, expires } = generateResetToken();
 
 
@@ -110,7 +103,7 @@ const resetPassword = async (email: string, token: string, password: string) => 
             }
         }
     })
-    if (!user) throw new AppError('User not found', 401)
+    if (!user) throw new AppError("Invalid email or reset token.", 401);
 
     const hashedpassword = await bcrypt.hash(password, 10);
     await prisma.user.update({
@@ -138,63 +131,96 @@ const refresh = async (refreshToken: string) => {
         where: { id: userId },
     });
 
-    if (!user) throw new AppError('User not found', 404);
+    if (!user) throw new AppError('Invalid token', 404);
 
     const newAccessToken = generateAccessToken(user.role, user.id);
     return newAccessToken
 };
 
 const googleCallback = async (code: string) => {
-    const clientId = process.env.CLIENTID;
-    const clientSecret = process.env.CLIENTSECRET;
-    const redirectUri = process.env.CALLBACK_URL;
-    const access_token_url = process.env.GOOGLE_ACCESS_TOKEN_URL!;
 
-    const data = {
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: "authorization_code"
-    }
 
-    const tokenResponse = await fetch(access_token_url, {
+    const tokenResponse = await fetch(process.env.GOOGLE_ACCESS_TOKEN_URL!, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+            code,
+            client_id: process.env.GOOGLE_CLIENTID,
+            client_secret: process.env.GOOGLE_CLIENTSECRET,
+            redirect_uri: process.env.GOOGLE_CALLBACK_URL,
+            grant_type: "authorization_code"
+        }),
     });
 
-    const access_token_data = await tokenResponse.json();
-    const { id_token } = access_token_data;
+    const { id_token } = await tokenResponse.json();
 
     const token_info_response = await fetch(
         `${process.env.GOOGLE_TOKEN_INFO_URL}?id_token=${id_token}`
     );
 
-    const token_info_data = await token_info_response.json();
+    const { email, name, sub: providerId } = await token_info_response.json();
+    if (!email) throw new AppError("Something went wrong");
 
-    const { email, name } = token_info_data;
 
-    const user = await prisma.user.upsert({
-        where: { email },
-        update: {
-            name,
-            verified: true,
+    const user = await checkAccount(providerId, "google", email, name);
+
+    return {
+        accessToken: generateAccessToken(user.role, user.id),
+        refreshToken: generateRefreshToken(user.id)
+    };
+
+}
+
+const githubCallback = async (code: string) => {
+
+    const tokenResponse = await fetch(process.env.GITHUB_ACCESS_TOKEN_URL!, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         },
-        create: {
-            name,
-            email,
-            verified: true,
-            provider: "google",
-        }
-    })
+        body: JSON.stringify({
+            code,
+            client_id: process.env.GITHUB_CLIENTID,
+            client_secret: process.env.GITHUB_CLIENTSECRET,
+            redirect_uri: process.env.GITHUB_CALLBACK_URL,
+        }),
+    });
 
-    const accessToken = generateAccessToken(user.role, user.id)
-    const refreshToken = generateRefreshToken(user.id)
+    const { access_token } = await tokenResponse.json();
+    if (!access_token) throw new AppError("Something went wrong");
 
-    return { accessToken, refreshToken };
+
+    const userResponse = await fetch(`${process.env.GITHUB_INFO_URL}`, {
+        headers: {
+            "Authorization": `Bearer ${access_token}`,
+            "Accept": "application/json",
+        },
+    });
+
+    if (!userResponse.ok) throw new AppError("Something went wrong");
+
+    const userData = await userResponse.json();
+    let email = userData.email
+    if (!email) {
+        const emailsResponse = await fetch(`${process.env.GITHUB_INFO_URL}/emails`, {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        const emails = await emailsResponse.json();
+        email = emails.find((e: any) => e.primary)?.email;
+        if (!email) throw new AppError("Something went wrong");
+
+    }
+
+    const { id: providerId, name } = userData
+    const user = await checkAccount(providerId.toString(), "github", email, name);
+
+    return {
+        accessToken: generateAccessToken(user.role, user.id),
+        refreshToken: generateRefreshToken(user.id)
+    };
 
 }
 
 
-export { register, verifyEmail, login, resetPassword, refresh, forgetPassword, googleCallback }
+export { register, verifyEmail, login, resetPassword, refresh, forgetPassword, googleCallback, githubCallback }
