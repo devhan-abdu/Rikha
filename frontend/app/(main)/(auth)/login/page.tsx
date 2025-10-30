@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { setUser } from '@/redux/slices/authSlice';
-import GoogleButton from '@/components/ui/GoogleButton';
+import OAuthButtons from '@/components/ui/OAuthButtons';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 
@@ -72,7 +72,7 @@ const Login = () => {
             {isSubmitting ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
-        <GoogleButton />
+        <OAuthButtons />
         <p className="text-md text-gray-900 text-center my-8">
           Don&rsquo;t have an account yet? <Link href="/register" className="font-medium text-primary hover:underline ">Sign up</Link>
         </p>

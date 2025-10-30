@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from 'next/navigation'
 import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
-import GoogleButton from '@/components/ui/GoogleButton'
+import OAuthButtons from '@/components/ui/OAuthButtons'
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
 
@@ -86,7 +86,7 @@ const Register: FC = () => {
             )
           }
         </form>
-        <GoogleButton />
+        <OAuthButtons />
         <p className="text-md text-gray-900 text-center my-8">
           Already have an account? <Link href="/signin" className="font-medium text-primary hover:underline ">Login here</Link>
         </p>
