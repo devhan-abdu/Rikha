@@ -1,6 +1,6 @@
 
 import prisma from "../config/prisma"
-import { CreateReviewInput } from "../types/type"
+import { CreateReviewInput } from "../validators/order.schema"
 import { AppError } from "../utils/AppError"
 
 

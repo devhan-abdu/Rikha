@@ -1,6 +1,5 @@
 import { catchAsync } from "../utils/catchAsync"
 import { NextFunction, Response, Request } from "express"
-import { OrderBodySchema } from "../types/type";
 import * as orderService from "../services/orderService";
 
 export interface AuthenticatedRequest extends Request {
@@ -10,21 +9,13 @@ export interface AuthenticatedRequest extends Request {
 const orderController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.userId;
 
-    const validationResult = OrderBodySchema.safeParse(req.body);
-    if (!validationResult.success) {
-        res.status(404).json({
-            success: false,
-            message: "bad request"
-        })
-        return
-    }
-    const { items, paymentMethod, addressId  } = validationResult.data;
+    const { items, paymentMethod, addressId } = req.body;
 
-    const paymentUrl = await orderService.createOrder({ items, paymentMethod, addressId , userId })
+    const paymentUrl = await orderService.createOrder({ items, paymentMethod, addressId, userId })
 
     res.status(200).json({
         success: true,
-        url: paymentUrl
+        data: paymentUrl
     });
 
 })
@@ -63,12 +54,12 @@ const orderStatusController = catchAsync(async (req: AuthenticatedRequest, res: 
         });
     }
     const order = await orderService.orderStatus(txRef, userId);
-  
-        res.status(200).json({
-            success: true,
-            order
-        })
-    
+
+    res.status(200).json({
+        success: true,
+        data:order
+    })
+
 })
 
 const getUserOrdersController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -77,7 +68,7 @@ const getUserOrdersController = catchAsync(async (req: AuthenticatedRequest, res
     if (!userId) {
         return res.status(401).json({
             success: false,
-            message: "User ID not found in token"
+            message: "User ID not found "
         });
     }
 

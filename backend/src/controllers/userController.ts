@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
-import prisma from "../config/prisma";
 import * as userServices from "../services/userServices";
 
 
@@ -14,7 +13,7 @@ const getUser = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
 
     res.status(200).json({
         success: true,
-        user
+        data: user
     });
 })
 
@@ -28,7 +27,7 @@ const updateUser = catchAsync(async (req: AuthenticatedRequest, res: Response) =
 
     res.status(200).json({
         success: true,
-        user: updatedUser
+        data: updatedUser
     });
 })
 

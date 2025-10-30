@@ -59,7 +59,7 @@ export const handleGetReviews = catchAsync(async (req: Request, res: Response, n
 
 })
 export const handleAddReview = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const { productId } = req.params;
+    const { productId } = (req.params);
     const userId = req.user.userId;
     const { rating, comment } = req.body;
     const reviewData = { userId, productId, rating, comment };

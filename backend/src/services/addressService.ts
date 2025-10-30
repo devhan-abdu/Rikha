@@ -1,5 +1,5 @@
 import prisma from "../config/prisma"
-import { AddressData } from "../types/type"
+import { AddressData } from "../validators/order.schema"
 import { AppError } from "../utils/AppError"
 
 const getAll = async (userId: number): Promise<AddressData[]> => {

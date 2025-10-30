@@ -1,6 +1,6 @@
 import { OrderStatus, PaymentStatus } from "@prisma/client";
 import prisma from "../config/prisma";
-import { ExtendedOrderBody, OrderBody, OrderItem } from "../types/type";
+import { ExtendedOrderBody, OrderBody, OrderItem } from "../validators/order.schema";
 import { AppError } from "../utils/AppError";
 import { randomUUID } from 'crypto'
 import { createTransaction } from "../utils/createTransaction";
@@ -91,7 +91,7 @@ const createOrder = async (data: ExtendedOrderBody) => {
 }
 
 
-const verifyPaymentAndHandleOrder = async (id: string): Promise<{ success: boolean; order: any }> => {
+const verifyPaymentAndHandleOrder = async (id: string) => {
 
     const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${id}`, {
         method: "GET",
@@ -156,7 +156,7 @@ const verifyPaymentAndHandleOrder = async (id: string): Promise<{ success: boole
 }
 
 
-const orderStatus = async (txRef: string, userId: number): Promise<{ success: boolean; order: any }> => {
+const orderStatus = async (txRef: string, userId: number) => {
     const order = await prisma.order.findUnique({
         where: {
             tx_ref: txRef,
