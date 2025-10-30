@@ -24,6 +24,7 @@ export interface Product {
   rating: number;
   numReviews: number;
   specs: string[];
+  discount: number;
 };
 
 export interface Review {
@@ -49,6 +50,7 @@ export interface Cart {
   productId: number;
   discount: number;
   stock: number;
+  slug: string
 }
 
 export type UserDetails = {
