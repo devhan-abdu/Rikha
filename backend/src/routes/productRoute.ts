@@ -13,29 +13,24 @@ import {
 } from '../controllers/productsController';
 
 import { isAuth } from '../middleware/isAuth';
-import { validateReview } from '../middleware/validateReview';
+import { validate } from '../middleware/Validation';
+import { Review } from '../validators/order.schema';
 
 const router = express.Router();
 
-//  Collection Pages
 router.get('/categories', handleCategory);
 router.get('/categories/:slug', handleCategoryProducts);
 
-
-
-//  Homepage Highlights
 router.get('/products/featured', handleFeaturedProducts);
 router.get('/products/new-arrivals', handleNewArrivalsProducts);
 
-//  Product Info
 router.get('/products', handleAllProducts);
 router.get('/products/search' , handleSearch)
 router.get('/products/:slug', handleProductDetail);  
 router.get('/products/:slug/related', handleRelated);
 
-//  Reviews
 router.get('/products/:productId/reviews', handleGetReviews);
-router.post('/products/:productId/reviews', isAuth, validateReview, handleAddReview);
+router.post('/products/:productId/reviews', isAuth, validate(Review), handleAddReview);
 
 
 export { router as productRouter };
