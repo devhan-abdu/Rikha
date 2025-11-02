@@ -9,52 +9,56 @@ import { Menu, TabletSmartphone } from "lucide-react";
 import Link from "next/link";
 import { navData } from "@/constants/index";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const MobileNav = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleNavigate = (path: string) => {
+    setOpen(false)
+    router.push(path)
+  }
 
   return (
-    <>
-      <div className="flex items-center gap-4 order-1 md:order-3 md:hidden ">
+    <div className="flex order-1 md:order-3 md:hidden">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <button aria-label="open menu" className="cursor-pointer">
+            <Menu className="h-6 w-6" />
+          </button>
+        </SheetTrigger>
 
-        <div className="flex">
-          <Sheet >
-            <SheetTrigger><Menu /></SheetTrigger>
-            <SheetContent className='z-[9999] bg-forground'>
-              <SheetHeader>
-                <SheetTitle>
-                  <div className={`font-cinzel text-primary font-bold text-4xl text-center mt-16 mb-6 mx-auto flex items-center justify-center gap-1`}>
-                    <TabletSmartphone className='text-6xl' />
-                    <p >Rikha</p>
-                  </div>
-                </SheetTitle>
+        <SheetContent className='z-[9999] bg-white w-[280px] border-none'>
+          <SheetHeader>
+            <SheetTitle>
+              <div className="font-cinzel text-primary font-bold text-4xl text-center mt-14 mb-8 flex items-center justify-center gap-1">
+                <TabletSmartphone className="text-6xl" />
+                <p>Rikha</p>
+              </div>
+            </SheetTitle>
+            </SheetHeader>
 
-                <nav className="">
-                  <ul className="flex flex-col items-center justify-center gap-6 no-underline  flex-1">
-                    {
-                      navData.map((item) => {
-                        return (
-                          <li key={item.id}>
-                            <Link href={item.path} className={cn('transition-colors ', { "text-primary": pathname === item.path })}>
-                              {item.name}
-                            </Link>
-                          </li>
-                        )
-                      })
-                    }
-                  </ul>
-                </nav>
-              </SheetHeader>
-            </SheetContent>
-          </Sheet>
+            <nav className="mt-4">
+              <ul className="flex flex-col items-center gap-6">
+                {
+                  navData.map((item) => (
 
-        </div>
-        {/* <Button variant="ghost" className=''>
-          <Link href='/search'><Search /></Link>
-        </Button> */}
-      </div>
-    </>
+                    <li key={item.id}>
+                      <button onClick={() => handleNavigate(item.path)} className={cn(' text-lg transition-colors cursor-pointer', { "text-primary": pathname === item.path })}>
+                        {item.name}
+                      </button>
+                    </li>
+                  )
+                  )
+                }
+              </ul>
+            </nav>
+        </SheetContent>
+      </Sheet>
+    </div >
   )
 }
 
