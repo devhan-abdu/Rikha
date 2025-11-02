@@ -48,7 +48,7 @@ export const fetchProductDetail = async (slug: string): Promise<ProductDetail> =
     const json = await res.json();
     return json.data;
 }
-export const fetchRelatedProducts = async (slug: String): Promise<Product[]> => {
+export const fetchRelatedProducts = async (slug: string): Promise<Product[]> => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${slug}/related`, {
     });
     if (!res.ok) throw new Error("Failed to fetch related products");
