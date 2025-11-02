@@ -16,7 +16,6 @@ async function tryRefresh() {
         });
 
         if (!res.ok) {
-            console.error("refresh failed", res.status, await res.text().catch(() => ""));
             return false;
         }
 
@@ -36,7 +35,6 @@ async function tryRefresh() {
 
         return true;
     } catch (err) {
-        console.error('tryRefresh error', err);
         return false;
     }
 
@@ -55,12 +53,11 @@ export async function fetchMe() {
 
         if (meRes.ok) {
             const data = await meRes.json();
-            return data.user;
+            return data.data;
         }
 
         if (meRes.status === 401) {
             const refreshed = await tryRefresh();
-            console.log("trying to refresh", refreshed)
             if (!refreshed) return null;
 
             const cookieHeader2 = (await cookies()).getAll().map(c => `${c.name}=${c.value}`).join("; ");
@@ -72,7 +69,7 @@ export async function fetchMe() {
             })
             if (meRes2.ok) {
                 const data2 = await meRes2.json();
-                return data2.user;
+                return data2.data;
             } else {
                 console.log("unable to get new access after refresh", meRes2.status);
                 return null;
