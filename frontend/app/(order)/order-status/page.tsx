@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startOrderPolling } from "@/lib/startOrderPolling";
-import OrderCard from "@/components/OrderCard";
+import OrderStatusCard from "@/components/OrderStatusCard";
 
 const OrderStatus = () => {
   const [status, setStatus] = useState<
@@ -33,7 +33,7 @@ const OrderStatus = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       {status === "pending" && (
-        <OrderCard
+        <OrderStatusCard
           status="pending"
           title="Processing Payment..."
           message="Please do not close this window. We are confirming your order status."
@@ -41,7 +41,7 @@ const OrderStatus = () => {
       )}
 
       {status === "error" && (
-        <OrderCard
+        <OrderStatusCard
           status="error"
           title="Error Confirming Payment"
           message={`There was a network issue or timeout. Please check your email or contact support with reference: ${txRef}.`}
