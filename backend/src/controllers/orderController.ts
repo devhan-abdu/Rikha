@@ -26,43 +26,35 @@ const verifyTransaction = catchAsync(async (req: Request, res: Response, next: N
         return res.status(400).json({ success: false, message: "Transaction reference is required." });
     }
 
-    const { success, order } = await orderService.verifyPaymentAndHandleOrder(id);
+    const order = await orderService.verifyPaymentAndHandleOrder(id);
 
-    if (success === true) {
-        res.status(200).json({
-            success: true,
-            message: "Payment verified and order confirmed.",
-            data: order
-        });
-    } else {
-        res.status(400).json({
-            success: false,
-            message: "Payment verification failed. Order status updated/stock reverted.",
-            data: order
-        });
-    }
+    res.status(200).json({
+        success: true,
+        data: order
+    });
 })
 
-const orderStatusController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const orderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 
     const txRef = req.query.tx_ref as string;
     const userId = req.user?.userId;
-    if (!txRef || !userId) {
+
+    if (!txRef) {
         return res.status(400).json({
             success: false,
-            message: "Transaction reference and user authentication are required."
+            message: "Transaction reference required."
         });
     }
     const order = await orderService.orderStatus(txRef, userId);
 
     res.status(200).json({
         success: true,
-        data:order
+        data: order
     })
 
 })
 
-const getUserOrdersController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const getUserOrders = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const userId = req.user.userId;
 
     if (!userId) {
@@ -79,5 +71,27 @@ const getUserOrdersController = catchAsync(async (req: AuthenticatedRequest, res
     });
 
 })
+const updateOrderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const userId = req.user.userId;
+    const orderId = Number(req.params.id)
 
-export { orderController, verifyTransaction, orderStatusController, getUserOrdersController }
+    const orders = await orderService.updateOrderStatus(orderId, userId);
+    res.status(200).json({
+        success: true,
+        data: orders
+    });
+
+})
+const removeOrder = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const userId = req.user.userId;
+    const orderId = Number(req.params.id)
+
+    const isRemoved = await orderService.removeOrder(orderId, userId);
+    res.status(200).json({
+        success: isRemoved,
+    });
+
+})
+
+
+export { orderController, verifyTransaction, orderStatus, getUserOrders, updateOrderStatus, removeOrder }
