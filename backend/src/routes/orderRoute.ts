@@ -10,8 +10,8 @@ router.post('/order',isAuth,validate(OrderBodySchema),order.orderController);
 router.get('/verify-payment/:id' ,order.verifyTransaction)
 router.get('/order-status',isAuth,order.orderStatus)
 router.get('/my-orders',isAuth,order.getUserOrders)
-router.patch("cancel/:id", isAuth, order.updateOrderStatus)
-router.delete("remove/:id", isAuth, order.removeOrder)
+router.patch("/cancel/:id", isAuth, order.updateOrderStatus)
+router.delete("/remove/:id", isAuth, order.removeOrder)
 
 
 export {router as orderRouter}
