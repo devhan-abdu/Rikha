@@ -75,10 +75,10 @@ const updateOrderStatus = catchAsync(async (req: AuthenticatedRequest, res: Resp
     const userId = req.user.userId;
     const orderId = Number(req.params.id)
 
-    const orders = await orderService.updateOrderStatus(orderId, userId);
+    const order = await orderService.updateOrderStatus(orderId, userId);
     res.status(200).json({
         success: true,
-        data: orders
+        data: order
     });
 
 })
