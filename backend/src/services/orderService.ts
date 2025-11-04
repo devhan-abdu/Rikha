@@ -125,8 +125,8 @@ const verifyPaymentAndHandleOrder = async (id: string) => {
             return await tx.order.update({
                 where: { tx_ref: id },
                 data: {
-                    paymentStatus: PaymentStatus.FAILED,
-                    orderStatus: OrderStatus.PENDING_PAYMENT,
+                    paymentStatus: PaymentStatus.COMPLETED,
+                    orderStatus: OrderStatus.PROCESSING,
                 },
                 include: { shipping: true, items: true }
             });
@@ -190,11 +190,14 @@ const getOrdersByUserId = async (userId: number) => {
                 include: {
                     product: {
                         select: {
+                            id: true,
                             image: true,
                             title: true,
-                            brand: true,
                             price: true,
                             discount: true,
+                            shortDesc: true,
+                            stock: true,
+                            slug: true,
                         }
                     }
                 }
