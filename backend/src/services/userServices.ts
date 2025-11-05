@@ -1,17 +1,23 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { AppError } from "../utils/AppError";
-import { randomInt }  from 'crypto';
+import { randomInt } from 'crypto';
 import { sendverificationEmail } from "../nodemailer/email";
+import { userData } from "../validators/auth.schema";
 
- const getUserProfile = async (userId: string) => {
+const getUserProfile = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) },
         select: {
             id: true,
-            name: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            phoneNumber: true,
+            avatarUrl: true,
             email: true,
             role: true,
+            verified: true,
             createdAt: true,
             updatedAt: true,
         }
@@ -20,57 +26,63 @@ import { sendverificationEmail } from "../nodemailer/email";
     if (!user) throw new AppError('User not found', 400)
     return user;
 }
- const updateUserProfile = async (userId: string, name?: string, email?: string) => {
+const updateUserProfile = async (userId: number, data: userData) => {
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new AppError('user not found ', 404)
 
     const updatedData: Prisma.UserUpdateInput = {};
 
-    const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
-    if (!user) throw new AppError('user not found ', 404)
+    if (data.email && data.email !== user.email) {
+        const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+        if (existingUser) throw new AppError(' email already in use', 400)
 
-    if (email && email !== user.email) {
-
-        const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (existingUser) throw new AppError(' email already in use', 404)
         const otp = randomInt(100000, 999999).toString();
-        const otpExpires = new Date(Date.now() + 1 * 60 * 60 * 1000);
+        const otpExpires = new Date(Date.now() + 60 * 60 * 1000);
 
         Object.assign(updatedData, {
-            email,
+            email: data.email,
             verified: false,
             otp,
             otpExpires
-
         })
 
-        await sendverificationEmail(email, otp);
+        await sendverificationEmail(data.email, otp);
     }
 
-    if (name) updatedData.name = name;
+    Object.assign(updatedData, data);
 
-    const updatedUser = await prisma.user.update({
-        where: { id: Number(userId) },
+    return prisma.user.update({
+        where: { id: userId },
         data: updatedData,
         select: {
             id: true,
-            name: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            phoneNumber: true,
+            avatarUrl: true,
             email: true,
             role: true,
+            verified: true,
             createdAt: true,
             updatedAt: true,
         }
-
-    })
-
-    return updatedUser;
+    });
 }
 
- const getAllUsers = async () => {
+const getAllUsers = async () => {
     const users = await prisma.user.findMany({
         select: {
             id: true,
-            name: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            phoneNumber: true,
+            avatarUrl: true,
             email: true,
             role: true,
+            verified: true,
             createdAt: true,
             updatedAt: true,
         }
@@ -78,7 +90,7 @@ import { sendverificationEmail } from "../nodemailer/email";
     return users;
 }
 
- const deleteUser = async (userId: string) => {
+const deleteUser = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) }
     })
