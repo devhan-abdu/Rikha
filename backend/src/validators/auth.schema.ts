@@ -26,16 +26,16 @@ export const resetPasswordSchema = z.object({
 });
 
 export const userUpdateSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  username: z.string().optional(),
-  avatarUrl: z.string().optional(),
-  email: z.email().optional(),
+  firstName: z.string().nullish(),
+  lastName: z.string().nullish(),
+  username: z.string().nullish(),
+  avatarUrl: z.string().nullish(),
+  email: z.email().nullish(),
   phoneNumber: z
     .string()
     .min(10)
     .regex(/^(09|07)\d{8}$/)
-    .optional(),
+    .nullish(),
 }).refine(data => Object.keys(data).length > 0, {
   message: "At least one field must be provided"
 });
