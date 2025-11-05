@@ -12,11 +12,48 @@ export const useCreate = () => {
             return res.data.url
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["order"] });
+            queryClient.invalidateQueries({ queryKey: ["my-orders"] });
         },
         onError: (error) => {
             console.log(error)
             toast.error("Failed to create order");
+        }
+    })
+}
+
+export const useRemove = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async (orderId: number) => {
+            const res = await api.delete(`/remove/${orderId}`)
+            return res.data.success
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["my-orders"] })
+            toast.success("Order removed")
+        },
+        onError: (error) => {
+            console.log(error, "from the review")
+            toast.error("Failed to remove the order");
+        }
+    })
+}
+export const useUpdateOrder = () => {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async (orderId: number) => {
+            const res = await api.patch(`/cancel/${orderId}`)
+            return res.data.data
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["my-orders"] })
+            toast.success("Order cancelled")
+        },
+        onError: (error) => {
+            console.log(error)
+            toast.error("Failed to cancel order status");
         }
     })
 }
