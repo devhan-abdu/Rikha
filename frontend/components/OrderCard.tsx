@@ -1,73 +1,114 @@
-"use client";
+"use client"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Order } from "@/interface"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
+import { addCartItem, selectCartItems } from "@/redux/slices/cartSlice"
+import { useRemove, useUpdateOrder } from "@/lib/query/mutations/useOrderMutation"
+import { useRouter } from "next/navigation"
+import { selectAll } from "@/redux/slices/selectedItemsSlice"
 
-import React from "react";
-import { Button } from "./ui/button";
-import { CheckCircle, XCircle, Loader2, AlertTriangle } from "lucide-react";
-import { motion } from "framer-motion";
+export default function OrderCard({ order }: { order: Order }) {
+    const disptch = useAppDispatch();
+    const cartItems = useAppSelector(selectCartItems)
+    const router = useRouter();
+    const { mutate: removeOrder } = useRemove()
+    const { mutate: updateOrder } = useUpdateOrder()
 
-interface OrderCardProps {
-  status: "success" | "failed" | "pending" | "error";
-  title: string;
-  message: string;
-  primaryAction?: {
-    label: string;
-    action: () => void;
-    variant?: "default" | "outline";
-  };
-  secondaryAction?: {
-    label: string;
-    action: () => void;
-    variant?: "default" | "outline";
-  };
-}
+    const handleAddToCart = () => {
+        for (const item of order.items) {
+            const product = item.product
+            const cartItem = {
+                productId: product.id,
+                title: product.title,
+                desc: product.shortDesc,
+                quantity: item.quantity,
+                image: product.image,
+                price: product.price,
+                discount: product.discount,
+                stock: product.stock,
+                slug: product.slug
+            }
+            disptch(addCartItem(cartItem))
+        }
+    }
 
-const icons = {
-  success: <CheckCircle className="text-green-500 w-10 h-10" />,
-  failed: <XCircle className="text-red-500 w-10 h-10" />,
-  pending: <Loader2 className="text-yellow-500 w-10 h-10 animate-spin" />,
-  error: <AlertTriangle className="text-orange-500 w-10 h-10" />,
-};
+    const handlePay = () => {
+        handleAddToCart();
+        disptch(selectAll(cartItems.map(item => item.productId)))
+        router.replace("/checkout")
+    }
 
-const OrderCard: React.FC<OrderCardProps> = ({
-  status,
-  title,
-  message,
-  primaryAction,
-  secondaryAction,
-}) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="p-10 flex flex-col items-center justify-center shadow-xl rounded-xl border border-gray-200 max-w-lg mx-auto text-center bg-white"
-    >
-      {icons[status]}
-      <h1 className="font-bold text-2xl mt-4">{title}</h1>
-      <p className="mt-2 text-gray-600">{message}</p>
+    return (
+        <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
 
-      {(primaryAction || secondaryAction) && (
-        <div className="flex gap-3 mt-6">
-          {primaryAction && (
-            <Button
-              className="text-white"
-              onClick={primaryAction.action}
-            >
-              {primaryAction.label}
-            </Button>
-          )}
-          {secondaryAction && (
-            <Button
-              variant="outline"
-              onClick={secondaryAction.action}
-            >
-              {secondaryAction.label}
-            </Button>
-          )}
+            <div className="flex items-center justify-between border-b border-slate-300 pb-3">
+                <p className="font-semibold text-lg">{order.orderStatus}</p>
+                <p className="text-sm text-gray-500">{new Date(order.orderDate).toLocaleString().split(",")[0]}</p>
+            </div>
+
+            <div className="space-y-6 grid grid-cols-1 gap-2 lg:grid-cols-2">
+                {order.items.map((item) => (
+                    <div className="flex gap-3 py-2">
+                        <div className="h-20 w-20 flex-shrink-0">
+                            <Image
+                                src={item.product.image}
+                                alt={item.product.title}
+                                width={80}
+                                height={80}
+                                className="object-contain w-full h-full"
+                            />
+                        </div>
+
+                        <div className="flex flex-col justify-evenly gap-2">
+                            <div className="space-y-1">
+                                <p className="text-sm text-slate-700 font-medium">{item.product.title}</p>
+                                <p className="text-black/80">{item.product.shortDesc}</p>
+                            </div>
+
+                            <div className="flex items-center gap-3 text-slate-600 text-sm">
+                                <span className="font-bold ">ETB {item.product.price - (item.product.price * item.product.discount)}</span>
+                                <span>x{item.quantity}</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="border-t border-slate-300 pt-4 flex flex-col items-end gap-3">
+                <p className="text-sm font-semibold">
+                    Total ({order.items.length} items): ETB {order.totalAmount}
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+
+                    {(order.orderStatus === "DELIVERED" || order.orderStatus === "CANCELLED") && (
+                        <Button variant="outline" size="sm" className="text-primary border border-primary hover:scale-105 transition-all duration-300" onClick={() => removeOrder(order.id)}>
+                            Remove
+                        </Button>
+                    )}
+                    {(order.orderStatus === "DELIVERED" || order.orderStatus === "CANCELLED") && (
+                        <Button variant="secondary" size="sm" className="rounded-md bg-primary text-white  hover:scale-105 transition-all duration-300" onClick={handleAddToCart}>
+                            Add all to cart
+                        </Button>
+                    )}
+
+
+                    {(order.orderStatus === "PENDING_PAYMENT" || order.orderStatus === "PROCESSING") && (
+                        <Button variant="outline" size="sm" className="text-primary border border-primary hover:scale-105 transition-all duration-300" onClick={() => updateOrder(order.id)}>
+                            Cancel
+                        </Button>
+                    )}
+
+                    {order.orderStatus === "PENDING_PAYMENT" && (
+                        <Button size="sm" className="rounded-md w-12 text-white  hover:scale-105 transition-all duration-300" onClick={handlePay}>
+                            Pay
+                        </Button>
+                    )}
+
+                </div>
+
+            </div>
         </div>
-      )}
-    </motion.div>
-  );
-};
-
-export default OrderCard;
+    )
+}
