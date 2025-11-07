@@ -40,5 +40,23 @@ export const userUpdateSchema = z.object({
   message: "At least one field must be provided"
 });
 
+export const changePasswordSchema = z.object({
+  password: z
+    .string({ message: "Please enter your current password" })
+    .min(1, { message: "Please enter your current password" }),
+
+  newPassword: z
+    .string({ message: "New password is required" })
+    .min(8, { message: "Be at least 8 characters long" })
+    .regex(/[a-zA-Z]/, { message: "Contain at least one letter" })
+    .regex(/[0-9]/, { message: "Contain at least one number" })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Contain at least one special character",
+    })
+    .trim(),
+})
+
 
 export type userData = z.infer<typeof userUpdateSchema>
+export type changePassword = z.infer<typeof changePasswordSchema>
+
