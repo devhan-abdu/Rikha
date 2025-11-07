@@ -29,7 +29,7 @@ export const getProductDetail = async (slug: string) => {
           comment: true,
           user: {
             select: {
-              name: true,
+              username: true,
               id: true
             }
           }
@@ -177,7 +177,7 @@ export const getReviews = async (productId: string) => {
     where: { productId: Number(productId) },
     include: {
       user: {
-        select: { id: true, name: true, email: true },
+        select: { id: true, username: true, email: true },
       },
     },
   })
@@ -203,7 +203,7 @@ export const addReviews = async (reviewData: CreateReviewInput) => {
     include: {
       user: {
         select: {
-          name: true,
+          username: true,
           id: true
         }
       }
@@ -237,11 +237,11 @@ export const getSearch = async (query: string) => {
     },
     take: 10,
     orderBy: {
-    createdAt: "desc",
-  },
+      createdAt: "desc",
+    },
   });
 
-return products;
+  return products;
 };
 
 
