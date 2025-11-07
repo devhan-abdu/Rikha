@@ -14,7 +14,10 @@ enum Role {
 
 model User {
   id             Int       @id @default(autoincrement())
-  name           String?
+  username       String?   @unique
+  firstName      String?
+  lastName       String?
+  phoneNumber    String? 
   email          String    @unique
   password       String?    
   role           Role      @default(USER)
@@ -72,6 +75,7 @@ model Product {
   brand        String
   slug         String   @unique
   stock        Int      @default(1)
+  reserved_qnt  Int     @default(0) 
   isFeatured   Boolean  @default(false)
   isNewArrival Boolean  @default(false)
   isHot        Boolean  @default(false)
@@ -129,9 +133,10 @@ model Order {
   items          OrderItem[]
   shipping       ShippingAddress?
   paymentMethod  PaymentMethod
+  isRemoved       Boolean    @default(false)
 
   totalAmount    Float
-  orderStatus    OrderStatus  @default(PENDING)
+  orderStatus    OrderStatus  @default(PENDING_PAYMENT)
   paymentStatus  PaymentStatus
   orderDate      DateTime     @default(now())
 }
@@ -193,12 +198,16 @@ enum PaymentStatus {
   PENDING
   COMPLETED
   FAILED
+  REFUNDED
 }
+
 
 
 enum OrderStatus {
-  PENDING
+  PENDING_PAYMENT
   PROCESSING
   SHIPPED
   DELIVERED
+  CANCELLED
 }
+
