@@ -2,8 +2,10 @@ import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { AppError } from "../utils/AppError";
 import { randomInt } from 'crypto';
-import { sendverificationEmail } from "../nodemailer/email";
+import { sendPasswordChangedEmail, sendverificationEmail } from "../nodemailer/email";
 import { userData } from "../validators/auth.schema";
+import bcrypt from "bcrypt"
+import { includes } from "zod";
 
 const getUserProfile = async (userId: string) => {
     const user = await prisma.user.findUnique({
@@ -90,6 +92,43 @@ const getAllUsers = async () => {
     return users;
 }
 
+const changePassword = async (userId: number, password: string, newPassword: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id: userId }, include: {
+            oauthAccounts: true
+        }
+    },);
+    if (!user) throw new AppError("User not found", 404);
+
+    if (user.oauthAccounts.length <= 0 && !user.password) {
+        throw new AppError(
+            "You signed in using an external provider. Please manage your password there.",
+            400
+        );
+
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password!);
+    if (!isMatch) throw new AppError("Current password is incorrect", 401);
+
+    const isSame = await bcrypt.compare(newPassword, user.password!);
+    if (isSame) throw new AppError("New password cannot be the same as the old one", 400);
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    const update = await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashed },
+    });
+
+    await sendPasswordChangedEmail(update, {
+        city: "Addis Ababa",
+        country: "ET",
+    });
+
+    return update;
+};
+
+
 const deleteUser = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) }
@@ -102,4 +141,4 @@ const deleteUser = async (userId: string) => {
     return deletedUser;
 }
 
-export { getAllUsers, getUserProfile, updateUserProfile, deleteUser }
+export { getAllUsers, getUserProfile, updateUserProfile, deleteUser, changePassword }

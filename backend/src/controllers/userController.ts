@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import * as userServices from "../services/userServices";
-import { userUpdateSchema } from "../validators/auth.schema";
+import { changePasswordSchema, userUpdateSchema } from "../validators/auth.schema";
 
 
 export interface AuthenticatedRequest extends Request {
@@ -32,6 +32,26 @@ const updateUser = catchAsync(async (req: AuthenticatedRequest, res: Response) =
     });
 })
 
+const changePassword = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = Number(req.user?.userId)
+    const parsed = changePasswordSchema.safeParse(req.body)
+
+    if (!parsed.success) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid request body. Please check your input."
+        });
+    }
+    const { password, newPassword } = parsed.data
+    await userServices.changePassword(userId, password, newPassword)
+
+    res.status(200).json({
+        success: true,
+        message: "Password updated successfully"
+    });
+
+})
+
 const deleteUser = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.userId;
     await userServices.deleteUser(userId);
@@ -41,4 +61,4 @@ const deleteUser = catchAsync(async (req: AuthenticatedRequest, res: Response) =
     });
 })
 
-export { getUser, updateUser, deleteUser }
+export { getUser, updateUser, deleteUser, changePassword }
