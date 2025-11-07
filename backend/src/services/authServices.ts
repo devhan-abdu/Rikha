@@ -13,7 +13,7 @@ const findUserByEmail = async (email: string,) => {
     })
 }
 
-const register = async (name: string, password: string, email: string) => {
+const register = async (username: string, password: string, email: string) => {
 
     const existingUser = await findUserByEmail(email.toLowerCase())
     if (existingUser) throw new AppError("Email already exists. Please login instead.", 409);
@@ -23,7 +23,7 @@ const register = async (name: string, password: string, email: string) => {
 
     await prisma.user.create({
         data: {
-            name,
+            username,
             email,
             password: hashedpwd,
             verified: false,
@@ -57,7 +57,7 @@ const verifyEmail = async (email: string, otp: string) => {
             otpExpires: null,
         }
     })
-    return { user: { id: foundUser.id, email: foundUser.email, name: foundUser.name }, accessToken, refreshToken };
+    return { user: { id: foundUser.id, email: foundUser.email, name: foundUser.username }, accessToken, refreshToken };
 }
 const login = async (email: string, password: string) => {
     const user = await findUserByEmail(email);
@@ -71,7 +71,7 @@ const login = async (email: string, password: string) => {
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
 
-    return { user: { id: user.id, email: user.email, name: user.name }, accessToken, refreshToken };
+    return { user: { id: user.id, email: user.email, name: user.username }, accessToken, refreshToken };
 
 }
 
@@ -118,7 +118,7 @@ const resetPassword = async (email: string, token: string, password: string) => 
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
 
-    return { user: { id: user.id, email: user.email, name: user.name }, accessToken, refreshToken };
+    return { user: { id: user.id, email: user.email, name: user.username }, accessToken, refreshToken };
 
 }
 
