@@ -24,7 +24,7 @@ export const checkAccount = async (providerId: string, provider: string, email: 
         const newUser = await prisma.user.create({
             data: {
                 email: email,
-                name: name,
+                username: name,
                 verified: true,
                 oauthAccounts: {
                     create: { provider, providerId }
