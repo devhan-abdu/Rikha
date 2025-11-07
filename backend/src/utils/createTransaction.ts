@@ -15,8 +15,8 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
                 currency: "ETB",
                 orderId: orderId,
                 tx_ref,
-                "callback_url":`${process.env.BACKEND_URL}/api/verify-payment/${tx_ref}`,
-                "return_url":`${process.env.FRONTEND_URL}/order-status?tx_ref=${tx_ref}`,
+                "callback_url": `${process.env.BACKEND_URL}/api/verify-payment/${tx_ref}`,
+                "return_url": `${process.env.FRONTEND_URL}/order-status?tx_ref=${tx_ref}`,
                 customization: {
                     title: "Rikha",
                     description: `Payment`,
@@ -44,3 +44,41 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
         throw new AppError(`An unexpected error occurred during payment initialization.${error}`);
     }
 }
+
+
+
+const CHAPA_API_BASE = "https://api.chapa.co/v1";
+const CHAPA_SECRET_KEY = process.env.CHAPA_SECRET_KEY!;
+
+
+export const chapaRefund = async (tx_ref: string) => {
+    if (!tx_ref) throw new AppError("Transaction reference is required", 400);
+
+    try {
+        const response = await fetch(`${CHAPA_API_BASE}/transaction/refund`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ tx_ref }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.status !== "success") {
+            throw new AppError(data.message || "Refund failed", response.status);
+        }
+
+        console.log("Chapa refund response:", data);
+
+        return {
+            status: "success",
+            message: data.message,
+            data: data.data,
+        };
+    } catch (err: any) {
+        console.error("Refund error:", err.message || err);
+        throw new AppError(err.message || "Chapa refund request failed", 500);
+    }
+};
