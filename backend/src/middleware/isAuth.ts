@@ -9,7 +9,7 @@ dotenv.config();
 
 
 interface JwtPayloadWithId extends JwtPayload {
-  userId: number;
+  userId: string;
   role: string;
 }
 
@@ -43,7 +43,7 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as JwtPayloadWithId;
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } })
+    const user = await prisma.user.findUnique({ where: { id: Number(decoded.userId) } })
     if (!user) return res.status(401).json({ message: "Invalid  refresh token" })
 
     const newAccessToken = generateAccessToken(user.role, user.id);
