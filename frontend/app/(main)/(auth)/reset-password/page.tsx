@@ -10,6 +10,7 @@ import api from "@/lib/api";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/authSlice";
 import { Button } from "@/components/ui/button";
+import { InputField } from "@/components/ui/InputField";
 
 const ResetPassword = () => {
   const searchParams = useSearchParams();
@@ -49,22 +50,23 @@ const ResetPassword = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className='space-y-2 max-w-[430px] mx-auto '>
-        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center '>Set a New Password</h2>
+        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center '>Set A New Password</h2>
         <p className='text-center text-gray-600 text-sm'>type your email so we can send you a password recovery email</p>
         <form onSubmit={handleSubmit(onSubmit)} className='mt-8 space-y-5 '>
-          <div>
-            <input type="password"  {...register("password")} placeholder='enter new password*' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-            {errors.password && (
-              <p className='text-red-500 text-sm mt-1'>{errors.password.message}</p>
-            )}
-          </div>
-
-          <div>
-            <input type="password"  {...register("confirmPassword")} placeholder='confirm password' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-            {errors.confirmPassword && (
-              <p className='text-red-500 text-sm mt-1'>{errors.confirmPassword.message}</p>
-            )}
-          </div>
+          <InputField
+            label="Password *"
+            name="password"
+            type="password"
+            register={register}
+            error={errors.password?.message}
+          />
+          <InputField
+            label="Confirm Password *"
+            name="confirmPassword"
+            type="password"
+            register={register}
+            error={errors.confirmPassword?.message}
+          />
 
           <Button type='submit' disabled={isSubmitting} className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel '> {isSubmitting ? "Resetting..." : "Reset Password"}</Button>
           <p className="text-md text-gray-900 text-center">

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { toast } from 'react-toastify'
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { InputField } from '@/components/ui/InputField'
 
 const ForgetPassword = () => {
 
@@ -39,12 +40,13 @@ const ForgetPassword = () => {
                 <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center '>Reset Password</h2>
                 <p className='text-center text-gray-600 text-sm'>type your email so we can send you a password recovery email</p>
                 <form onSubmit={handleSubmit(onSubmit)} className='mt-8 space-y-5 '>
-                    <div>
-                        <input type="email"  {...register("email")} placeholder='your email*' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-                        {errors.email && (
-                            <p className='text-red-500 text-sm mt-1'>{errors.email.message}</p>
-                        )}
-                    </div>
+
+                    <InputField
+                        label="Email *"
+                        name="email"
+                        register={register}
+                        error={errors.email?.message}
+                    />
 
                     <Button
                         type="submit"
@@ -54,7 +56,7 @@ const ForgetPassword = () => {
                         {isSubmitting ? "Resetting..." : "Reset Password"}
                     </Button>
                     <p className="text-md text-gray-900 text-center">
-                        Go to <Link href="/signin" className="font-medium text-primary hover:underline ">Sign In</Link>
+                        Go to <Link href="/login" className="font-medium text-primary hover:underline ">Login</Link>
                     </p>
                 </form>
             </motion.div>

@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import OAuthButtons from '@/components/ui/OAuthButtons'
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { InputField } from '@/components/ui/InputField'
 
 
 
@@ -49,30 +50,32 @@ const Register: FC = () => {
         className=' max-w-[430px] mx-auto'>
         <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center my-8'>Create an account</h2>
         <form className='space-y-5 md:space-y-6 ' onSubmit={handleSubmit(onSubmit)}>
-          <input type="text" placeholder='username*' id='username' {...register("name")} className='rounded-md px-4 py-2 border border-gray-600 w-full' />
-          {
-            errors.name && (
-              <div className='text-red-500 -mt-5'>{errors.name.message}</div>
-            )
-          }
-          <input type="email" placeholder='email*' id='email' {...register("email")} className='rounded-md px-4 py-2 border border-gray-600 w-full' />
-          {
-            errors.email && (
-              <div className='text-red-500 -mt-5'>{errors.email.message}</div>
-            )
-          }
-          <input type="password" placeholder='password' id='password' {...register("password")} className='rounded-md px-4 py-2 border border-gray-600 w-full' />
-          {
-            errors.password && (
-              <div className='text-red-500 -mt-5'>{errors.password.message}</div>
-            )
-          }
-          <input type="password" placeholder='confirmPassword' id='confirmPassword' {...register("confirmPassword")} className='rounded-md px-4 py-2 border border-gray-600 w-full' />
-          {
-            errors.confirmPassword && (
-              <div className='text-red-500 -mt-5'>{errors.confirmPassword.message}</div>
-            )
-          }
+          <InputField
+            label="User Name *"
+            name="username"
+            register={register}
+            error={errors.name?.message}
+          />
+          <InputField
+            label="Email *"
+            name="email"
+            register={register}
+            error={errors.email?.message}
+          />
+          <InputField
+            label="Password *"
+            type="password"
+            name="password"
+            register={register}
+            error={errors.password?.message}
+          />
+          <InputField
+            label="Confirm Password *"
+            name="confirmPassword"
+            type="password"
+            register={register}
+            error={errors.confirmPassword?.message}
+          />
           <Button
             type="submit"
             className="cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel"

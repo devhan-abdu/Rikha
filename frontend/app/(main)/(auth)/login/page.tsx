@@ -12,6 +12,7 @@ import { setUser } from '@/redux/slices/authSlice';
 import OAuthButtons from '@/components/ui/OAuthButtons';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { InputField } from '@/components/ui/InputField';
 
 
 
@@ -51,19 +52,20 @@ const Login = () => {
         className=' max-w-[430px] mx-auto'>
         <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center my-10'>Sign in to you account</h2>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-5 md:space-y-6 '>
+          <InputField
+            label="Email *"
+            name="email"
+            register={register}
+            error={errors.email?.message}
+          />
+          <InputField
+            label="Password *"
+            name="password"
+            type="password"
+            register={register}
+            error={errors.password?.message}
+          />
 
-          <div className='space-y-1'>
-            <input type="email"  {...register("email")} placeholder='your email*' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-            {errors.email && (
-              <p className='text-red-500 text-sm '>{errors.email.message}</p>
-            )}
-          </div>
-          <div className='space-y-1'>
-            <input type="password"  {...register("password")} placeholder='password' className='rounded-md px-4 py-2 border border-gray-500 w-full' />
-            {errors.password && (
-              <p className='text-red-500 text-sm '>{errors.password.message}</p>
-            )}
-          </div>
           <Link href='/forget-password' className="text-sm font-medium text-primary hover:underline block text-end leading-0">Forgot password ?</Link>
           <Button
             className="cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel text-md"
