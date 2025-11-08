@@ -15,7 +15,7 @@ type Props = {
     defaultCategory: string;
 }
 
-const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) => {
+const CategoryContent = ({ categories, initialProducts, defaultCategory }: Props) => {
     const [selected, setSelected] = useState(defaultCategory || "all")
     const [sortOption, setSortOption] = useState('relevant');
     const shouldFetch = selected !== '';
@@ -82,7 +82,7 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
                         ? Array.from({ length: 6 }).map((_, i) => (
                             <div key={i} className="w-full h-[300px] bg-gray-200 animate-pulse rounded-lg" />
                         )) : (
-                            sortedProducts.map((product) => (
+                            sortedProducts?.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))
                         )}
@@ -93,4 +93,4 @@ const CategoryPage = ({ categories, initialProducts, defaultCategory }: Props) =
     )
 }
 
-export default CategoryPage
+export default CategoryContent

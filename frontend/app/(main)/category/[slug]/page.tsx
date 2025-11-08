@@ -6,9 +6,14 @@ import Review from './Review';
 import { fetchProductDetail } from '@/lib/featchers';
 import AddToCartButton from '@/components/AddToCartButton';
 
-const ProductDetail = async ({ params }: { params:Promise<{ slug: string }> }) => {
+const ProductDetail = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params
   const product = await fetchProductDetail(slug);
+  if (!product) {
+    return {
+      notFound: true,
+    }
+  }
 
   return (
     <div className="py-6 font-poppins container mx-auto">
@@ -116,7 +121,7 @@ const ProductDetail = async ({ params }: { params:Promise<{ slug: string }> }) =
       </div>
 
       <div className=" mr-auto">
-        <Review reviews={product.reviews} desc={product.longDesc} productId={product.id}/>
+        <Review reviews={product.reviews} desc={product.longDesc} productId={product.id} />
         <Suspense fallback={<div>Loading...</div>}>
           <Related slug={product.slug} />
         </Suspense>

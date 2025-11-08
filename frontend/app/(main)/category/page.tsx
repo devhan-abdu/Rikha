@@ -1,34 +1,38 @@
-import { fetchCategories, fetchProductsByCategory, fetchAllProducts } from '@/lib/featchers'
-import CategoryPage from "./Category";
-import Common from '@/components/Common';
-import { Suspense } from 'react';
-import Loading from './loading';
+import Common from "@/components/Common";
+import CategoryContent from "./CategoryContent";
+import { fetchAllProducts, fetchCategories, fetchProductsByCategory } from "@/lib/featchers";
+import { Category, Product } from "@/interface";
 
-
-const Category = async ({ searchParams }: { searchParams: Promise<{ slug?: string }> }) => {
-    const categories = await fetchCategories();
+const CategoryPage = async ({ searchParams }: { searchParams: Promise<{ slug?: string }> }) => {
+    let categories: Category[] = [];
+    let initialProducts: Product[] = [];
+    let defaultCategory = "";
     const { slug } = await searchParams
 
-    let initialProducts, defaultCategory;
-    if (!slug) {
-        initialProducts = await fetchAllProducts();
-        defaultCategory = "";
-
-    } else {
-        initialProducts = await fetchProductsByCategory(slug);
-        defaultCategory = slug;
+    try {
+        categories = await fetchCategories();
+        if (slug) {
+            initialProducts = await fetchProductsByCategory(slug);
+            defaultCategory = slug;
+        } else {
+            initialProducts = await fetchAllProducts();
+        }
+    } catch (err) {
+        console.error("Failed to fetch categories or products", err);
+        categories = [];
+        initialProducts = [];
     }
 
     return (
-        <Suspense fallback={<Loading />}>
+        <>
             <Common header="Browse by Category" />
-            <CategoryPage
+            <CategoryContent
                 categories={categories}
                 initialProducts={initialProducts}
                 defaultCategory={defaultCategory}
             />
-        </Suspense>
+        </>
     )
 }
 
-export default Category
+export default CategoryPage;
