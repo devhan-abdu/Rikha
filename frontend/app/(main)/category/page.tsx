@@ -1,31 +1,33 @@
 import { fetchCategories, fetchProductsByCategory, fetchAllProducts } from '@/lib/featchers'
 import CategoryPage from "./Category";
 import Common from '@/components/Common';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 
-const Category = async ({searchParams}:{searchParams:{slug?: string}}) => {
+const Category = async ({ searchParams }: { searchParams: { slug?: string } }) => {
     const categories = await fetchCategories();
     const { slug } = await searchParams
 
-    let initialProducts , defaultCategory;
-    if(!slug) {
-       initialProducts = await fetchAllProducts();
-        defaultCategory="";
-       
+    let initialProducts, defaultCategory;
+    if (!slug) {
+        initialProducts = await fetchAllProducts();
+        defaultCategory = "";
+
     } else {
         initialProducts = await fetchProductsByCategory(slug);
-        defaultCategory= slug;
+        defaultCategory = slug;
     }
 
     return (
-        <div>
-         <Common header="Browse by Category"/>  
+        <Suspense fallback={<Loading />}>
+            <Common header="Browse by Category" />
             <CategoryPage
                 categories={categories}
                 initialProducts={initialProducts}
-                defaultCategory = {defaultCategory}
+                defaultCategory={defaultCategory}
             />
-        </div>
+        </Suspense>
     )
 }
 
