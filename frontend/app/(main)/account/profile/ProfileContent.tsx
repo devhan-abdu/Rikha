@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { CldUploadWidget } from 'next-cloudinary';
-import type { CloudinaryUploadWidgetResults,CloudinaryUploadWidgetInfo  } from "next-cloudinary";
+import type { CloudinaryUploadWidgetResults} from "next-cloudinary";
 
 export default function ProfileContent({ user }: { user: UserDetails }) {
     const dispatch = useAppDispatch();
