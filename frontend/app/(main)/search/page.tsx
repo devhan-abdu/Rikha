@@ -2,6 +2,7 @@ import Search from '@/components/Search';
 import { Frown } from 'lucide-react';
 import { fetchFeaturedProducts, fetchSearchProducts } from '@/lib/featchers';
 import SearchProductCard from '@/components/SearchProductCard';
+import { Suspense } from 'react';
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -18,7 +19,9 @@ export default async function Page(props: {
   if (query === "") {
     return (
       <div>
-        <Search />
+        <Suspense fallback={<div>Loading ....</div>}>
+          <Search />
+        </Suspense>
         <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
           <div className=" flex flex-col gap-12 w-full ">
             <h1 className="text-[24px] font-cinzel font-light text-center ">Get to know
@@ -39,7 +42,9 @@ export default async function Page(props: {
   if (products?.length === 0 || !products) {
     return (
       <div>
-        <Search />
+        <Suspense fallback={<div>Loading ....</div>}>
+          <Search />
+        </Suspense>
         <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
           <div className="flex flex-col items-center justify-center gap-12 ">
             <div className="text-xl  w-max p-8 pb-0 flex flex-wrap items-center justify-center gap-1">
@@ -65,7 +70,9 @@ export default async function Page(props: {
 
   return (
     <div>
-      <Search />
+      <Suspense fallback={<div>Loading ....</div>}>
+        <Search />
+      </Suspense>
       <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
         <div className='space-y-4 md:space-y-2  '>
           {products?.map(product => (
