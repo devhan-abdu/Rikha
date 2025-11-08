@@ -67,7 +67,7 @@ export default function ProfileContent({ user }: { user: UserDetails }) {
     const onSubmit = async (data: ProfileData) => {
         try {
 
-            let avatarUrl = newAvatarUrl ?? user?.avatarUrl ?? null
+            const avatarUrl = newAvatarUrl ?? user?.avatarUrl ?? null
 
             const payload = { ...data, avatarUrl }
 

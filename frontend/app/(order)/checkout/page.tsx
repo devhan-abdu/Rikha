@@ -33,7 +33,7 @@ const CheckoutPage = () => {
       const defaultAddr = addresses.find(addr => addr.isDefault);
       setSelectedAddress(defaultAddr || addresses[0]);
     }
-  }, [addresses]);
+  }, [addresses, selectedAddress]);
 
 
   if (checkoutItems.length === 0) {

@@ -28,15 +28,15 @@ const Register: FC = () => {
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (data: SignUpFormData) => {
     try {
-      const { confirmPassword, ...sanitizedData } = data
+      const { confirmPassword: _, ...sanitizedData } = data
       await api.post("/auth/register", sanitizedData)
       localStorage.setItem("verify_email", data.email)
 
       toast.success('Sign up  successfully! pls verify your email');
       router.push('/verify-email')
-    } catch (error: any) {
-      const message = error.response?.data?.message || "Something went wrong";
-      toast.error(message);
+    } catch (error) {
+      console.log(error)
+      toast.error("Something went wrong");
     }
   }
 

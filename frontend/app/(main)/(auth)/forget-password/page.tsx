@@ -25,6 +25,7 @@ const ForgetPassword = () => {
             await api.post('/auth/forgot-password', data)
             toast.success("Password reset link sent! Please check your email");
         } catch (error) {
+            console.log(error)
             toast.error("Something went wrong ")
         }
     }

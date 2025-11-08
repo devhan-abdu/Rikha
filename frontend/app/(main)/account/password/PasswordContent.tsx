@@ -34,8 +34,9 @@ const PasswordContent = () => {
 
             router.push("/login")
 
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || "Failed to update password");
+        } catch (err) {
+            console.log(err)
+            toast.error("Failed to update password");
         }
     }
 

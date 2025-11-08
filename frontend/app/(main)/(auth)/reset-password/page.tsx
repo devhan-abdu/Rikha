@@ -18,12 +18,7 @@ const ResetPassword = () => {
   const email = searchParams.get('email');
   const dispatch = useAppDispatch();
 
-  if (!token || !email) {
-    return <div className="text-center mt-10 h-[60px] flex flex-col items-center justify-center gap-4">
-      <p className="text-xl">Invalid password reset link</p>
-      <Link href="/register" className="text-primary">Back to Sign Up</Link>
-    </div>;
-  }
+
 
   const {
     register,
@@ -33,6 +28,13 @@ const ResetPassword = () => {
     resolver: zodResolver(ResetPasswordSchema),
   });
 
+  if (!token || !email) {
+    return <div className="text-center mt-10 h-[60px] flex flex-col items-center justify-center gap-4">
+      <p className="text-xl">Invalid password reset link</p>
+      <Link href="/register" className="text-primary">Back to Sign Up</Link>
+    </div>;
+  }
+
   const onSubmit: SubmitHandler<ResetPasswordData> = async ({ password }) => {
     try {
       const res = await api.put(`/auth/reset-password/${token}`, { email, password });
@@ -40,6 +42,7 @@ const ResetPassword = () => {
       dispatch(setUser(user))
       toast.success("Password reset successful");
     } catch (error) {
+      console.log(error)
       toast.error("Something went wrong. Please try again.");
     }
   }

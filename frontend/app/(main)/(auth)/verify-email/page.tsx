@@ -36,7 +36,8 @@ const EmailVerificationPage = () => {
 			toast.success('Email verified successfully!');
 			dispatch(setUser(res.data.user))
 			router.push("/");
-		} catch (error: any) {
+		} catch (error) {
+			console.log(error)
 			toast.error("Something went wrong");
 		}
 	};
@@ -72,7 +73,7 @@ const EmailVerificationPage = () => {
 		if (code.every((c) => c !== "")) {
 			handleSubmit(onSubmit)();
 		}
-	}, [code]);
+	}, [code, handleSubmit, onSubmit]);
 
 	return (
 		<div className='max-w-md w-full mx-auto my-32'>

@@ -37,7 +37,8 @@ const Login = () => {
       toast.success("Login Successfully!");
       const redirectTo = searchParams.get('redirect') || '/';
       router.push(redirectTo)
-    } catch (error: any) {
+    } catch (error) {
+      console.log(error)
       toast.error("Something went wrong");
     }
   }
