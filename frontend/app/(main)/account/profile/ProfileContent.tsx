@@ -131,18 +131,18 @@ export default function ProfileContent({ user }: { user: UserDetails }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                        <InputField label="First Name" name="firstName" register={register} error={errors.firstName?.message} />
-                        <InputField label="Last Name" name="lastName" register={register} error={errors.lastName?.message} />
+                        <InputField label="First Name" name="firstName" register={register("firstName")} error={errors.firstName?.message} />
+                        <InputField label="Last Name" name="lastName" register={register("lastName")} error={errors.lastName?.message} />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
 
-                        <InputField label="Email" name="email" register={register} error={errors.email?.message} />
-                        <InputField label="username" name="username" register={register} error={errors.username?.message} />
+                        <InputField label="Email" name="email" register={register("email")} error={errors.email?.message} />
+                        <InputField label="username" name="username" register={register("username")} error={errors.username?.message} />
                     </div>
                     <div className="max-w-max">
-                        <InputField label="Phone Number" name="phoneNumber" register={register} error={errors.phoneNumber?.message} className="" />
+                        <InputField label="Phone Number" name="phoneNumber" register={register("phoneNumber")} error={errors.phoneNumber?.message} className="" />
                     </div>
 
 

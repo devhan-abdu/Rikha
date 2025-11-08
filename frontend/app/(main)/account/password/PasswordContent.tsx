@@ -49,7 +49,7 @@ const PasswordContent = () => {
                         <InputField
                             label="Password *"
                             name="password"
-                            register={register}
+                            register={register("password")}
                             error={errors.password?.message}
                             type="password"
                         />
@@ -58,14 +58,14 @@ const PasswordContent = () => {
                     <InputField
                         label="New Password"
                         name="newPassword"
-                        register={register}
+                        register={register("newPassword")}
                         error={errors.newPassword?.message}
                         type="password"
                     />
                     <InputField
                         label="Confirm Password"
                         name="confirmNewPassword"
-                        register={register}
+                        register={register("confirmNewPassword")}
                         error={errors.confirmNewPassword?.message}
                         type="password"
                     />

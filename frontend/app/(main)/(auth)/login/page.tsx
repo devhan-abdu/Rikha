@@ -56,14 +56,14 @@ const Login = () => {
           <InputField
             label="Email *"
             name="email"
-            register={register}
+            register={register("email")}
             error={errors.email?.message}
           />
           <InputField
             label="Password *"
             name="password"
             type="password"
-            register={register}
+            register={register("password")}
             error={errors.password?.message}
           />
 

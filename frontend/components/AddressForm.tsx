@@ -84,7 +84,7 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                     <InputField
                         label="Country"
                         name="country"
-                        register={register}
+                        register={register("country")}
                         error={errors.country?.message}
                         defaultValue="Ethiopia"
                         readOnly={true}
@@ -93,7 +93,7 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                     <InputField
                         label="City"
                         name="city"
-                        register={register}
+                        register={register("city")}
                         error={errors.city?.message}
                         defaultValue="Addis Ababa"
                         readOnly={true}
@@ -102,8 +102,8 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InputField label="Full Name" name="name" register={register} error={errors.name?.message} />
-                    <InputField label="Phone Number" name="phoneNumber" register={register} error={errors.phoneNumber?.message} />
+                    <InputField label="Full Name" name="name" register={register("name")} error={errors.name?.message} />
+                    <InputField label="Phone Number" name="phoneNumber" register={register("phoneNumber")} error={errors.phoneNumber?.message} />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -127,11 +127,11 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                             </div>
                         )}
                     />
-                    <InputField label="Woreda" name="woreda" register={register} error={errors.woreda?.message} />
+                    <InputField label="Woreda" name="woreda" register={register("woreda")} error={errors.woreda?.message} />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InputField label="House Number" name="houseNumber" register={register} error={errors.houseNumber?.message} />
+                    <InputField label="House Number" name="houseNumber" register={register("houseNumber")} error={errors.houseNumber?.message} />
                 </div>
                 <div className="flex items-center gap-2 mt-6">
                     <input type="checkbox" id="isDefault" {...register("isDefault")} />

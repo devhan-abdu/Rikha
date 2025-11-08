@@ -60,14 +60,14 @@ const ResetPassword = () => {
             label="Password *"
             name="password"
             type="password"
-            register={register}
+            register={register("password")}
             error={errors.password?.message}
           />
           <InputField
             label="Confirm Password *"
             name="confirmPassword"
             type="password"
-            register={register}
+            register={register("confirmPassword")}
             error={errors.confirmPassword?.message}
           />
 

@@ -53,27 +53,27 @@ const Register: FC = () => {
           <InputField
             label="User Name *"
             name="username"
-            register={register}
+            register={register("name")}
             error={errors.name?.message}
           />
           <InputField
             label="Email *"
             name="email"
-            register={register}
+            register={register("email")}
             error={errors.email?.message}
           />
           <InputField
             label="Password *"
             type="password"
             name="password"
-            register={register}
+            register={register("password")}
             error={errors.password?.message}
           />
           <InputField
             label="Confirm Password *"
             name="confirmPassword"
             type="password"
-            register={register}
+            register={register("confirmPassword")}
             error={errors.confirmPassword?.message}
           />
           <Button

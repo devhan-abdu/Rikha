@@ -45,7 +45,7 @@ const ForgetPassword = () => {
                     <InputField
                         label="Email *"
                         name="email"
-                        register={register}
+                        register={register("email")}
                         error={errors.email?.message}
                     />
 

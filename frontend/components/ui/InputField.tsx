@@ -32,7 +32,7 @@ export const InputField = ({
         <input
           id={name}
           type={isPassword && showPassword ? "text" : type}
-          {...(register || {})}
+           {...(register ?? {})}
           readOnly={readOnly}
           disabled={disabled}
           {...props}
