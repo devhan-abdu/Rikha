@@ -6,16 +6,16 @@ import { cn } from "@/lib/utils";
 import { navData } from '@/constants/index';
 import MobileNav from "./MobileNav";
 import { selectTotalQnt } from '@/redux/slices/cartSlice';
-import { selectIsAuthenticated } from '@/redux/slices/authSlice';
 import { useAppSelector } from '@/redux/hooks';
 import { AccountDropdown } from './AccountDropdown';
+import { selectUser } from '@/redux/slices/authSlice';
 
 
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
   const totalQnt = useAppSelector(selectTotalQnt)
-  const isAuthenicated = useAppSelector(selectIsAuthenticated)
+  const user = useAppSelector(selectUser)
 
 
   return (
@@ -44,7 +44,7 @@ const Header = () => {
       <div className="flex items-center gap-4 order-3">
         <button className="text-gray-600 hidden md:block cursor-pointer z-10 "  ><Link href='/search'><Search /></Link> </button>
 
-        {isAuthenicated ? (
+        {user ? (
           <AccountDropdown />
         ) : (
           <Link href='/login' className='text-gray-600'> <User className="" /></Link>

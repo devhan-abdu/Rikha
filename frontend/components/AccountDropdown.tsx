@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearUser, selectUser } from "@/redux/slices/authSlice";
 import { ArrowRight, Package, User, MapPin, Lock } from "lucide-react";
@@ -17,8 +17,8 @@ import { useRouter } from "next/navigation";
 
 export function AccountDropdown() {
   const router = useRouter();
-  const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser)
 
   const handleLogout = async () => {
     try {
@@ -36,8 +36,9 @@ export function AccountDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarFallback className="uppercase">
-            {user?.name.slice(0, 2)}
+          <AvatarImage src={user?.avatarUrl} />
+          <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-primary/30 shadow-md">
+            {user?.username?.slice(0, 2)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -48,12 +49,13 @@ export function AccountDropdown() {
       >
         <DropdownMenuItem className="flex items-center gap-2 ">
           <Avatar className="cursor-pointer">
+            <AvatarImage src={user?.avatarUrl} />
             <AvatarFallback className="uppercase">
-              {user?.name.slice(0, 2)}
+              {user?.username?.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
           <div className="">
-            <p className="text-md font-semibold ">{user?.name.split(" ")[0]}</p>
+            <p className="text-md font-semibold ">{user?.username?.split(" ")[0]}</p>
             <p>{user?.email}</p>
           </div>
         </DropdownMenuItem>
@@ -62,7 +64,7 @@ export function AccountDropdown() {
           <User size={16} /> Profile
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="flex items-center gap-2 hover:bg-gray-100" onSelect={()=> router.push("/account/orders")}>
+        <DropdownMenuItem className="flex items-center gap-2 hover:bg-gray-100" onSelect={() => router.push("/account/orders")}>
           <Package size={16} /> Orders
         </DropdownMenuItem>
         <DropdownMenuItem className="flex items-center gap-2 hover:bg-gray-100" onSelect={() => router.push("/account/address")}>

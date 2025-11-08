@@ -1,10 +1,11 @@
 "use client"
 import React from 'react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { accountNav } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/slices/authSlice';
+import { UserDetails } from '@/interface';
 
 
 const SideNav = () => {
@@ -13,10 +14,11 @@ const SideNav = () => {
   const user = useAppSelector(selectUser)
 
   return (
-    <div className='flex h-full flex-col px-3 py-4 md:px-4 md:py-6 gap-6'>
+    <div className='flex h-full flex-col px-3 py-4 md:px-4 md:py-6 gap-6 border-r border-slate-300'>
       <div className=' flex items-center gap-3 '>
         <Avatar className="cursor-pointer ">
-          <AvatarFallback className="uppercase">
+          <AvatarImage src={user?.avatarUrl}/>
+          <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-slate-300 shadow-md">
             {user?.username?.slice(0, 2)}
           </AvatarFallback>
         </Avatar>
@@ -26,7 +28,7 @@ const SideNav = () => {
         </div>
       </div>
 
-      <div className='flex items-center justify-between gap-4 md:flex-col md:items-start'>
+      <div className='flex items-center justify-between gap-4 md:flex-col md:items-start '>
         {accountNav.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.path
@@ -34,7 +36,7 @@ const SideNav = () => {
             <button
               key={item.name}
               onClick={() => router.push(item.path)}
-              className={`flex items-center gap-2 text-left px-3 py-2 rounded-md transition-all duration-200
+              className={`flex items-center gap-2 text-left w-full px-3 py-2 rounded-md transition-all duration-200 
                     ${isActive ? " font-medium text-primary" : "hover:bg-gray-50 text-gray-700"}`}
             >
               <Icon size={18} />
