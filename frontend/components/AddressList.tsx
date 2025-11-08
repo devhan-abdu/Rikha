@@ -53,7 +53,7 @@ const AddressList = ({ isListOpen, setIsListOpen, selectedAddress, setSelectedAd
                             </DialogTitle>
                         </DialogHeader>
                         {
-                            addresses.map((item, index) => (
+                            addresses.map((item) => (
                                 <div
                                     onClick={() => setSelectedAddress(item)}
                                     key={item.id}
@@ -87,7 +87,7 @@ const AddressList = ({ isListOpen, setIsListOpen, selectedAddress, setSelectedAd
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                 <DialogTitle></DialogTitle>
                 <DialogContent>
-                    <AddressForm isEdit={false} setIsEdit={setIsEdit} />
+                    <AddressForm isEdit={isEdit} setIsEdit={setIsEdit} data={item}/>
                 </DialogContent>
             </Dialog>
         </>

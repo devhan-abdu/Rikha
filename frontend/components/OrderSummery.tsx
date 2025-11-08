@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { decreaseCartQuantity, increaseCartQuantity, selectCartItems, selectTotalPrice } from "@/redux/slices/cartSlice"
+import { decreaseCartQuantity, increaseCartQuantity } from "@/redux/slices/cartSlice"
 import { Button } from "./ui/button"
 import { useCreate } from "@/lib/query/mutations/useOrderMutation"
 import { useRouter } from "next/navigation"
@@ -15,7 +15,7 @@ type Props = {
   addressId: number | null
 }
 export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
-  const { totalQnt, totalPrice, totalDiscount } = useAppSelector(selectCheckoutTotals)
+  const { totalPrice, totalDiscount } = useAppSelector(selectCheckoutTotals)
   const dispatch = useAppDispatch();
   const checkoutItems = useAppSelector(selectCheckoutItems)
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    if(addressId) setError(null)
+    if (addressId) setError(null)
   }, [addressId])
 
   const handlePlaceOrder = async () => {

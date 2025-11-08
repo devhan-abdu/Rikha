@@ -2,7 +2,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 
 import type { Metadata } from "next";
-import {Inter ,Cinzel , Poppins} from 'next/font/google'
+import { Cinzel } from 'next/font/google'
 import { StoreProvider } from '@/redux/storeProvider'
 import { ToastContainer } from 'react-toastify';
 import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "E-commerce website",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

@@ -5,7 +5,6 @@ import { accountNav } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
 import { selectUser } from '@/redux/slices/authSlice';
-import { UserDetails } from '@/interface';
 
 
 const SideNav = () => {

@@ -6,7 +6,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Menu, TabletSmartphone } from "lucide-react";
-import Link from "next/link";
 import { navData } from "@/constants/index";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";

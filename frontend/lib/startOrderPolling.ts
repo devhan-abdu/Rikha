@@ -17,7 +17,7 @@ export const startOrderPolling = (txRef: string): Promise<{ status: "success" | 
 
             try {
                 const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/order/status?tx_ref=${txRef}`)
-                const order =  response.data.order;
+                const order = response.data.order;
                 console.log(order, order, order)
 
                 if (order.paymentStatus === "COMPLETED") {
@@ -32,6 +32,7 @@ export const startOrderPolling = (txRef: string): Promise<{ status: "success" | 
                     return resolve({ status: "pending", orderId: order.id });
                 }
             } catch (error) {
+                console.log(error)
                 clearInterval(intervalId)
                 return resolve({ status: "error", orderId: null });
             }

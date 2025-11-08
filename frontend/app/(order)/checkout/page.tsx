@@ -1,6 +1,5 @@
 "use client"
 import { useAppSelector } from '@/redux/hooks'
-import { selectCartItems, selectTotalPrice } from '@/redux/slices/cartSlice'
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -11,11 +10,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import AddressList from '@/components/AddressList'
 import { Button } from '@/components/ui/button'
 import { useAddresses } from '@/lib/query/hook/useAddresses'
-import { AddressModal } from '@/components/AddressModal'
 import { ShippingData } from '@/interface'
 import { selectCheckoutItems, selectCheckoutTotals } from '@/redux/selectors'
+import { Dialog, DialogContent, DialogTrigger } from '@radix-ui/react-dialog'
+import AddressForm from '@/components/AddressForm'
+import { DialogTitle } from '@/components/ui/dialog'
 
-type PaymentMethodType =  "TELEBIRR" | "MPSA" | "CBEBIRR";
+type PaymentMethodType = "TELEBIRR" | "MPSA" | "CBEBIRR";
 
 const CheckoutPage = () => {
   const { totalPrice } = useAppSelector(selectCheckoutTotals)
@@ -99,9 +100,17 @@ const CheckoutPage = () => {
                 </div>
               </div>
             ) : (
-              <Button variant='ghost' className='text-primary ' onClick={() => setIsAddOpen(true)}>
-                <MapPin /> Add New Address
-              </Button>
+              <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <DialogTrigger asChild>
+                  <Button variant='ghost' className='text-primary ' onClick={() => setIsAddOpen(true)}>
+                    <MapPin /> Add New Address
+                  </Button>
+                </DialogTrigger>
+                <DialogTitle></DialogTitle>
+                <DialogContent >
+                  <AddressForm isEdit={false} setIsEdit={() => false} />
+                </DialogContent>
+              </Dialog>
             )}
           </div>
 
@@ -150,7 +159,7 @@ const CheckoutPage = () => {
         selectedAddress={selectedAddress}
         setSelectedAddress={setSelectedAddress}
       />
-      <AddressModal isEdit={false} isOpen={isAddOpen} onOpenChange={setIsAddOpen} />
+
     </div >
   )
 }
