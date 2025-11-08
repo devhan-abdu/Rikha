@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import Loading from './loading';
 
 
-const Category = async ({ searchParams }: { searchParams: { slug?: string } }) => {
+const Category = async ({ searchParams }: { searchParams: Promise<{ slug?: string }> }) => {
     const categories = await fetchCategories();
     const { slug } = await searchParams
 

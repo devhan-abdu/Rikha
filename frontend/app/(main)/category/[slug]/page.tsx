@@ -6,7 +6,7 @@ import Review from './Review';
 import { fetchProductDetail } from '@/lib/featchers';
 import AddToCartButton from '@/components/AddToCartButton';
 
-const ProductDetail = async ({ params }: { params: { slug: string } }) => {
+const ProductDetail = async ({ params }: { params:Promise<{ slug: string }> }) => {
   const { slug } = await params
   const product = await fetchProductDetail(slug);
 
