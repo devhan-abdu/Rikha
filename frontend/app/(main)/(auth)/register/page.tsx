@@ -28,7 +28,7 @@ const Register: FC = () => {
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (data: SignUpFormData) => {
     try {
-      const { confirmPassword: _, ...sanitizedData } = data
+      const { confirmPassword: __, ...sanitizedData } = data;
       await api.post("/auth/register", sanitizedData)
       localStorage.setItem("verify_email", data.email)
 
