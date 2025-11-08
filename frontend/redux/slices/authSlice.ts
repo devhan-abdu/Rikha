@@ -6,12 +6,12 @@ import { UserDetails } from "@/interface";
 
 interface UserState {
   user: UserDetails | null;
-  isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const initialState: UserState = {
   user: null,
-  isAuthenticated: false,
+  loading: true,
 };
 
 const userSlice = createSlice({
@@ -20,19 +20,19 @@ const userSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<UserDetails>) => {
       state.user = action.payload;
-      state.isAuthenticated = true;
     },
-
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload
+    },
     clearUser: (state) => {
       state.user = null;
-      state.isAuthenticated = false;
     },
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setLoading } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
-export const selectIsAuthenticated = (state: RootState) => state.user.isAuthenticated;
+export const selectIsLoading = (state: RootState) => state.user.loading;
 
 export default userSlice.reducer;
