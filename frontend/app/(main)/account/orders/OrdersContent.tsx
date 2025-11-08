@@ -30,16 +30,16 @@ export default function OrderContent() {
                 My Orders
             </h2>
 
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide bg-gray-50 p-4 rounded-lg shadow-sm mb-8">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide  p-4 rounded-lg shadow-sm mb-8">
                 {orderTab.map((t) => (
                     <button
                         key={t.value}
                         onClick={() => setTab(t.value)}
                         className={cn(
-                            "px-5 py-2.5 text-sm font-medium whitespace-nowrap rounded-full transition-all",
+                            "px-5 py-2.5 text-sm cursor-pointer font-medium whitespace-nowrap  transition-all",
                             tab === t.value
-                                ? "bg-primary text-white shadow-md"
-                                : "bg-white text-gray-600 hover:bg-gray-100"
+                                ? "border-b border-primary"
+                                : ""
                         )}
                     >
                         {t.name}
@@ -63,7 +63,7 @@ export default function OrderContent() {
                     ))
                 ) : sortedOrders.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="bg-gray-100 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-6" />
+                        <div className="bg-gray-50 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-6" />
                         <h3 className="text-xl font-semibold text-gray-700 mb-2">
                             No orders yet
                         </h3>

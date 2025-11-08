@@ -86,10 +86,10 @@ export default function ProfileContent({ user }: { user: UserDetails }) {
 
     return (
         <div className="shadow-xl p-6 py-16  min-h-screen">
-            <div className="rounded-xl  space-y-10 ">
+            <div className="rounded-xl  space-y-10 max-w-2xl mx-auto">
                 <h2 className="text-3xl font-semibold font-cinzel text-center ">Profile Settings</h2>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 max-w-2xl mr-auto">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 ">
                     <div className="flex flex-col items-center gap-3 mb-4">
                         <div className="relative">
                             <Avatar className="w-20 h-20">
