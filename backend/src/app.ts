@@ -30,6 +30,12 @@ app.use('/api', userRouter)
 app.use('/api', cartRouter)
 app.use('/api', orderRouter)
 app.use('/api', addressRouter)
+app.use('/api/try', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "User registered successfully. Please verify your email.",
+    });
+})
 
 
 
