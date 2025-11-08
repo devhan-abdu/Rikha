@@ -24,7 +24,7 @@ const Header = () => {
         <TabletSmartphone className='text-6xl' />
         <p className='text-2xl md:text-4xl'>Rikha</p>
       </Link>
-      <nav className="hidden items-center justify-between gap-16 md:flex md:order-2 xl:text-lg ">
+      <nav className="hidden items-center justify-between gap-16 md:flex md:order-2  ">
         <ul className="flex items-center justify-center gap-6 no-underline  flex-1">
           {
             navData.map((item) => (

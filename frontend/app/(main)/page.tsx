@@ -18,8 +18,8 @@ export default async function Home() {
             <h1 className="font-cinzel text-3xl  lg:text-4xl  text-black/80 "> Professional tone that inspires <span className="text-primary">confidence</span></h1>
             <p className="text-xl ">Explore iPhones, AirPods, iPads, Macs, and more premium devices for work, play, and everything in between </p>
             <div className="flex items-center gap-6 mt-3">
-              <Link href='/category' className="font-cinzel bg-primary text-white px-3 py-2 rounded-sm text-lg capitalize z-10 hover:scale-95 transition-all duration-300">Shop Now</Link>
-              <Link href='#category-section' className="font-cinzel text-primary border-2 border-primary px-3 py-1.5  rounded-sm text-lg capitalize font-bold hover:scale-95 transition-all duration-300 z-10">Explore More</Link>
+              <Link href='/category' className="font-cinzel bg-primary text-white px-3 py-2 rounded-sm text-base capitalize z-10 hover:scale-95 transition-all duration-300">Shop Now</Link>
+              <Link href='#category-section' className="font-cinzel text-primary border-2 border-primary px-3 py-1.5  rounded-sm text-base capitalize font-bold hover:scale-95 transition-all duration-300 z-10">Explore More</Link>
             </div>
           </div>
           <div className="h-[500px] w-full md:w-[50%] flex items-center justify-center -mt-20 ">
@@ -78,7 +78,7 @@ export default async function Home() {
       </section>
       <section className="bg-primary flex flex-col items-center justify-center p-6 gap-3 ">
         <h2 className="text-xl lg:text-2xl font-semibold text-white mb-3 text-center font-cinzel  ">Need Help Finding the Right Product?</h2>
-        <Link href='/contact' className=" bg-white text-primary px-4 py-2 rounded-md text-lg capitalize font-extrabold font-cinzel hover:scale-95 transition-all duration-300">Contact us</Link>
+        <Link href='/contact' className=" bg-white text-primary px-4 py-2 rounded-md text-base capitalize font-extrabold font-cinzel hover:scale-95 transition-all duration-300">Contact us</Link>
       </section>
 
       <section className="px-8 pb-12 pt-18 space-y-12 bg-gray-50">
@@ -92,7 +92,6 @@ export default async function Home() {
               <ProductCard key={product.id} product={product} />
             ))
           )
-
           }
         </div>
       </section>

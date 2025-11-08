@@ -7,7 +7,7 @@ import { Product } from "@/interface";
 const ProductCard = ({ product }: { product: Product }) => {
 
   return (
-    <div className="group relative flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 w-[310px] mx-auto overflow-hidden">
+    <div className="group relative flex flex-col  rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 w-[305px] mx-auto overflow-hidden">
       <Link
         href={`/category/${product.slug}`}
         className="flex items-center justify-center h-[190px] w-full "

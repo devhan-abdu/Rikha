@@ -1,14 +1,7 @@
 export default function Loading() {
   return (
     <div className="px-4 md:px-6 py-6 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 animate-pulse">
-      <div className="my-4 p-4 bg-white rounded-xl shadow-md w-fit border border-gray-200">
-        <div className="h-8 bg-gray-200 rounded w-32 mb-6"></div>
-        <div className="flex flex-wrap gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-6 bg-gray-200 rounded-full w-24"></div>
-          ))}
-        </div>
-      </div>
+     
 
       <div className="space-y-8 mt-12">
         <div className="flex justify-between gap-12">
