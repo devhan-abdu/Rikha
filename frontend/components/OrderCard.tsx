@@ -1,114 +1,184 @@
-"use client"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Order } from "@/interface"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { addCartItem, selectCartItems } from "@/redux/slices/cartSlice"
-import { useRemove, useUpdateOrder } from "@/lib/query/mutations/useOrderMutation"
-import { useRouter } from "next/navigation"
-import { selectAll } from "@/redux/slices/selectedItemsSlice"
+"use client";
+
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Order } from "@/interface";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { addCartItem, selectCartItems } from "@/redux/slices/cartSlice";
+import { useRemove, useUpdateOrder } from "@/lib/query/mutations/useOrderMutation";
+import { useRouter } from "next/navigation";
+import { selectAll } from "@/redux/slices/selectedItemsSlice";
+import { Package, Calendar, Trash2, ShoppingCart, XCircle, CreditCard } from "lucide-react";
 
 export default function OrderCard({ order }: { order: Order }) {
-    const disptch = useAppDispatch();
-    const cartItems = useAppSelector(selectCartItems)
+    const dispatch = useAppDispatch();
+    const cartItems = useAppSelector(selectCartItems);
     const router = useRouter();
-    const { mutate: removeOrder } = useRemove()
-    const { mutate: updateOrder } = useUpdateOrder()
+    const { mutate: removeOrder } = useRemove();
+    const { mutate: updateOrder } = useUpdateOrder();
 
     const handleAddToCart = () => {
         for (const item of order.items) {
-            const product = item.product
-            const cartItem = {
-                productId: product.id,
-                title: product.title,
-                desc: product.shortDesc,
-                quantity: item.quantity,
-                image: product.image,
-                price: product.price,
-                discount: product.discount,
-                stock: product.stock,
-                slug: product.slug
-            }
-            disptch(addCartItem(cartItem))
+            const product = item.product;
+            dispatch(
+                addCartItem({
+                    productId: product.id,
+                    title: product.title,
+                    desc: product.shortDesc,
+                    quantity: item.quantity,
+                    image: product.image,
+                    price: product.price,
+                    discount: product.discount,
+                    stock: product.stock,
+                    slug: product.slug,
+                })
+            );
         }
-    }
+    };
 
     const handlePay = () => {
         handleAddToCart();
-        disptch(selectAll(cartItems.map(item => item.productId)))
-        router.replace("/checkout")
-    }
+        dispatch(selectAll(cartItems.map((item) => item.productId)));
+        router.replace("/checkout");
+    };
+
+    const statusColor = {
+        PENDING_PAYMENT: "bg-orange-100 text-orange-700 border-orange-200",
+        PROCESSING: "bg-blue-100 text-blue-700 border-blue-200",
+        SHIPPED: "bg-purple-100 text-purple-700 border-purple-200",
+        DELIVERED: "bg-green-100 text-green-700 border-green-200",
+        CANCELLED: "bg-red-100 text-red-700 border-red-200",
+    }[order.orderStatus];
 
     return (
-        <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-
-            <div className="flex items-center justify-between border-b border-slate-300 pb-3">
-                <p className="font-semibold text-lg">{order.orderStatus}</p>
-                <p className="text-sm text-gray-500">{new Date(order.orderDate).toLocaleString().split(",")[0]}</p>
+        <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 border-b border-gray-200">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <Package className="w-5 h-5 text-primary" />
+                        <span className="font-bold text-lg text-gray-800">
+                            Order #{order.id}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Calendar className="w-4 h-4" />
+                            <span>{new Date(order.orderDate).toLocaleDateString("en-GB")}</span>
+                        </div>
+                        <span
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold border ${statusColor}`}
+                        >
+                            {order.orderStatus.replace("_", " ")}
+                        </span>
+                    </div>
+                </div>
             </div>
 
-            <div className="space-y-6 grid grid-cols-1 gap-2 lg:grid-cols-2">
-                {order.items.map((item) => (
-                    <div className="flex gap-3 py-2">
-                        <div className="h-20 w-20 flex-shrink-0">
-                            <Image
-                                src={item.product.image}
-                                alt={item.product.title}
-                                width={80}
-                                height={80}
-                                className="object-contain w-full h-full"
-                            />
+            <div className="p-6 space-y-5">
+                {order.items.map((item, index) => (
+                    <div
+                        key={index}
+                        className="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                    >
+                        <div className="relative flex-shrink-0">
+                            <div className="w-20 h-20 bg-white rounded-lg shadow-sm border border-gray-200 p-2">
+                                <Image
+                                    src={item.product.image}
+                                    alt={item.product.title}
+                                    width={80}
+                                    height={80}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            {item.quantity > 1 && (
+                                <span className="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-md">
+                                    {item.quantity}
+                                </span>
+                            )}
                         </div>
 
-                        <div className="flex flex-col justify-evenly gap-2">
-                            <div className="space-y-1">
-                                <p className="text-sm text-slate-700 font-medium">{item.product.title}</p>
-                                <p className="text-black/80">{item.product.shortDesc}</p>
-                            </div>
-
-                            <div className="flex items-center gap-3 text-slate-600 text-sm">
-                                <span className="font-bold ">ETB {item.product.price - (item.product.price * item.product.discount)}</span>
-                                <span>x{item.quantity}</span>
+                        <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-800 truncate">
+                                {item.product.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                {item.product.shortDesc}
+                            </p>
+                            <div className="flex items-center gap-3 mt-2">
+                                <span className="font-bold text-base ">
+                                    ETB {(item.product.price * (1 - item.product.discount)).toFixed(2)}
+                                </span>
+                                {item.product.discount > 0 && (
+                                    <span className="text-sm text-gray-500 line-through">
+                                        ETB {item.product.price.toFixed(2)}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="border-t border-slate-300 pt-4 flex flex-col items-end gap-3">
-                <p className="text-sm font-semibold">
-                    Total ({order.items.length} items): ETB {order.totalAmount}
-                </p>
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="text-right">
+                        <p className="text-sm text-gray-600">Total Amount</p>
+                        <p className="text-xl font-bold">
+                            ETB {order.totalAmount.toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            {order.items.length} item{order.items.length > 1 ? "s" : ""}
+                        </p>
+                    </div>
 
-                <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-3 justify-end">
+                        {(order.orderStatus === "DELIVERED" || order.orderStatus === "CANCELLED") && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:scale-105 transition-all"
+                                    onClick={() => removeOrder(order.id)}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    Remove
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all shadow-lg"
+                                    onClick={handleAddToCart}
+                                >
+                                    <ShoppingCart className="w-4 h-4" />
+                                    Add to Cart
+                                </Button>
+                            </>
+                        )}
 
-                    {(order.orderStatus === "DELIVERED" || order.orderStatus === "CANCELLED") && (
-                        <Button variant="outline" size="sm" className="text-primary border border-primary hover:scale-105 transition-all duration-300" onClick={() => removeOrder(order.id)}>
-                            Remove
-                        </Button>
-                    )}
-                    {(order.orderStatus === "DELIVERED" || order.orderStatus === "CANCELLED") && (
-                        <Button variant="secondary" size="sm" className="rounded-md bg-primary text-white  hover:scale-105 transition-all duration-300" onClick={handleAddToCart}>
-                            Add all to cart
-                        </Button>
-                    )}
+                        {(order.orderStatus === "PENDING_PAYMENT" || order.orderStatus === "PROCESSING") && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-2 border-gray-400 text-gray-700 hover:bg-gray-100 hover:scale-105 transition-all"
+                                onClick={() => updateOrder(order.id)}
+                            >
+                                <XCircle className="w-4 h-4" />
+                                Cancel Order
+                            </Button>
+                        )}
 
-
-                    {(order.orderStatus === "PENDING_PAYMENT" || order.orderStatus === "PROCESSING") && (
-                        <Button variant="outline" size="sm" className="text-primary border border-primary hover:scale-105 transition-all duration-300" onClick={() => updateOrder(order.id)}>
-                            Cancel
-                        </Button>
-                    )}
-
-                    {order.orderStatus === "PENDING_PAYMENT" && (
-                        <Button size="sm" className="rounded-md w-12 text-white  hover:scale-105 transition-all duration-300" onClick={handlePay}>
-                            Pay
-                        </Button>
-                    )}
-
+                        {order.orderStatus === "PENDING_PAYMENT" && (
+                            <Button
+                                size="sm"
+                                className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-110 transition-all shadow-xl font-bold"
+                                onClick={handlePay}
+                            >
+                                <CreditCard className="w-4 h-4" />
+                                Pay Now
+                            </Button>
+                        )}
+                    </div>
                 </div>
-
             </div>
         </div>
-    )
+    );
 }
