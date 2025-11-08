@@ -37,7 +37,7 @@ const Review = ({ reviews, desc, productId }: Props) => {
     setLoading(true)
 
     try {
-      const res = await api.post(`/products/${productId}/reviews`, {
+      await api.post(`/products/${productId}/reviews`, {
         comment: message,
         rating,
       });

@@ -45,6 +45,7 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
         router.push(url);
       }
     } catch (error) {
+      console.log(error)
       toast.error("Order creation failed");
     }
   }
