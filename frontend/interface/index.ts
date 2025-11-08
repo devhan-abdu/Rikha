@@ -53,18 +53,35 @@ export interface Cart {
   slug: string
 }
 
-export type UserDetails = {
+export interface UserDetails {
   id: number;
-  name: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  avatarUrl?: string;
+  role?: "USER" | "ADMIN";
+  verified?: boolean;
   email: string;
-  role: 'ADMIN' | 'USER' 
   createdAt: Date;
   updatedAt: Date;
 };
 
+export const ProfileSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  username: z.string(),
+  email: z
+    .string().nonempty({ message: 'Email is required' })
+    .email({ message: 'Please enter a valid email.' })
+    .trim(),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
+
+})
 
 
-const passwordSchema = z.object({
+
+export const signUpSchema = z.object({
   name: z
     .string().nonempty({ message: 'Username is required' })
     .min(2, { message: 'Name must be at least 2 characters long.' })
@@ -87,15 +104,45 @@ const passwordSchema = z.object({
 
   confirmPassword: z
     .string({ message: 'Please confirm your password' })
-});
-
-export const signUpSchema = passwordSchema.refine(
+}).refine(
   (data) => data.password === data.confirmPassword,
   {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   }
 );
+
+
+export const ChangePasswordSchema = z
+  .object({
+    password: z
+      .string({ message: "Please enter your current password" })
+      .min(1, { message: "Please enter your current password" }),
+
+    newPassword: z
+      .string({ message: "New password is required" })
+      .min(8, { message: "Be at least 8 characters long" })
+      .regex(/[a-zA-Z]/, { message: "Contain at least one letter" })
+      .regex(/[0-9]/, { message: "Contain at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Contain at least one special character",
+      })
+      .trim(),
+
+    confirmNewPassword: z
+      .string({ message: "Please confirm your new password" })
+      .min(1, { message: "Please confirm your new password" }),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords do not match",
+    path: ["confirmNewPassword"],
+  }).refine((data) => data.password !== data.newPassword,
+    {
+      message: "New password must be different from the current password",
+      path: ["newPassword"],
+    }
+  )
+
 
 export const verifyEmailSchema = z.object({
   otp: z
@@ -139,7 +186,7 @@ export const ResetPasswordSchema = z.object({
 });
 
 export const ShippingSchema = z.object({
-  id:z.number().optional(),
+  id: z.number().optional(),
   country: z.string().min(1, "Country is required"),
   name: z.string().min(1, "First name is required"),
   city: z.string().min(1, "city is required"),
@@ -158,10 +205,34 @@ export const OrderItemSchema = z.object({
 export const OrderSchema = z.object({
   items: z.array(OrderItemSchema),
   addressId: z.number(),
-  paymentMethod: z.enum(["TELEBIRR", "MPSA", "CBEBIRR"]), 
+  paymentMethod: z.enum(["TELEBIRR", "MPSA", "CBEBIRR"]),
 })
 
+export type OrderProduct = {
+  title: string;
+  image: string;
+  price: number;
+  shortDesc: string;
+  quantity: number;
+  id: number;
+  stock: number;
+  slug: string,
+  discount: number,
+}
 
+export type OrderItem = {
+  quantity: number;
+  product: OrderProduct;
+}
+
+export type Order = {
+  id: number;
+  totalAmount: number;
+  orderStatus: "PENDING_PAYMENT" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  paymentStatus: "PENDING" | "PAID" | "FAILED";
+  orderDate: string;
+  items: OrderItem[];
+}
 
 export type SignUpFormData = z.infer<typeof signUpSchema>;
 export type VerifyEmailData = z.infer<typeof verifyEmailSchema>;
@@ -170,3 +241,5 @@ export type ForgetPasswordData = z.infer<typeof ForgetPasswordSchema>;
 export type ResetPasswordData = z.infer<typeof ResetPasswordSchema>;
 export type ShippingData = z.infer<typeof ShippingSchema>;
 export type OrderData = z.infer<typeof OrderSchema>;
+export type ProfileData = z.infer<typeof ProfileSchema>;
+export type ChangePasswordData = z.infer<typeof ChangePasswordSchema>;
