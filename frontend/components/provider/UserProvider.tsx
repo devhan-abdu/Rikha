@@ -1,20 +1,27 @@
 "use client"
-
-import { featchMe } from "@/lib/auth/featchme";
+import { useEffect, ReactNode } from "react";
 import { useAppDispatch } from "@/redux/hooks";
-import { setLoading, setUser } from "@/redux/slices/authSlice";
-import { ReactNode, useEffect } from "react";
+import { setUser, setLoading } from "@/redux/slices/authSlice";
+import { featchMe } from "@/lib/auth/featchme";
 
 export function UserProvider({ children }: { children: ReactNode }) {
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        dispatch(setLoading(true));
-        featchMe().then(user => {
-            dispatch(setUser(user))
-            dispatch(setLoading(false))
-        })
-    }, [dispatch])
+  useEffect(() => {
+    const loadUser = async () => {
+      dispatch(setLoading(true));
+      try {
+        const user = await featchMe();
+        dispatch(setUser(user));
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
 
-    return <>{children}</>
+    loadUser();
+  }, [dispatch]);
+
+  return <>{children}</>;
 }

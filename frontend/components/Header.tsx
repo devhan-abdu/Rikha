@@ -8,7 +8,7 @@ import MobileNav from "./MobileNav";
 import { selectTotalQnt } from '@/redux/slices/cartSlice';
 import { useAppSelector } from '@/redux/hooks';
 import { AccountDropdown } from './AccountDropdown';
-import { selectUser } from '@/redux/slices/authSlice';
+import { selectIsLoading, selectUser } from '@/redux/slices/authSlice';
 
 
 const Header = () => {
@@ -16,6 +16,7 @@ const Header = () => {
   const router = useRouter();
   const totalQnt = useAppSelector(selectTotalQnt)
   const user = useAppSelector(selectUser)
+  const isLoading = useAppSelector(selectIsLoading)
 
 
   return (
@@ -30,7 +31,7 @@ const Header = () => {
             navData.map((item) => (
 
               <li key={item.id}>
-                <button onClick={() => router.push(item.path)} className={cn(' text-lg transition-colors ', { "text-primary": pathname === item.path })}>
+                <button onClick={() => router.push(item.path)} className={cn(' text-lg transition-colors cursor-pointer ', { "text-primary": pathname === item.path })}>
                   {item.name}
                 </button>
               </li>
@@ -44,10 +45,15 @@ const Header = () => {
       <div className="flex items-center gap-4 order-3">
         <button className="text-gray-600 hidden md:block cursor-pointer z-10 "  ><Link href='/search'><Search /></Link> </button>
 
-        {user ? (
+
+        {isLoading ? (
+          <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
+        ) : user ? (
           <AccountDropdown />
         ) : (
-          <Link href='/login' className='text-gray-600'> <User className="" /></Link>
+          <Link href="/login" className="text-gray-600">
+            <User />
+          </Link>
         )}
 
         <div className="relative  flex items-center">

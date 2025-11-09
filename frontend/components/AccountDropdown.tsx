@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearUser, selectUser } from "@/redux/slices/authSlice";
+import { clearUser, selectIsLoading, selectUser } from "@/redux/slices/authSlice";
 import { ArrowRight, Package, User, MapPin, Lock } from "lucide-react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
@@ -19,6 +19,7 @@ export function AccountDropdown() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser)
+  const isLoading = useAppSelector(selectIsLoading)
 
   const handleLogout = async () => {
     try {
@@ -35,13 +36,20 @@ export function AccountDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage src={user?.avatarUrl} />
-          <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-primary/30 shadow-md">
-            {user?.username?.slice(0, 2)}
-          </AvatarFallback>
-        </Avatar>
+        <div>
+          {isLoading ? (
+            <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
+          ) : (
+            <Avatar className="cursor-pointer">
+              <AvatarImage src={user?.avatarUrl} />
+              <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-primary/30 shadow-md">
+                {user?.username?.slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+          )}
+        </div>
       </DropdownMenuTrigger>
+
 
       <DropdownMenuContent
         align="end"

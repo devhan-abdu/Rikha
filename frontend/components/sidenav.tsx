@@ -4,23 +4,29 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { accountNav } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppSelector } from '@/redux/hooks';
-import { selectUser } from '@/redux/slices/authSlice';
+import { selectIsLoading, selectUser } from '@/redux/slices/authSlice';
 
 
 const SideNav = () => {
   const router = useRouter();
   const pathname = usePathname();
   const user = useAppSelector(selectUser)
+  const isLoading = useAppSelector(selectIsLoading)
 
   return (
     <div className='flex h-full flex-col px-3 py-4 md:px-4 md:py-6 gap-6 border-r border-slate-300'>
       <div className=' flex items-center gap-3 '>
-        <Avatar className="cursor-pointer ">
-          <AvatarImage src={user?.avatarUrl}/>
-          <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-slate-300 shadow-md">
-            {user?.username?.slice(0, 2)}
-          </AvatarFallback>
-        </Avatar>
+        {isLoading ? (
+          <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
+        ) : (
+          <Avatar className="cursor-pointer">
+            <AvatarImage src={user?.avatarUrl} />
+            <AvatarFallback className="uppercase bg-gray-100 font-cinzel border-primary/30 shadow-md">
+              {user?.username?.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+        )}
+
         <div className="flex flex-col">
           <p className="font-semibold text-gray-800">{user?.username.split(" ")[0]}</p>
           <p className='text-sm text-gray-500'>{user?.email}</p>
@@ -44,7 +50,7 @@ const SideNav = () => {
           )
         })}
       </div>
-    </div>
+    </div >
   )
 }
 
