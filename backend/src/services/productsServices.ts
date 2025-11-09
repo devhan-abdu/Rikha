@@ -216,9 +216,9 @@ export const getSearch = async (query: string) => {
   const products = await prisma.product.findMany({
     where: {
       OR: [
-        { title: { contains: query } },
-        { brand: { contains: query } },
-        { shortDesc: { contains: query } },
+        { title: { contains: query, mode: "insensitive" } },
+        { brand: { contains: query, mode: "insensitive" } },
+        { shortDesc: { contains: query, mode: "insensitive" } },
       ],
     },
     select: {
@@ -243,6 +243,7 @@ export const getSearch = async (query: string) => {
 
   return products;
 };
+
 
 
 
