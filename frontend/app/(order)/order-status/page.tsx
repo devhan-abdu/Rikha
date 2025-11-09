@@ -11,7 +11,6 @@ export default function OrderStatusPage() {
           <OrderStatusContent />
         </Suspense>
       </nav>
-      <h1>Dashboard</h1>
     </>
   )
 }

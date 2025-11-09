@@ -16,8 +16,8 @@ export const startOrderPolling = (txRef: string): Promise<{ status: "success" | 
             }
 
             try {
-                const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/order/status?tx_ref=${txRef}`)
-                const order = response.data.order;
+                const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/order-status?tx_ref=${txRef}`)
+                const order = response.data.data;
                 console.log(order, order, order)
 
                 if (order.paymentStatus === "COMPLETED") {

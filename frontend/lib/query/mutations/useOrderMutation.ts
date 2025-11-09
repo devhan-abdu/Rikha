@@ -9,7 +9,7 @@ export const useCreate = () => {
     return useMutation({
         mutationFn: async (data: OrderData): Promise<string> => {
             const res = await api.post('/order', data);
-            return res.data.url
+            return res.data.data
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["my-orders"] });

@@ -15,7 +15,7 @@ export default function OrderSuccess() {
         }}
         secondaryAction={{
           label: "View Orders",
-          action: () => router.push("/orders"),
+          action: () => router.push("/account/orders"),
         }}
       />
     </main>

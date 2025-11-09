@@ -41,9 +41,13 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
 
     try {
       const url = await mutateAsync(orderData);
+
       if (url) {
         router.push(url);
+      } else {
+          router.push("/account/orders")
       }
+
     } catch (error) {
       console.log(error)
       toast.error("Order creation failed");
