@@ -9,12 +9,24 @@ import { authRouter } from "./routes/authRoute";
 import cors from 'cors'
 import { orderRouter } from "./routes/orderRoute";
 import { addressRouter } from "./routes/addressRoute";
+import { AppError } from "./utils/AppError";
 
 dotenv.config();
 const app: Application = express()
 
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.DEPLOYED_FRONTEND_URL,
+];
+
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new AppError("Not Allowed by CORS"))
+        }
+    },
     credentials: true
 }))
 
@@ -30,12 +42,6 @@ app.use('/api', userRouter)
 app.use('/api', cartRouter)
 app.use('/api', orderRouter)
 app.use('/api', addressRouter)
-app.use('/api/try', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "User registered successfully. Please verify your email.",
-    });
-})
 
 
 
