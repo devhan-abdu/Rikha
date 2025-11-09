@@ -15,8 +15,9 @@ type Props = {
   reviews: Review[];
   productId: number,
   desc: string;
+  slug: string;
 }
-const Review = ({ reviews, desc, productId }: Props) => {
+const Review = ({ reviews, desc, productId,slug }: Props) => {
   const router = useRouter();
   const user = useAppSelector(selectUser);
   const [tab, setTab] = useState('desc')
@@ -84,10 +85,10 @@ const Review = ({ reviews, desc, productId }: Props) => {
                       </blockquote>
                       <figcaption className="flex items-center justify-center mt-6 space-x-3">
                         <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold">
-                          {review.user.name.charAt(0).toUpperCase()}
+                          {review.user.username.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex items-center divide-x-2 divide-gray-500 dark:divide-gray-700">
-                          <div className="pr-3 font-medium text-gray-900 dark:text-white">  {review.user.name}</div>
+                          <div className="pr-3 font-medium text-gray-900 dark:text-white">  {review.user.username}</div>
                         </div>
                       </figcaption>
                     </figure>
@@ -160,7 +161,7 @@ const Review = ({ reviews, desc, productId }: Props) => {
                 ) : (
                   <>
                     <p className=" font-cinzel font-semibold text-center text-md">TO Share Your Experience Please Login</p>
-                    <Button onClick={() => router.push('/login')} className='text-white px-4 py-1.5'>
+                    <Button onClick={() => router.push(`/login?redirect=category/${slug}`)} className='text-white px-4 py-1.5 w-12 '>
                       Login
                     </Button>
                   </>

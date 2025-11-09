@@ -121,7 +121,7 @@ const ProductDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
       </div>
 
       <div className=" mr-auto">
-        <Review reviews={product.reviews} desc={product.longDesc} productId={product.id} />
+        <Review reviews={product.reviews} desc={product.longDesc} productId={product.id} slug={slug} />
         <Suspense fallback={<div>Loading...</div>}>
           <Related slug={product.slug} />
         </Suspense>
