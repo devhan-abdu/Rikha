@@ -6,6 +6,7 @@ import { randomBytes } from "crypto";
 import dotenv from 'dotenv';
 import { getCookieOptions } from "../utils/getCookieOptions";
 import { AppError } from "../utils/AppError";
+import { success } from "zod";
 
 dotenv.config();
 
@@ -40,7 +41,6 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 
 const login = catchAsync(async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
     const { accessToken, refreshToken, user } = await authServices.login(email, password);
 
     res.cookie('access', accessToken, getCookieOptions(true))
@@ -76,6 +76,12 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { password, email } = req.body;
     const { token } = req.params;
+    if (!token) {
+        return res.status(400).json({
+            success: false,
+            message: "Token is missing",
+        });
+    }
 
     const { accessToken, refreshToken, user } = await authServices.resetPassword(email, token, password);
 
@@ -112,10 +118,10 @@ const googleAuthRedirect = catchAsync(async (req: Request, res: Response) => {
     const scopes = encodeURIComponent(SCOPES.join(" "));
 
     const clientId = process.env.GOOGLE_CLIENTID;
-    const redirectUri = process.env.GOOGLE_CALLBACK_URL;
+    const redirectUrl = process.env.GOOGLE_CALLBACK_URL;
     const OAUTH_URL = process.env.GOOGLE_OAUTH_URL
     const state = randomBytes(16).toString("hex");;
-    const authUrl = `${OAUTH_URL}?client_id=${clientId}&redirect_uri=${redirectUri}&access_type=offline&response_type=code&state=${state}&scope=${scopes}`;
+    const authUrl = `${OAUTH_URL}?client_id=${clientId}&redirect_uri=${redirectUrl}&access_type=offline&response_type=code&state=${state}&scope=${scopes}`;
     res.redirect(authUrl);
 })
 
