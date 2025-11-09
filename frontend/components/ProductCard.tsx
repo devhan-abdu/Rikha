@@ -38,7 +38,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       <div className="flex flex-col flex-1 px-6 py-4 space-y-2">
         <Link
           href={`/category/${product.slug}`}
-          className="text-base font-semibold leading-snug text-gray-900 hover:text-blue-600 transition-colors line-clamp-2"
+          className="text-base font-semibold leading-snug text-gray-700 hover:text-black transition-colors line-clamp-2"
         >
           {product.title}
         </Link>
