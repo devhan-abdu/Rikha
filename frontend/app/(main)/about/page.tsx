@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function ComingSoon() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen  text-center px-4">
-            <h1 className="text-5xl font-cinzel mb-4">We're Launching Soon </h1>
+            <h1 className="text-5xl font-cinzel mb-4">We&lsquo;re Launching Soon </h1>
             <p className="text-lg mb-8 text-black/60 max-w-md">
                 Our electronics store is getting ready. Stay tuned for something amazing!
             </p>
