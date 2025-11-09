@@ -32,7 +32,7 @@ export interface Review {
   rating: number;
   comment: string;
   user: {
-    name: string;
+    username: string;
   };
 };
 export interface ProductDetail extends Product {
