@@ -49,7 +49,7 @@ const Register: FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className=' max-w-[430px] mx-auto'>
-        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center my-8'>Create an account</h2>
+        <h2 className='text-2xl font-cinzel font-bold text-center my-8 uppercase'>Create an account</h2>
         <form className='space-y-5 md:space-y-6 ' onSubmit={handleSubmit(onSubmit)}>
           <InputField
             label="User Name *"
@@ -92,7 +92,7 @@ const Register: FC = () => {
         </form>
         <OAuthButtons />
         <p className="text-md text-gray-900 text-center my-8">
-          Already have an account? <Link href="/signin" className="font-medium text-primary hover:underline ">Login here</Link>
+          Already have an account? <Link href="/login" className="font-medium text-primary hover:underline ">Login here</Link>
         </p>
       </motion.div>
     </div>

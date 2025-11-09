@@ -31,8 +31,8 @@ const LoginContent = () => {
 
   const onSubmit: SubmitHandler<SignInFormData> = async (data: SignInFormData) => {
     try {
-      const res = await api.post('/auth/Content', data)
-      const { user } = res.data;
+      const res = await api.post('/auth/login', data)
+      const user = res.data.data;
       dispatch(setUser(user))
       toast.success("Login Successfully!");
       const redirectTo = searchParams.get('redirect') || '/';
@@ -51,7 +51,7 @@ const LoginContent = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className=' max-w-[430px] mx-auto'>
-        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center my-10'>Sign in to you account</h2>
+        <h2 className='text-2xl  font-cinzel font-bold text-center my-10 '>SIGN IN TO YOUR ACCOUNT</h2>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-5 md:space-y-6 '>
           <InputField
             label="Email *"

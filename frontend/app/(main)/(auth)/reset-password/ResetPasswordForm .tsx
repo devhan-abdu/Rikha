@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { ResetPasswordData, ResetPasswordSchema, } from '@/interface';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
 import { useAppDispatch } from "@/redux/hooks";
@@ -14,6 +14,7 @@ import { InputField } from "@/components/ui/InputField";
 
 const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get('token');
   const email = searchParams.get('email');
   const dispatch = useAppDispatch();
@@ -38,9 +39,10 @@ const ResetPasswordForm = () => {
   const onSubmit: SubmitHandler<ResetPasswordData> = async ({ password }) => {
     try {
       const res = await api.put(`/auth/reset-password/${token}`, { email, password });
-      const { user } = res.data;
+      const user = res.data.data;
       dispatch(setUser(user))
       toast.success("Password reset successful");
+      router.push("/login")
     } catch (error) {
       console.log(error)
       toast.error("Something went wrong. Please try again.");
@@ -53,8 +55,13 @@ const ResetPasswordForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className='space-y-2 max-w-[430px] mx-auto '>
-        <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center '>Set A New Password</h2>
-        <p className='text-center text-gray-600 text-sm'>type your email so we can send you a password recovery email</p>
+        <h2 className='text-2xl  font-cinzel font-bold text-center'>
+          SET A NEW PASSWORD
+        </h2>
+        <p className='text-center text-gray-600 text-sm'>
+          Enter your new password below to update your account credentials.
+        </p>
+
         <form onSubmit={handleSubmit(onSubmit)} className='mt-8 space-y-5 '>
           <InputField
             label="Password *"
@@ -73,7 +80,7 @@ const ResetPasswordForm = () => {
 
           <Button type='submit' disabled={isSubmitting} className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel '> {isSubmitting ? "Resetting..." : "Reset Password"}</Button>
           <p className="text-md text-gray-900 text-center">
-            Don&rsquo;t get the email? <Link href="/forgot-password" className="text-primary ">Try again</Link>
+            Don&rsquo;t get the email? <Link href="/forget-password" className="text-primary ">Try again</Link>
           </p>
         </form>
       </motion.div>

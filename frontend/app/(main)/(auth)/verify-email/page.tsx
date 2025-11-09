@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import api from "@/lib/api";
 
 const EmailVerificationPage = () => {
 	const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
+	const [submitted, setSubmitted] = useState(false)
 	const inputRefs = useRef<HTMLInputElement[]>([]);
 	const dispatch = useAppDispatch();
 	const router = useRouter();
@@ -31,13 +32,13 @@ const EmailVerificationPage = () => {
 			const email = localStorage.getItem("verify_email");
 			if (!email) throw new Error("No email found in localStorage");
 			const res = await api.post('/auth/verify-email', { email, otp });
-
 			localStorage.removeItem("verify_email");
 			toast.success('Email verified successfully!');
-			dispatch(setUser(res.data.user))
+			dispatch(setUser(res.data.data))
 			router.push("/");
 		} catch (error) {
 			console.log(error)
+			setSubmitted(true);
 			toast.error("Something went wrong");
 		}
 	};
@@ -60,20 +61,29 @@ const EmailVerificationPage = () => {
 	};
 
 	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-		const pasted = e.clipboardData.getData("text").slice(0, 6).split("");
-		const newCode = Array(6).fill("");
-		pasted.forEach((char, i) => (newCode[i] = char));
+		e.preventDefault();
+		const pasted = e.clipboardData.getData("text").trim().slice(0, 6).split("");
+
+		const newCode = [...code];
+		pasted.forEach((char, i) => {
+			newCode[i] = char;
+		});
+
 		setCode(newCode);
 		setValue("otp", newCode.join(""));
-		const nextIndex = pasted.length >= 6 ? 5 : pasted.length;
+
+		const nextIndex = Math.min(pasted.length, 6) - 1;
 		inputRefs.current[nextIndex]?.focus();
 	};
 
+
 	useEffect(() => {
-		if (code.every((c) => c !== "")) {
+		if (code.every((c) => c !== "") && !submitted) {
 			handleSubmit(onSubmit)();
+			setSubmitted(true);
 		}
-	}, [code, handleSubmit, onSubmit]);
+	}, [code, submitted, handleSubmit, onSubmit]);
+
 
 	return (
 		<div className='max-w-md w-full mx-auto my-32'>
@@ -83,7 +93,7 @@ const EmailVerificationPage = () => {
 				transition={{ duration: 0.5 }}
 				className='bg-white p-8 rounded-2xl '
 			>
-				<h2 className='text-3xl font-bold text-center font-cinzel'>Verify Your Email</h2>
+				<h2 className='text-2xl font-bold text-center font-cinzel'>VERIFY YOUR EMAIL</h2>
 				<p className='text-center text-gray-700 mb-6'>
 					Enter the 6-digit code sent to your email.
 				</p>

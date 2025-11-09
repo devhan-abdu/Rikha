@@ -38,7 +38,7 @@ const ForgetPassword = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className='space-y-2 max-w-[430px] mx-auto '>
-                <h2 className='text-2xl md:text-3xl font-cinzel font-bold text-center '>Reset Password</h2>
+                <h2 className='text-2xl  font-cinzel font-bold text-center '>Reset Password</h2>
                 <p className='text-center text-gray-600 text-sm'>type your email so we can send you a password recovery email</p>
                 <form onSubmit={handleSubmit(onSubmit)} className='mt-8 space-y-5 '>
 
