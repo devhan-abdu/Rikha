@@ -2,7 +2,7 @@
 import { useEffect, ReactNode } from "react";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser, setLoading } from "@/redux/slices/authSlice";
-import { featchMe } from "@/lib/auth/featchme";
+import { fetchMe } from "@/lib/auth/fetchme";
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
@@ -11,7 +11,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const loadUser = async () => {
       dispatch(setLoading(true));
       try {
-        const user = await featchMe();
+        const user = await fetchMe();
         dispatch(setUser(user));
       } catch (error) {
         console.error("Error fetching user:", error);

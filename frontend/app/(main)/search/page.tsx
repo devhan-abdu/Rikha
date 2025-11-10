@@ -1,6 +1,6 @@
 import Search from '@/components/Search';
 import { Frown } from 'lucide-react';
-import { fetchFeaturedProducts, fetchSearchProducts } from '@/lib/featchers';
+import { fetchFeaturedProducts, fetchSearchProducts } from '@/lib/fetchers';
 import SearchProductCard from '@/components/SearchProductCard';
 import { Suspense } from 'react';
 

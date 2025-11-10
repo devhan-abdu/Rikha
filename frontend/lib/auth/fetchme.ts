@@ -5,7 +5,7 @@ import { cookies } from "next/headers"
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 
-export async function featchMe() {
+export async function fetchMe() {
     try {
         const cookieStore = await cookies();
         const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
