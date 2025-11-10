@@ -1,22 +1,23 @@
 import Common from "@/components/Common";
 import CategoryContent from "./CategoryContent";
-import { fetchAllProducts, fetchCategories, fetchProductsByCategory } from "@/lib/featchers";
+import { fetchAllProducts, fetchCategories, fetchProductsByCategory } from "@/lib/fetchers";
 import { Category, Product } from "@/interface";
 
 const CategoryPage = async ({ searchParams }: { searchParams: Promise<{ slug?: string }> }) => {
-    let categories: Category[] = [];
-    let initialProducts: Product[] = [];
-    let defaultCategory = "";
     const { slug } = await searchParams
 
+    let categories: Category[] = [];
+    let initialProducts: Product[] = [];
+    let defaultCategory = slug || "";
+
     try {
-        categories = await fetchCategories();
-        if (slug) {
-            initialProducts = await fetchProductsByCategory(slug);
-            defaultCategory = slug;
-        } else {
-            initialProducts = await fetchAllProducts();
-        }
+        const productPromise = slug ? fetchProductsByCategory(slug) : fetchAllProducts()
+        const results = await Promise.all([
+            fetchCategories(),
+            productPromise,
+        ]);
+        categories = results[0];
+        initialProducts = results[1];
     } catch (err) {
         console.error("Failed to fetch categories or products", err);
         categories = [];

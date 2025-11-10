@@ -1,10 +1,11 @@
 import React, { Suspense } from 'react';
 import Image from 'next/image';
 import { Lock, ShieldCheck, Truck, Undo2 } from 'lucide-react';
-import Related from './Related';
 import Review from './Review';
-import { fetchProductDetail } from '@/lib/featchers';
+import { fetchProductDetail, fetchRelatedProducts } from '@/lib/fetchers';
 import AddToCartButton from '@/components/AddToCartButton';
+import ProductWrapper from '@/components/ProductWrapper';
+import { ProductCardsSkeleton } from '@/components/skeletons';
 
 const ProductDetail = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params
@@ -122,9 +123,13 @@ const ProductDetail = async ({ params }: { params: Promise<{ slug: string }> }) 
 
       <div className=" mr-auto">
         <Review reviews={product.reviews} desc={product.longDesc} productId={product.id} slug={slug} />
-        <Suspense fallback={<div>Loading...</div>}>
-          <Related slug={product.slug} />
-        </Suspense>
+
+        <section className="p-8 pt-10 pb-20 space-y-12 bg-gray-50">
+          <h2 className="text-2xl lg:text-3xl font-cinzel text-left">Featured Products</h2>
+          <Suspense fallback={<ProductCardsSkeleton />}>
+            <ProductWrapper fetchProduct={() => fetchRelatedProducts(slug)} />
+          </Suspense>
+        </section>
       </div>
     </div>
   );

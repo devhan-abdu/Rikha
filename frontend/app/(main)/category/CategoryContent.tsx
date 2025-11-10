@@ -5,8 +5,9 @@ import { cn } from '@/lib/utils'
 import { Category, Product } from '@/interface'
 import { useState } from 'react'
 import ProductCard from '@/components/ProductCard'
-import { fetchAllProducts, fetchProductsByCategory } from '@/lib/featchers'
+import { fetchAllProducts, fetchProductsByCategory } from '@/lib/fetchers'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProductCardsSkeleton } from '@/components/skeletons'
 
 
 type Props = {
@@ -44,7 +45,7 @@ const CategoryContent = ({ categories, initialProducts, defaultCategory }: Props
             <div className="my-4 p-4 shadow-sm border border-slate-200 rounded-md w-fit ">
                 <h2 className="text-2xl font-semibold mb-6 ">Category</h2>
                 <div className="flex flex-wrap  gap-4 items-start ">
-                    {[{name: "All", slug:"all"},...categories].map((item) => (
+                    {[{ name: "All", slug: "all" }, ...categories].map((item) => (
                         <button
                             key={item.slug}
                             className={cn(
@@ -69,24 +70,24 @@ const CategoryContent = ({ categories, initialProducts, defaultCategory }: Props
                             <SelectValue placeholder="Sort by price" />
                         </SelectTrigger>
                         <SelectContent className='bg-white shadow-2xl z-[999]'>
+                            <SelectItem value="relevant">Relevance</SelectItem>
                             <SelectItem value="price-asc">Price: Low to High</SelectItem>
                             <SelectItem value="price-desc">Price: High to Low</SelectItem>
                         </SelectContent>
                     </Select>
 
                 </div>
-
-                <div className="max-w-fit mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-x-6 gap-y-8 mt-12">
-
-                    {isLoading
-                        ? Array.from({ length: 6 }).map((_, i) => (
-                            <div key={i} className="w-full h-[300px] bg-gray-200 animate-pulse rounded-lg" />
-                        )) : (
-                            sortedProducts?.map((product) => (
+                {isLoading ? (
+                    <ProductCardsSkeleton />
+                ) : (!products || products?.length === 0) ? (
+                    <p className="text-gray-500"> No Product Found</p>)
+                    : (
+                        <div className="max-w-fit mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center justify-center gap-x-6 gap-y-8 mt-12">
+                            {sortedProducts?.map((product) => (
                                 <ProductCard key={product.id} product={product} />
-                            ))
-                        )}
-                </div>
+                            ))}
+                        </div>
+                    )}
 
             </div>
         </div>
