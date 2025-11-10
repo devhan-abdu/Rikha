@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
@@ -17,7 +18,8 @@ const ProductCard = ({ product }: { product: Product }) => {
           alt={product.title}
           width={300}
           height={190}
-          className="object-contain w-full h-full px-2 py-5 transition-transform duration-200 group-hover:scale-105"
+          className="object-contain w-full h-full px-2 py-5  group-hover:scale-105 opacity-0 transition-opacity duration-500"
+          onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
         />
       </Link>
 

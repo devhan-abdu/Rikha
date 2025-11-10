@@ -87,7 +87,8 @@ export default function OrderCard({ order }: { order: Order }) {
                                     alt={item.product.title}
                                     width={80}
                                     height={80}
-                                    className="w-full h-full object-contain"
+                                    className="w-full h-full object-contain opacity-0 transition-opacity duration-500"
+                                    onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
                                 />
                             </div>
                             {item.quantity > 1 && (
