@@ -6,15 +6,15 @@ import { fetchProductDetail, fetchRelatedProducts } from '@/lib/fetchers';
 import AddToCartButton from '@/components/AddToCartButton';
 import ProductWrapper from '@/components/ProductWrapper';
 import { ProductCardsSkeleton } from '@/components/skeletons';
+import { notFound } from 'next/navigation';
 
 const ProductDetail = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params
   const product = await fetchProductDetail(slug);
-  if (!product) {
-    return {
-      notFound: true,
-    }
-  }
+
+    if (!product) {
+     notFound(); 
+  }    
 
   return (
     <div className="py-6 font-poppins container mx-auto">
