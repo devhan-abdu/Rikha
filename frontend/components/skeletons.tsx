@@ -85,3 +85,54 @@ export function OrderCardSkeleton() {
         </div>
     );
 }
+
+export const LoginFallback = () => (
+    <div className="my-16 p-6 md:p-10 select-none pointer-events-none">
+        <div className="max-w-[430px] mx-auto">
+            <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-center my-10 text-gray-300">
+                Sign in to your account
+            </h2>
+
+            <div className="space-y-5 md:space-y-6">
+                <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+                <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+                <div className={`h-10 bg-gray-300 rounded-md mt-2 ${shimmer}`}></div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+                <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+                <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+            </div>
+
+            <p className="text-md text-gray-400 text-center my-8">
+                Don&rsquo;t have an account yet?{" "}
+                <span className={`bg-gray-200 rounded w-16 h-4 inline-block align-middle ${shimmer}`}></span>
+            </p>
+        </div>
+    </div>
+);
+
+export const ResetPasswordFallback = () => (
+  <div className="my-16 p-6 md:p-10 select-none pointer-events-none">
+    <div className="max-w-[430px] mx-auto space-y-4">
+      <h2 className="text-2xl md:text-3xl font-cinzel font-bold text-center text-gray-300">
+        Set a New Password
+      </h2>
+
+      <p className="text-center text-gray-400 text-sm">
+        Type your email so we can send you a password recovery email
+      </p>
+
+      <div className="mt-8 space-y-5">
+        <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+        <div className={`h-12 bg-gray-200 rounded-md ${shimmer}`}></div>
+        <div className={`h-10 bg-gray-300 rounded-md ${shimmer}`}></div>
+      </div>
+
+      <p className="text-md text-gray-400 text-center my-6">
+        Don&rsquo;t get the email?{" "}
+        <span className={`bg-gray-200 w-16 h-4 inline-block rounded align-middle ${shimmer}`}></span>
+      </p>
+    </div>
+  </div>
+);
