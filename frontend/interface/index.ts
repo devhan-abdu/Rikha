@@ -80,16 +80,6 @@ export const ContactSchema = z.object({
   message: z.string().min(4)
 });
 
-export const ContactSchema = z.object({
-  name: z.string("Name is required"),
-  email: z
-    .string().nonempty({ message: 'Email is required' })
-    .email({ message: 'Please enter a valid email.' })
-    .trim(),
-  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
-  subject: z.string(),
-  message: z.string().min(4)
-})
 
 export const ProfileSchema = z.object({
   firstName: z.string(),
