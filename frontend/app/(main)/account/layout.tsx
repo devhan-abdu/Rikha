@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import SideNav from "@/components/sidenav";
 import { fetchMe } from "@/lib/auth/fetchme";
 import { redirect } from "next/navigation";
