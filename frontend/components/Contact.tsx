@@ -39,86 +39,94 @@ const Contact = () => {
 
 
     return (
-        <div className="py-10 ">
-            <h2 className="text-2xl  font-cinzel text-center">GET IN TOUCH WITH US</h2>
-            <p className="text-foreground-500/80 text-center max-w-[500px] mx-auto text-sm">
-                We&apos;re here to assist you with any inquiries, orders, or feedback — just send us a message below.
-            </p>
+        <div className="py-12 px-4 md:px-12">
+            <h2 className="text-2xl md:text-3xl font-cinzel text-center font-bold">
+                GET IN TOUCH WITH US
+            </h2>
 
-            <div className="flex flex-col md:flex-row place-content-center items-start gap-12  mt-8 md:mt-12">
-                <form className=" flex flex-col gap-6 md:w-1/2 w-full" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="space-y-2 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mt-8 md:mt-12 max-w-5xl mx-auto">
+                <form className="flex flex-col gap-5 w-lg mx-auto md:w-full " onSubmit={handleSubmit(onSubmit)}>
+                    <div className="flex flex-col gap-1">
                         <input
                             id="name"
                             type="text"
                             {...register("name")}
                             placeholder="Your name"
-                            className=" px-3 py-2 border border-black/80 rounded-md  placeholder:text-black/60  outline-none focus:ring-1 focus:ring-black w-full"
+                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
                         />
                         {errors.name && <p className="text-red-500 text-xs">{errors.name?.message}</p>}
                     </div>
-                    <div className="space-y-2 relative">
+
+                    <div className="flex flex-col gap-1">
                         <input
                             id="email"
                             type="email"
                             {...register("email")}
                             placeholder="Email address"
-                            className=" px-3 py-2 border border-black/80 rounded-md  placeholder:text-black/60  outline-none focus:ring-1 focus:ring-black w-full"
+                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
                         />
                         {errors.email && <p className="text-red-500 text-xs">{errors.email?.message}</p>}
                     </div>
-                    <div className="space-y-2 relative">
+
+                    <div className="flex flex-col gap-1">
                         <input
                             id="phoneNumber"
                             type="text"
-                            {...register("name")}
+                            {...register("phoneNumber")}
                             placeholder="Phone number"
-                            className=" px-3 py-2 border border-black/80 rounded-md  placeholder:text-black/60  outline-none focus:ring-1 focus:ring-black w-full"
+                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
                         />
                         {errors.phoneNumber && <p className="text-red-500 text-xs">{errors.phoneNumber?.message}</p>}
                     </div>
-                    <div className="space-y-2 relative">
+
+                    <div className="flex flex-col gap-1">
                         <input
                             id="subject"
                             type="text"
-                            {...register("email")}
+                            {...register("subject")}
                             placeholder="Subject"
-                            className=" px-3 py-2 border border-black/80 rounded-md  placeholder:text-black/60  outline-none focus:ring-1 focus:ring-black w-full"
+                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
                         />
                         {errors.subject && <p className="text-red-500 text-xs">{errors.subject?.message}</p>}
                     </div>
-                    <div className="space-y-2 relative">
+
+                    <div className="flex flex-col gap-1">
                         <textarea
                             id="message"
-                            rows={4}
-                            {...register("email")}
+                            rows={5}
+                            {...register("message")}
                             placeholder="Message"
-                            className="mt-2 px-3 py-2 rounded-md span-col-2 border border-black/80   placeholder:text-black/60 outline-none text-gray-200 focus:outline-ring-1 focus:ring-black  col-span-2 min-h-24 w-full" />
+                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full resize-none"
+                        />
                         {errors.message && <p className="text-red-500 text-xs">{errors.message?.message}</p>}
                     </div>
-                    <Button disabled={isSubmitting} className='rounded-md px-6 py-3 cursor-pointer w-max self-start md:self-end text-white font-bold'>{isSubmitting ? "Sending..." : "Send Message"}</Button>
+
+                    <Button
+                        disabled={isSubmitting}
+                        className="self-start px-6 py-3 rounded-md font-bold text-white bg-primary hover:bg-primary/90"
+                    >
+                        {isSubmitting ? "Sending..." : "Send Message"}
+                    </Button>
                 </form>
-                <div className="space-y-4  rounded-xl px-6 p-6 w-max h-max ">
-                    <h6 className="text-xl capitalize font-bold text-center">Contact Info</h6>
+
+                <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-6">
+                    <h6 className="text-xl font-bold text-center">Contact Info</h6>
+
                     <div className="space-y-2">
-                        <div className="inline-flex gap-2 items-center">
-                            <h6 className="text-md font-semibold">Phone Number</h6>
-                        </div>
-                        <p className="ml-8 mb-1 text-sm text-foreground-500/90">+25195234125</p>
-                        <p className="ml-8 text-sm text-foreground-500/90">+251743567212</p>
+                        <h6 className="text-md font-semibold">Phone Number</h6>
+                        <p className="ml-2 text-sm text-gray-700">+25195234125</p>
+                        <p className="ml-2 text-sm text-gray-700">+251743567212</p>
                     </div>
 
                     <div className="space-y-2">
-                        <div className="inline-flex gap-2 items-center">
-                            <h6 className="text-md font-semibold">Email</h6>
-                        </div>
-                        <p className="ml-8 mb-1 text-sm text-foreground-500/90">rikha12@gmail.com</p>
-                        <p className="ml-8 text-sm text-foreground-500/90">rikhahan@gmail.com</p>
+                        <h6 className="text-md font-semibold">Email</h6>
+                        <p className="ml-2 text-sm text-gray-700">rikha12@gmail.com</p>
+                        <p className="ml-2 text-sm text-gray-700">rikhahan@gmail.com</p>
                     </div>
-
                 </div>
             </div>
         </div>
+
     )
 }
 
