@@ -5,6 +5,7 @@ import { ContactData, ContactSchema } from "@/interface";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
+import { InputField } from "./ui/InputField";
 
 
 
@@ -24,13 +25,7 @@ const Contact = () => {
         try {
             await api.post('/contact', data)
             toast.success('Message sent!');
-            reset({
-                name: "",
-                email: "",
-                phoneNumber: "",
-                subject: "",
-                message: "",
-            });
+            reset();
         } catch (error) {
             console.log(error)
             toast.error('Unexpected error occurred.');
@@ -46,61 +41,41 @@ const Contact = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mt-8 md:mt-12 max-w-5xl mx-auto">
                 <form className="flex flex-col gap-5 w-lg mx-auto md:w-full " onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-col gap-1">
-                        <input
-                            id="name"
-                            type="text"
-                            {...register("name")}
-                            placeholder="Your name"
-                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
-                        />
-                        {errors.name && <p className="text-red-500 text-xs">{errors.name?.message}</p>}
-                    </div>
 
-                    <div className="flex flex-col gap-1">
-                        <input
-                            id="email"
-                            type="email"
-                            {...register("email")}
-                            placeholder="Email address"
-                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
-                        />
-                        {errors.email && <p className="text-red-500 text-xs">{errors.email?.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <input
-                            id="phoneNumber"
-                            type="text"
-                            {...register("phoneNumber")}
-                            placeholder="Phone number"
-                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
-                        />
-                        {errors.phoneNumber && <p className="text-red-500 text-xs">{errors.phoneNumber?.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <input
-                            id="subject"
-                            type="text"
-                            {...register("subject")}
-                            placeholder="Subject"
-                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full"
-                        />
-                        {errors.subject && <p className="text-red-500 text-xs">{errors.subject?.message}</p>}
-                    </div>
-
+                    <InputField
+                        label="name *"
+                        name="name"
+                        register={register("name")}
+                        error={errors.name?.message}
+                    />
+                    <InputField
+                        label="Email *"
+                        name="email"
+                        register={register("email")}
+                        error={errors.email?.message}
+                    />
+                    <InputField
+                        label="phoneNumber *"
+                        name="phoneNumber"
+                        register={register("phoneNumber")}
+                        error={errors.phoneNumber?.message}
+                    />
+                    <InputField
+                        label="subject *"
+                        name="subject"
+                        register={register("subject")}
+                        error={errors.subject?.message}
+                    />
                     <div className="flex flex-col gap-1">
                         <textarea
                             id="message"
                             rows={5}
                             {...register("message")}
                             placeholder="Message"
-                            className="px-3 py-2 border border-black/20 rounded-md placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full resize-none"
+                            className="rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none border border-slate-200 placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full resize-none"
                         />
                         {errors.message && <p className="text-red-500 text-xs">{errors.message?.message}</p>}
                     </div>
-
                     <Button
                         disabled={isSubmitting}
                         className="self-start px-6 py-3 rounded-md font-bold text-white bg-primary hover:bg-primary/90"
