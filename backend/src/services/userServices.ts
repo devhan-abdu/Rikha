@@ -3,9 +3,8 @@ import prisma from "../config/prisma";
 import { AppError } from "../utils/AppError";
 import { randomInt } from 'crypto';
 import { sendPasswordChangedEmail, sendverificationEmail } from "../nodemailer/email";
-import { userData } from "../validators/auth.schema";
+import { contactData, userData } from "../validators/auth.schema";
 import bcrypt from "bcrypt"
-import { includes } from "zod";
 
 const getUserProfile = async (userId: string) => {
     const user = await prisma.user.findUnique({
@@ -129,7 +128,7 @@ const changePassword = async (userId: number, password: string, newPassword: str
 };
 
 
-const deleteUser = async (userId: string) => {
+const deleteUser = async (userId: number) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) }
     })
@@ -140,5 +139,28 @@ const deleteUser = async (userId: string) => {
     })
     return deletedUser;
 }
+const createContactMessage = async (userId: number | null, data: contactData) => {
+    let userIdValue: number | null = null
 
-export { getAllUsers, getUserProfile, updateUserProfile, deleteUser, changePassword }
+    if (userId) {
+        const user = await prisma.user.findUnique({
+            where: { id: Number(userId) }
+        })
+        if (user) {
+            userIdValue = user.id
+        }
+    }
+
+
+    return await prisma.contactMessage.create({
+        data: {
+            ...data,
+            userId: userIdValue
+        }
+    })
+
+}
+
+
+
+export { getAllUsers, getUserProfile, updateUserProfile, deleteUser, changePassword, createContactMessage }

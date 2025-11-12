@@ -56,7 +56,16 @@ export const changePasswordSchema = z.object({
     .trim(),
 })
 
+export const contactSchema = z.object({
+  name: z.string().nonempty({ message: 'Name is required' }),
+  email: z.string().nonempty({ message: 'Email is required' }).email({ message: 'Please enter a valid email.' }).trim(),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^(09|07)\d{8}$/, "Invalid Ethiopian phone format"),
+  subject: z.string(),
+  message: z.string().min(4),
+})
+
 
 export type userData = z.infer<typeof userUpdateSchema>
 export type changePassword = z.infer<typeof changePasswordSchema>
+export type contactData = z.infer<typeof contactSchema>
 

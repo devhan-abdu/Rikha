@@ -36,6 +36,21 @@ export const isAuth = async (req: Request, res: Response, next: NextFunction) =>
     return res.status(401).json({ message: "Invalid token" })
   }
 }
+export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
+  const refreshToken = req.cookies?.refresh;
+
+  if (!refreshToken) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as JwtPayloadWithId;
+    req.user = { userId: decoded.userId, role: decoded.role };
+  } catch (err: any) {
+    console.log(err)
+  }
+  return next()
+}
 
 const refresh = async (req: Request, res: Response, next: NextFunction) => {
   const refreshToken = req.cookies?.refresh;

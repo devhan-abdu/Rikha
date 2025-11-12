@@ -27,6 +27,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   cartItems     CartItem[]
   oauthAccounts OAuthAccount[]
+  contactMessage  ContactMessage[]
   order         Order[]
   reviews       Review[]
   addresses     UserAddress[]
@@ -153,6 +154,19 @@ model ShippingAddress {
   houseNumber String
   phoneNumber String
   order       Order  @relation(fields: [orderId], references: [id])
+}
+model ContactMessage {
+  id      Int    @id @default(autoincrement())
+  name    String
+  email   String
+  phoneNumber   String
+  subject String
+  message String
+  createdAt DateTime  @default(now())
+
+  userId   Int?
+  user     User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
 }
 
 enum Role {

@@ -1,6 +1,6 @@
 import express from 'express';
 import * as  userController from '../controllers/userController'
-import { isAuth } from '../middleware/isAuth';
+import { isAuth, optionalAuth } from '../middleware/isAuth';
 
 
 const router = express.Router();
@@ -12,6 +12,7 @@ router.route("/user/me")
     .delete(isAuth, userController.deleteUser);
 
 router.patch("/user/change-password", isAuth, userController.changePassword)
+router.post("/contact", optionalAuth, userController.sendContactMessage)
 
 
 
