@@ -3,9 +3,7 @@ import { addReviews, getAllProducts, getCategory, getFeaturedProducts, getNewArr
 import { catchAsync } from "../utils/catchAsync";
 
 
-export interface AuthenticatedRequest extends Request {
-    user?: any;
-}
+
 
 
 export const handleCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -58,9 +56,10 @@ export const handleGetReviews = catchAsync(async (req: Request, res: Response, n
     res.status(200).json({ success: true, data: reviews });
 
 })
-export const handleAddReview = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const handleAddReview = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { productId } = (req.params);
-    const userId = req.user.userId;
+    const userId = Number(req.user?.userId);
+    
     const { rating, comment } = req.body;
     const reviewData = { userId, productId, rating, comment };
 

@@ -2,12 +2,10 @@ import { catchAsync } from "../utils/catchAsync";
 import { Response, Request } from "express"
 import * as userAddress from '../services/addressService'
 
-export interface AuthenticatedRequest extends Request {
-    user?: any;
-}
 
-const getAll = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+
+const getAll = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const addresses = await userAddress.getAll(userId);
 
     return res.status(200).json(
@@ -17,8 +15,8 @@ const getAll = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
         }
     )
 })
-const getDefault = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+const getDefault = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const address = await userAddress.getDefault(userId);
 
     return res.status(200).json(
@@ -28,8 +26,8 @@ const getDefault = catchAsync(async (req: AuthenticatedRequest, res: Response,) 
         }
     )
 })
-const create = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+const create = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const address = await userAddress.create(userId, req.body);
 
     return res.status(200).json(
@@ -39,8 +37,8 @@ const create = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
         }
     )
 })
-const update = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+const update = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const id = req.params.id;
     const address = await userAddress.update(userId, Number(id), req.body);
 
@@ -51,8 +49,8 @@ const update = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
         }
     )
 })
-const setDefault = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+const setDefault = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const id = req.params.id;
 
     if (!id) {
@@ -71,8 +69,8 @@ const setDefault = catchAsync(async (req: AuthenticatedRequest, res: Response,) 
         }
     )
 })
-const deleteAddress = catchAsync(async (req: AuthenticatedRequest, res: Response,) => {
-    const userId = req.user?.userId;
+const deleteAddress = catchAsync(async (req: Request, res: Response,) => {
+    const userId = Number(req.user?.userId);
     const id = req.params.id;
 
     if (!id) {

@@ -6,7 +6,7 @@ import { sendPasswordChangedEmail, sendverificationEmail } from "../nodemailer/e
 import { contactData, userData } from "../validators/auth.schema";
 import bcrypt from "bcrypt"
 
-const getUserProfile = async (userId: string) => {
+const getUserProfile = async (userId: number) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) },
         select: {

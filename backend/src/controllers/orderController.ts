@@ -2,12 +2,11 @@ import { catchAsync } from "../utils/catchAsync"
 import { NextFunction, Response, Request } from "express"
 import * as orderService from "../services/orderService";
 
-export interface AuthenticatedRequest extends Request {
-    user?: any;
-}
 
-const orderController = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const userId = req.user?.userId;
+
+const orderController = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+
 
     const { items, paymentMethod, addressId } = req.body;
 
@@ -34,10 +33,11 @@ const verifyTransaction = catchAsync(async (req: Request, res: Response, next: N
     });
 })
 
-const orderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const orderStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const txRef = req.query.tx_ref as string;
-    const userId = req.user?.userId;
+    const userId = Number(req.user?.userId);
+
 
     if (!txRef) {
         return res.status(400).json({
@@ -54,8 +54,9 @@ const orderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response, 
 
 })
 
-const getUserOrders = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const userId = req.user.userId;
+const getUserOrders = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+
 
     if (!userId) {
         return res.status(401).json({
@@ -71,8 +72,9 @@ const getUserOrders = catchAsync(async (req: AuthenticatedRequest, res: Response
     });
 
 })
-const updateOrderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const userId = req.user.userId;
+const updateOrderStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+
     const orderId = Number(req.params.id)
 
     const order = await orderService.updateOrderStatus(orderId, userId);
@@ -82,8 +84,9 @@ const updateOrderStatus = catchAsync(async (req: AuthenticatedRequest, res: Resp
     });
 
 })
-const removeOrder = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const userId = req.user.userId;
+const removeOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+
     const orderId = Number(req.params.id)
 
     const isRemoved = await orderService.removeOrder(orderId, userId);

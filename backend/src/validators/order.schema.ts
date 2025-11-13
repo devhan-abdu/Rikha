@@ -1,17 +1,17 @@
 import { z } from "zod";
 
 export const CreateReviewSchema = z.object({
-    userId:z.number(),
+    userId: z.number(),
     productId: z.string(),
     rating: z.number(),
     comment: z.string(),
 })
 
 export const Review = z.object({
-   rating: z.number().min(1).max(5),
-   comment:z.string().min(3)
+    rating: z.number().min(1).max(5),
+    comment: z.string().min(3)
 })
-  
+
 export const OrderItemSchema = z.object({
     productId: z.number(),
     quantity: z.number(),
@@ -35,9 +35,17 @@ export const AddressSchema = z.object({
     isDefault: z.boolean().optional(),
 });
 
+export const CartSchema = z.object({
+    quantity: z.number(),
+    productId: z.number()
+})
+
+
+
 
 export type OrderItem = z.infer<typeof OrderItemSchema>
 export type OrderBody = z.infer<typeof OrderBodySchema>
 export type CreateReviewInput = z.infer<typeof CreateReviewSchema>
 export type ExtendedOrderBody = OrderBody & { userId: number };
 export type AddressData = z.infer<typeof AddressSchema>;
+export type CartData = z.infer<typeof CartSchema>;
