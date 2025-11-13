@@ -27,7 +27,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   cartItems     CartItem[]
   oauthAccounts OAuthAccount[]
-  contactMessage  ContactMessage[]
+  contactMessages  ContactMessage[]
   order         Order[]
   reviews       Review[]
   addresses     UserAddress[]
