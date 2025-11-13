@@ -1,75 +1,69 @@
 
-import { NextFunction , Response , Request } from "express";
-import {addCart ,getCart ,deleteCart ,clearCart , merge} from '../services/cartServices'
+import { NextFunction, Response, Request } from "express";
+import * as cartServices from '../services/cartServices'
+import { catchAsync } from "../utils/catchAsync";
 
-export interface AuthenticatedRequest extends Request {
-    user?: any;
-}
 
-export const handleAdd = async (req:AuthenticatedRequest ,res:Response , next:NextFunction) => {
-    try {
-       const {productId , quantity} = req.body;
-       const userId = req.user;
+const handleAdd = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-       if(!productId || !quantity) {
-            res.status(400).json({success:false , message: "sanityId and quantity are required"});
-            return;
-       }
-      await  addCart(productId, quantity , userId)
-      res.status(201).json({success:true ,message: "Product added to cart successfully" });
+    const { productId, quantity } = req.body;
+    const userId = Number(req.user?.userId);
 
-    } catch (error){
-        next(error)
+    const cartItem = await cartServices.addCart(userId, productId, quantity)
+    res.status(200).json({ success: true, data: cartItem });
+
+})
+
+ const handleGet = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const userId = Number(req.user?.userId);
+    const cartItems = await cartServices.getCart(userId)
+    res.status(201).json({ success: true, data: cartItems });
+
+})
+
+ const handleDelete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const productId = Number(req.params.productId);
+    const userId = Number(req.user?.userId);
+
+    if (!productId) {
+        res.status(400).json({ success: false, message: "ProductId required" })
+        return;
     }
-}
-export const handleGet = async (req:AuthenticatedRequest ,res:Response , next:NextFunction) => {
-    try {
-       const userId = req.user.userId;
-      
-     const cartItems = await getCart(userId)
-      res.status(201).json({success:true ,message: "Product added to cart successfully" ,cartItems});
+    const id = await cartServices.deleteCart(userId, productId)
+    res.status(201).json({ success: true, data: id })
 
-    } catch (error){
-        next(error)
+})
+ const handleUpdate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const productId = Number(req.params.productId);
+    const userId = Number(req.user?.userId);
+
+    if (!productId) {
+        res.status(400).json({ success: false, message: "ProductId required" })
+        return;
     }
-}
+    const id = await cartServices.updateQuantity(userId, productId, req.body.quantity)
+    res.status(200).json({ success: true, data: id })
 
-export const handleDelete = async (req:AuthenticatedRequest ,res:Response , next:NextFunction) => {
-    try {
-        const productId = Number(req.params.productId);
-        const userId = req.user.userId;
+})
+ const handleClear = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+    await cartServices.clearCart(userId);
+    res.status(201).json({ success: true })
 
-        if(!productId) {
-            res.status(400).json({success:false , message:"sanityId required"})
-            return;
-        }
-        await deleteCart(productId, userId)
-        res.status(201).json({success:true , message:"cart item delted successfully"})
-    } catch (error) {
-        next(error)
+})
+
+ const handleMerge = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.user?.userId);
+    const { cartItems } = req.body
+    if (!cartItems || cartItems.length === 0) {
+        res.status(400).json({ success: false, message: "at least one item needed" })
+        return
     }
-}
-export const handleClear = async (req:AuthenticatedRequest ,res:Response , next:NextFunction) => {
-    try {
-         const userId =req.user.userId;
-         await clearCart(userId);
-         res.status(201).json({success:true , message:"cart cleared successfully"})
-    } catch(error){
-        next(error)
-    }
-}
+    const merged = await cartServices.merge(userId, cartItems)
+    res.status(200).json({ success: true, data: merged })
 
-export const handleMerge = async (req:AuthenticatedRequest ,res:Response , next:NextFunction) => {
-   try {
-     const userId = req.user.userId;
-     const {cartItems} = req.body
-     if(!cartItems) {
-        res.status(400).json({success:false , message:"at least one item needed"})
-     }
-    const merged = await merge(userId , cartItems)
-    res.status(200).json({success:true , message:"cart merged successfully" , cart:merged})
-   } catch(error) {
-    next(error)
-   }
-}
+})
+
+export {handleAdd , handleGet, handleUpdate, handleDelete, handleClear, handleMerge}
 
