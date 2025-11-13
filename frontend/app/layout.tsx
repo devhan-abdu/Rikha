@@ -7,12 +7,13 @@ import { StoreProvider } from '@/redux/storeProvider'
 import { ToastContainer } from 'react-toastify';
 import ReactQueryProvider from '@/lib/query/ReactQueryProvider';
 import { UserProvider } from '@/components/provider/UserProvider';
+import { CartProvider } from '@/components/provider/CartProvider';
 
 
 const cinzel = Cinzel({
-  subsets:['latin'],
-  weight:['600'],
-  variable:'--font-cinzel'
+  subsets: ['latin'],
+  weight: ['600'],
+  variable: '--font-cinzel'
 })
 
 
@@ -35,7 +36,11 @@ export default function RootLayout({
         <StoreProvider>
           <ReactQueryProvider>
             <ToastContainer position="bottom-right" theme="dark" />
-            <UserProvider>{children}</UserProvider>
+            <UserProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </UserProvider>
           </ReactQueryProvider>
         </StoreProvider>
       </body>
