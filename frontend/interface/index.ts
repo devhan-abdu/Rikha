@@ -54,6 +54,8 @@ export interface Cart {
   discount: number;
   stock: number;
   slug: string;
+  availableStock?: number,
+  outOfStock?: boolean,
 }
 
 export interface UserDetails {

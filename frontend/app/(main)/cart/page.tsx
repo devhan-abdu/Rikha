@@ -19,6 +19,17 @@ const CartPage = () => {
     const { totalQnt, totalPrice, totalDiscount } = useAppSelector(selectCheckoutTotals);
     const dispatch = useAppDispatch();
 
+    const selectableIds = cartItems.filter(i => !i.outOfStock).map(i => i.productId);
+    const allSelected = selectableIds.every(id => selectedItems.includes(id));
+
+    const handleSelectAll = () => {
+        if (allSelected) {
+            dispatch(clearSelcted());
+        } else {
+            dispatch(selectAll(selectableIds));
+        }
+    }
+
     if (cartItems.length === 0) {
         return <Empty />
     }
@@ -35,11 +46,8 @@ const CartPage = () => {
                             <div className='flex items-center'>
 
                                 <Checkbox className='rounded-full w-5 h-5 text-white border border-slate-400' checked={selectedItems.length === cartItems.length}
-                                    onCheckedChange={(checked) =>
-                                        checked
-                                            ? dispatch(selectAll(cartItems.map(item => item.productId)))
-                                            : dispatch(clearSelcted())
-                                    }
+                                    onCheckedChange={handleSelectAll}
+
                                 />
                                 <span className='ml-2 text-gray-700'>Select all items</span>
                             </div>
