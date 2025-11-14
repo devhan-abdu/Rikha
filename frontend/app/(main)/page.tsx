@@ -23,7 +23,7 @@ export default async function Home() {
           </div>
           <div className="h-[500px] w-full md:w-[50%] flex items-center justify-center -mt-20 ">
             <Image
-              src="/images/hero2.png"
+              src="/images/hero2.avif"
               alt="hero image"
               width={200}
               height={400}
