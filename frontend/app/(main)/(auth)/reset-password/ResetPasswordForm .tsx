@@ -11,6 +11,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/InputField";
+import { AxiosError } from "axios";
 
 const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
@@ -24,6 +25,7 @@ const ResetPasswordForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting }
   } = useForm<ResetPasswordData>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -43,9 +45,27 @@ const ResetPasswordForm = () => {
       dispatch(setUser(user))
       toast.success("Password reset successful");
       router.push("/login")
-    } catch (error) {
-      console.log(error)
-      toast.error("Something went wrong. Please try again.");
+    } catch (err) {
+      const error = err as AxiosError<{ success: boolean, message: string }>
+
+      if (!error?.response?.status) {
+        toast.error("Network error: Could not connect to the server.")
+        return
+      }
+
+      if (error?.response.status >= 400 && error?.response.status < 500) {
+        setError("root", {
+          type: "manual",
+          message: error?.response.data.message || "Invalid Credential"
+        });
+        return
+
+      }
+      if (error?.response.status >= 500) {
+        toast.error("An internal server error occurred. Please try again later.");
+        return
+      }
+      toast.error("An unexpected error occurred.");
     }
   }
   return (
@@ -77,7 +97,11 @@ const ResetPasswordForm = () => {
             register={register("confirmPassword")}
             error={errors.confirmPassword?.message}
           />
-
+          {
+            errors.root && (
+              <div className='text-red-500 -mt-5'>{errors.root.message}</div>
+            )
+          }
           <Button type='submit' disabled={isSubmitting} className='cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel '> {isSubmitting ? "Resetting..." : "Reset Password"}</Button>
           <p className="text-md text-gray-900 text-center">
             Don&rsquo;t get the email? <Link href="/forget-password" className="text-primary ">Try again</Link>

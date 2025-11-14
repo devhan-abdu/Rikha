@@ -1,6 +1,6 @@
 "use client";
 
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { setUser } from "@/redux/slices/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import api from "@/lib/api";
+import { AxiosError } from "axios";
 
 
 const EmailVerificationPage = () => {
@@ -22,6 +23,7 @@ const EmailVerificationPage = () => {
 	const {
 		handleSubmit,
 		setValue,
+		setError,
 		formState: { errors, isSubmitting },
 	} = useForm<VerifyEmailData>({
 		resolver: zodResolver(verifyEmailSchema),
@@ -36,10 +38,28 @@ const EmailVerificationPage = () => {
 			toast.success('Email verified successfully!');
 			dispatch(setUser(res.data.data))
 			router.push("/");
-		} catch (error) {
-			console.log(error)
+		} catch (err) {
+			const error = err as AxiosError<{ success: boolean, message: string }>
 			setSubmitted(true);
-			toast.error("Something went wrong");
+
+			if (!error?.response?.status) {
+				toast.error("Network error: Could not connect to the server.")
+				return
+			}
+
+			if (error?.response.status >= 400 && error?.response.status < 500) {
+				setError("root", {
+					type: "manual",
+					message: error?.response.data.message || "Invalid Credential"
+				});
+				return
+
+			}
+			if (error?.response.status >= 500) {
+				toast.error("An internal server error occurred. Please try again later.");
+				return
+			}
+			toast.error("An unexpected error occurred.");
 		}
 	};
 

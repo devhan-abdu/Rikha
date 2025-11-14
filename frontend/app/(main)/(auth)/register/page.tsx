@@ -11,6 +11,7 @@ import OAuthButtons from '@/components/ui/OAuthButtons'
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { InputField } from '@/components/ui/InputField'
+import { AxiosError } from 'axios'
 
 
 
@@ -21,6 +22,7 @@ const Register: FC = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema)
@@ -35,10 +37,29 @@ const Register: FC = () => {
 
       toast.success('Sign up  successfully! pls verify your email');
       router.push('/verify-email')
-    } catch (error) {
-      console.log(error)
-      toast.error("Something went wrong");
+    } catch (err) {
+      const error = err as AxiosError<{ success: boolean, message: string }>
+
+      if (!error?.response?.status) {
+        toast.error("Network error: Could not connect to the server.")
+        return
+      }
+
+      if (error?.response.status >= 400 && error?.response.status < 500) {
+        setError("root", {
+          type: "manual",
+          message: error?.response.data.message || "Invalid Credential"
+        });
+        return
+
+      }
+      if (error?.response.status >= 500) {
+        toast.error("An internal server error occurred. Please try again later.");
+        return
+      }
+      toast.error("An unexpected error occurred.");
     }
+
   }
 
 
@@ -77,6 +98,11 @@ const Register: FC = () => {
             register={register("confirmPassword")}
             error={errors.confirmPassword?.message}
           />
+          {
+            errors.root && (
+              <div className='text-red-500 '>{errors.root.message}</div>
+            )
+          }
           <Button
             type="submit"
             className="cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel"
@@ -84,11 +110,6 @@ const Register: FC = () => {
           >
             {isSubmitting ? "Creating an account..." : "Create an account"}
           </Button>
-          {
-            errors.root && (
-              <div className='text-red-500 -mt-5'>{errors.root.message}</div>
-            )
-          }
         </form>
         <OAuthButtons />
         <p className="text-md text-gray-900 text-center my-8">

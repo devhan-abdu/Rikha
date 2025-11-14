@@ -13,6 +13,7 @@ import OAuthButtons from '@/components/ui/OAuthButtons';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { InputField } from '@/components/ui/InputField';
+import { AxiosError } from 'axios';
 
 
 
@@ -24,9 +25,11 @@ const LoginContent = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting }
   } = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema)
+    resolver: zodResolver(signInSchema),
+    shouldFocusError: true,
   })
 
   const onSubmit: SubmitHandler<SignInFormData> = async (data: SignInFormData) => {
@@ -37,9 +40,27 @@ const LoginContent = () => {
       toast.success("Login Successfully!");
       const redirectTo = searchParams.get('redirect') || '/';
       router.push(redirectTo)
-    } catch (error) {
-      console.log(error)
-      toast.error("Something went wrong");
+    } catch (err) {
+      const error = err as AxiosError<{ success: boolean, message: string }>
+
+      if (!error?.response?.status) {
+        toast.error("Network error: Could not connect to the server.")
+        return
+      }
+
+      if (error?.response.status >= 400 && error?.response.status < 500) {
+        setError("root", {
+          type: "manual",
+          message: error?.response.data.message || "Invalid Credential"
+        });
+        return
+
+      }
+      if (error?.response.status >= 500) {
+        toast.error("An internal server error occurred. Please try again later.");
+        return
+      }
+      toast.error("An unexpected error occurred.");
     }
   }
 
@@ -66,8 +87,12 @@ const LoginContent = () => {
             register={register("password")}
             error={errors.password?.message}
           />
+          <div>
+            <Link href='/forget-password' className="text-sm font-medium text-primary hover:underline block text-end leading-0">Forgot password ?</Link>
+            {errors.root && <p className="text-red-500 text-xs ">{errors.root.message}</p>}
+          </div>
 
-          <Link href='/forget-password' className="text-sm font-medium text-primary hover:underline block text-end leading-0">Forgot password ?</Link>
+
           <Button
             className="cursor-pointer my-2 w-full px-3 py-1.5 rounded-md bg-primary text-white font-cinzel text-md"
             disabled={isSubmitting}

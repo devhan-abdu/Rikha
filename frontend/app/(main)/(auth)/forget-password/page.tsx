@@ -9,12 +9,14 @@ import { toast } from 'react-toastify'
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { InputField } from '@/components/ui/InputField'
+import { AxiosError } from 'axios'
 
 const ForgetPassword = () => {
 
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors, isSubmitting }
     } = useForm<ForgetPasswordData>({
         resolver: zodResolver(ForgetPasswordSchema)
@@ -24,9 +26,27 @@ const ForgetPassword = () => {
         try {
             await api.post('/auth/forgot-password', data)
             toast.success("Password reset link sent! Please check your email");
-        } catch (error) {
-            console.log(error)
-            toast.error("Something went wrong ")
+        } catch (err) {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+
+            if (!error?.response?.status) {
+                toast.error("Network error: Could not connect to the server.")
+                return
+            }
+
+            if (error?.response.status >= 400 && error?.response.status < 500) {
+                setError("root", {
+                    type: "manual",
+                    message: error?.response.data.message || "Invalid Credential"
+                });
+                return
+
+            }
+            if (error?.response.status >= 500) {
+                toast.error("An internal server error occurred. Please try again later.");
+                return
+            }
+            toast.error("An unexpected error occurred.");
         }
     }
 
@@ -48,7 +68,11 @@ const ForgetPassword = () => {
                         register={register("email")}
                         error={errors.email?.message}
                     />
-
+                    {
+                        errors.root && (
+                            <div className='text-red-500 '>{errors.root.message}</div>
+                        )
+                    }
                     <Button
                         type="submit"
                         disabled={isSubmitting}
