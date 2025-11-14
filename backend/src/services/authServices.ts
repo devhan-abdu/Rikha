@@ -3,7 +3,7 @@ import { generateAccessToken, generateOTP, generateRefreshToken, generateResetTo
 import prisma from '../config/prisma'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { sendverificationEmail, sendForgetEmail } from '../nodemailer/email';
+import { sendverificationEmail, sendForgetEmail, sendResetEmail } from '../nodemailer/email';
 import { AppError } from '../utils/AppError';
 import { checkAccount } from '../utils/checkAccount';
 
@@ -115,6 +115,8 @@ const resetPassword = async (email: string, token: string, password: string) => 
     })
     const accessToken = generateAccessToken(user.role, user.id)
     const refreshToken = generateRefreshToken(user.id)
+
+    await sendResetEmail(email)
 
     return { user: { id: user.id, email: user.email, username: user.username }, accessToken, refreshToken };
 
