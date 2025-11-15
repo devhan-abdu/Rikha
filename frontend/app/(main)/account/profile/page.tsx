@@ -27,31 +27,26 @@ export default function ProfilePage() {
   } = useForm<ProfileData>({
     resolver: zodResolver(ProfileSchema),
     defaultValues: {
-      firstName: user?.firstName ?? "",
-      lastName: user?.lastName ?? "",
-      email: user?.email ?? "",
-      username: user?.username ?? "",
-      phoneNumber: user?.phoneNumber ?? "",
+      firstName:  "",
+      lastName:"",
+      email: "",
+      username:"",
+      phoneNumber:"",
     },
+  values: user ? {
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email ?? "",
+      username: user.username ?? "",
+      phoneNumber: user.phoneNumber ?? ""
+  } : undefined,
+
   });
 
   const [newAvatarUrl, setNewAvatarUrl] = useState<string | null>(null);
   const currentAvatar = newAvatarUrl ?? user?.avatarUrl ?? null
 
 
-  useEffect(() => {
-    if (user) {
-      reset({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        username: user.username,
-        phoneNumber: user.phoneNumber,
-      })
-
-      setNewAvatarUrl(null)
-    }
-  }, [user, reset])
 
 
 

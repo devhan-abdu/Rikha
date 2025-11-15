@@ -86,8 +86,8 @@ const AddressList = ({ isListOpen, setIsListOpen, selectedAddress, setSelectedAd
             </Dialog>
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                 <DialogTitle></DialogTitle>
-                <DialogContent>
-                    <AddressForm isEdit={isEdit} setIsEdit={setIsEdit} data={item}/>
+                <DialogContent className="z-[999]">
+                    <AddressForm isEdit={isEdit} setIsEdit={setIsEdit} selectedAddress={item} setSelectedAddress={setSelectedAddress}/>
                 </DialogContent>
             </Dialog>
         </>
