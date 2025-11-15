@@ -13,9 +13,10 @@ import { InputField } from "./ui/InputField"
 type Props = {
     isEdit: boolean,
     setIsEdit: (isEdit: boolean) => void,
-    data?: ShippingData;
+    selectedAddress?: ShippingData;
+    setSelectedAddress:(address: ShippingData) => void
 }
-const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
+const AddressForm = ({ isEdit, selectedAddress,setSelectedAddress, setIsEdit }: Props) => {
     const { mutate: createAddress, isPending: addPending } = useCreate();
     const { mutate: updateAddress, isPending: editPending } = useUpdate()
 
@@ -27,25 +28,18 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
         formState: { errors },
     } = useForm<ShippingData>({
         resolver: zodResolver(ShippingSchema),
-        defaultValues: isEdit && data ? data : {},
+        defaultValues: {
+            country: "Ethiopia",
+            city: "Addis Ababa",
+            name: "",
+            phoneNumber: "",
+            subcity: "",
+            woreda: "",
+            houseNumber: "",
+            isDefault: false
+        },
+        values: isEdit && selectedAddress ? selectedAddress : undefined,
     })
-
-    useEffect(() => {
-        if (isEdit && data) {
-            reset(data);
-        } else {
-            reset({
-                country: "Ethiopia",
-                city: "Addis Ababa",
-                name: "",
-                phoneNumber: "",
-                subcity: "",
-                woreda: "",
-                houseNumber: "",
-                isDefault: false
-            });
-        }
-    }, [isEdit, data, reset]);
 
     const onSubmit: SubmitHandler<ShippingData> = async (data: ShippingData) => {
         if (isEdit && data.id) {
@@ -61,16 +55,7 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                 }
             })
         }
-        reset({
-            country: "Ethiopia",
-            city: "Addis Ababa",
-            name: "",
-            phoneNumber: "",
-            subcity: "",
-            woreda: "",
-            houseNumber: "",
-            isDefault: false
-        });
+            reset();
         setIsEdit(false);
         setIsEdit(false);
     }
@@ -106,7 +91,7 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                     <InputField label="Phone Number" name="phoneNumber" register={register("phoneNumber")} error={errors.phoneNumber?.message} />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                     <Controller
                         name="subcity"
                         control={control}
@@ -117,7 +102,7 @@ const AddressForm = ({ isEdit, data, setIsEdit }: Props) => {
                                     <SelectTrigger className="border-gray-300 focus:ring-2 focus:ring-primary/30 rounded-md">
                                         <SelectValue placeholder="Select sub city" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white">
+                                    <SelectContent className="bg-white z-[9999]">
                                         {subcityOptions.map((item) => (
                                             <SelectItem key={item} value={item}>{item}</SelectItem>
                                         ))}
