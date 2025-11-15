@@ -118,32 +118,14 @@ const merge = async (userId: number, items: { productId: number; quantity: numbe
 
     if (validItems.length === 0) return [];
 
-    await prisma.$transaction(async (tx) => {
-        const result: any[] = []
-        for (const item of validItems) {
-
-            const updated = await tx.cartItem.upsert({
-                where: { userId_productId: { userId, productId: item.productId } },
-                update: { quantity: { increment: item.quantity } },
-                create: { userId, productId: item.productId, quantity: item.quantity },
-                include: { product: { select: productSelect } },
-            });
-
-            const { product } = updated
-            const isOutOfStock = updated.product.stock < updated.quantity
-            result.push({
-                productId: updated.productId,
-                quantity: updated.quantity,
-                ...product,
-                availableStock: updated.product.stock,
-                outOfStock: isOutOfStock,
-
-            })
-        }
-
+    for (const item of validItems) {
+        await prisma.cartItem.upsert({
+            where: { userId_productId: { userId, productId: item.productId } },
+            update: { quantity: { increment: item.quantity } },
+            create: { userId, productId: item.productId, quantity: item.quantity },
+            include: { product: { select: productSelect } },
+        });
     }
-    )
-
     return await getCart(userId)
 
 }
