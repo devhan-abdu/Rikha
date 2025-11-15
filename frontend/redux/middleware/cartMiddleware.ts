@@ -7,6 +7,7 @@ import {
     removeCartItem,
     updateCartQuantity,
     setCartItem,
+    removeSelectedCartItems,
 } from "../slices/cartSlice";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
@@ -45,7 +46,8 @@ export const cartMiddleware: Middleware = (store) => (next) => async (action: an
             const { productId, quantity } = action.payload;
 
             try {
-                await api.patch(`/cart/${productId}`, { quantity });
+                const response = await api.patch(`/cart/${productId}`, { quantity });
+                next(setCartItem(response.data.data));
             } catch {
                 toast.error("Failed to update cart quantity");
             }
@@ -54,13 +56,14 @@ export const cartMiddleware: Middleware = (store) => (next) => async (action: an
 
         case increaseCartQuantity.type:
         case decreaseCartQuantity.type: {
-            next(action); 
+            next(action);
             const { cartItems } = store.getState().cart;
             const item = cartItems.find((i: any) => i.productId === action.payload);
             if (!item) break;
 
             try {
-                await api.patch(`/cart/${item.productId}`, { quantity: item.quantity });
+                const response = await api.patch(`/cart/${item.productId}`, { quantity: item.quantity });
+                next(setCartItem(response.data.data));
             } catch {
                 toast.error("Failed to update item quantity");
             }
@@ -68,11 +71,24 @@ export const cartMiddleware: Middleware = (store) => (next) => async (action: an
         }
 
         case removeCartItem.type: {
-            next(action); 
+            next(action);
             const productId = action.payload;
 
             try {
-                await api.delete(`/cart/${productId}`);
+                const response = await api.delete(`/cart/${productId}`);
+                next(setCartItem(response.data.data));
+            } catch {
+                toast.error("Failed to remove cart item");
+            }
+            break;
+        }
+        case removeSelectedCartItems.type: {
+            next(action);
+            const productIds: number[] = action.payload;
+
+            try {
+                const response = await api.delete('/cart/items', {data: productIds});
+                next(setCartItem(response.data.data));
             } catch {
                 toast.error("Failed to remove cart item");
             }

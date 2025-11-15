@@ -83,6 +83,13 @@ const cartSlice = createSlice({
             calculateTotals(state);
             state.lastAction = "decreaseCartQuantity";
         },
+        removeSelectedCartItems: (state, action: PayloadAction<number[]>) => {
+            state.cartItems = state.cartItems.filter(
+                item => !action.payload.includes(item.productId)
+            )
+            calculateTotals(state);
+            state.lastAction ="removeSelectedCartItems"
+        },
 
         clearCart: () => ({ ...initialState }),
 
@@ -103,6 +110,7 @@ export const {
     clearCart,
     setCartItem,
     updateCartQuantity,
+    removeSelectedCartItems
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -1,13 +1,13 @@
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { decreaseCartQuantity, increaseCartQuantity } from "@/redux/slices/cartSlice"
+import { decreaseCartQuantity, increaseCartQuantity, removeSelectedCartItems } from "@/redux/slices/cartSlice"
 import { Button } from "./ui/button"
 import { useCreate } from "@/lib/query/mutations/useOrderMutation"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { toast } from "react-toastify"
 import { selectCheckoutItems, selectCheckoutTotals } from "@/redux/selectors"
 import { Minus, Plus } from "lucide-react"
+import { clearSelcted, selectSelectedIds } from "@/redux/slices/selectedItemsSlice"
 
 
 type Props = {
@@ -18,6 +18,7 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
   const { totalPrice, totalDiscount } = useAppSelector(selectCheckoutTotals)
   const dispatch = useAppDispatch();
   const checkoutItems = useAppSelector(selectCheckoutItems)
+  const selectedIds = useAppSelector(selectSelectedIds)
   const [error, setError] = useState<string | null>(null);
   const { mutateAsync, isPending } = useCreate();
   const router = useRouter();
@@ -41,16 +42,16 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
 
     try {
       const url = await mutateAsync(orderData);
-
+      dispatch(removeSelectedCartItems(selectedIds))
+      dispatch(clearSelcted())
       if (url) {
         router.push(url);
       } else {
-          router.push("/account/orders")
+        router.push("/account/orders")
       }
 
     } catch (error) {
       console.log(error)
-      toast.error("Order creation failed");
     }
   }
 
