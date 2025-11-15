@@ -130,5 +130,17 @@ const merge = async (userId: number, items: { productId: number; quantity: numbe
 
 }
 
+const deleteSelectedCartItems = async (userId: number , productIds: number[]) => {
+    if(!productIds || productIds.length === 0) return await getCart(userId);
 
-export { addCart, getCart, deleteCart, updateQuantity, merge, clearCart }
+    await prisma.cartItem.deleteMany({
+        where: {
+            userId,
+            productId: {in: productIds},
+        }
+    })
+    return await getCart(userId)
+}
+
+
+export { addCart, getCart, deleteCart, updateQuantity, merge, clearCart, deleteSelectedCartItems }
