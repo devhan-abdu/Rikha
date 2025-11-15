@@ -108,7 +108,7 @@ const CheckoutPage = () => {
                 </DialogTrigger>
                 <DialogTitle></DialogTitle>
                 <DialogContent >
-                  <AddressForm isEdit={false} setIsEdit={() => false} />
+                  <AddressForm isEdit={false} setIsEdit={() => false} setSelectedAddress={setSelectedAddress} selectedAddress={selectedAddress ?? undefined} />
                 </DialogContent>
               </Dialog>
             )}

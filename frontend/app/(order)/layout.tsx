@@ -1,10 +1,16 @@
+import { fetchMe } from "@/lib/auth/fetchme";
 import { TabletSmartphone } from "lucide-react";
+import { redirect } from "next/navigation";
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+
+    const user = await fetchMe();
+    if (!user) redirect("/login?redirect=/account/orders");
+
     return (
         <>
             <div className="flex justify-between items-center py-4 shadow-lg  px-4 md:px-12 ">
