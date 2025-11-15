@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const user = await fetchMe();
-  if (!user) redirect("/login?redirect=/account");
+  if (!user) redirect("/login?redirect=/account/orders");
   
   return (
     <div className="flex min-h-screen flex-col md:flex-row md:overflow-hidden">
