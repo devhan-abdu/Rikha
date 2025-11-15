@@ -5,6 +5,7 @@ import { selectUser } from "@/redux/slices/authSlice";
 import api from "@/lib/api";
 import { setCartItem } from "@/redux/slices/cartSlice";
 import { Cart } from "@/interface";
+import { toast } from "react-toastify";
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const user = useAppSelector(selectUser)
@@ -18,7 +19,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             if (user) {
 
                 if (cartItems.length > 0) {
-                    const response = await api.post('/cart-merge', cartItems)
+                    const items = cartItems.map(item => ({ productId: item.productId, quantity: item.quantity }))
+                    const response = await api.post('/cart/merge', { cartItems: items })
                     cartItems = response.data.data
                     localStorage.removeItem("cart");
                 } else {
@@ -26,12 +28,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     cartItems = response.data.data
 
                 }
-                dispatch(setCartItem(cartItems))
             }
+
+            dispatch(setCartItem(cartItems))
         } catch (error) {
-            console.error("Error fetching user:", error);
+            console.log(error)
+            toast.error("Could not sync cart. please retry later")
         }
-    }, [user])
+    }, [user, dispatch])
 
     useEffect(() => {
         loadCart()

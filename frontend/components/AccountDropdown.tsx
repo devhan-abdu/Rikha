@@ -14,18 +14,21 @@ import { ArrowRight, Package, User, MapPin, Lock } from "lucide-react";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { selectCartItems } from "@/redux/slices/cartSlice";
 
 export function AccountDropdown() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser)
   const isLoading = useAppSelector(selectIsLoading)
+  const cartItem = useAppSelector(selectCartItems)
 
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
       toast.success("Successfully logged out");
-      dispatch(clearUser());
+      dispatch(clearUser())
+      localStorage.setItem("cart", JSON.stringify(cartItem));
       router.push("/");
     } catch (error) {
       console.error(error);
