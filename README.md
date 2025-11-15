@@ -85,7 +85,7 @@ Whether you’re looking for the latest products or managing your order history,
 - **Authentication:** JWT / Cookie-based auth
 - **API Integration:** Custom REST APIs for cart, user, and products
 - **State Management:** Redux Toolkit with middleware for async operations
-- **Deployment:** Vercel / Render for frontend & backend
+- **Deployment:** Vercel for frontend & backend
 - **Others:** Nodemailer for emails, bcrypt for password hashing, Cloudinary for images
 
 
