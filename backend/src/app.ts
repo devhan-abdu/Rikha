@@ -35,13 +35,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
-app.use('/api', authRouter)
-app.use('/api', productRouter)
+app.use(authRouter)
+app.use(productRouter)
 
-app.use('/api', userRouter)
-app.use('/api', cartRouter)
-app.use('/api', orderRouter)
-app.use('/api', addressRouter)
+app.use(userRouter)
+app.use(cartRouter)
+app.use(orderRouter)
+app.use(addressRouter)
 
 
 
