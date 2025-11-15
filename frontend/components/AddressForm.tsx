@@ -6,17 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useCreate, useUpdate } from "@/lib/query/mutations/useAddressMutations"
 import { toast } from "react-toastify"
-import { useEffect } from "react"
 import { subcityOptions } from "@/constants"
 import { InputField } from "./ui/InputField"
 
 type Props = {
     isEdit: boolean,
     setIsEdit: (isEdit: boolean) => void,
-    selectedAddress?: ShippingData;
-    setSelectedAddress:(address: ShippingData) => void
+    data?: ShippingData;
 }
-const AddressForm = ({ isEdit, selectedAddress,setSelectedAddress, setIsEdit }: Props) => {
+const AddressForm = ({ isEdit, setIsEdit ,data}: Props) => {
     const { mutate: createAddress, isPending: addPending } = useCreate();
     const { mutate: updateAddress, isPending: editPending } = useUpdate()
 
@@ -38,7 +36,7 @@ const AddressForm = ({ isEdit, selectedAddress,setSelectedAddress, setIsEdit }: 
             houseNumber: "",
             isDefault: false
         },
-        values: isEdit && selectedAddress ? selectedAddress : undefined,
+        values: isEdit && data ? data : undefined,
     })
 
     const onSubmit: SubmitHandler<ShippingData> = async (data: ShippingData) => {
