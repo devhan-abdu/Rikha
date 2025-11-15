@@ -8,36 +8,35 @@ import { chapaRefund, createTransaction } from "../utils/createTransaction";
 const createOrder = async (data: ExtendedOrderBody) => {
     const { userId, items, paymentMethod, addressId } = data;
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId }
-    })
-    if (!user) throw new AppError('User not found', 404);
+    const [user, address] = await Promise.all([
+        prisma.user.findUnique({ where: { id: userId } }),
+        prisma.userAddress.findUnique({ where: { id: addressId } })
+    ]);
 
-    const userAddress = await prisma.userAddress.findUnique({
-        where: { id: addressId }
-    })
-    if (!userAddress) throw new AppError('Address not found', 404);
+    if (!user) throw new AppError("User not found", 404);
+    if (!address) throw new AppError("Address not found", 404);
 
     const shippingData = {
-        name: userAddress.name,
-        country: userAddress.country,
-        city: userAddress.city,
-        subcity: userAddress.subcity,
-        woreda: userAddress.woreda,
-        houseNumber: userAddress.houseNumber,
-        phoneNumber: userAddress.phoneNumber,
+        name: address.name,
+        country: address.country,
+        city: address.city,
+        subcity: address.subcity,
+        woreda: address.woreda,
+        houseNumber: address.houseNumber,
+        phoneNumber: address.phoneNumber,
     };
 
     const tx_ref = `order-${randomUUID()}`;
 
     const newOrder = await prisma.$transaction(async (tx) => {
-        const productId = items.map(item => item.productId);
+
+        const productIds = items.map(item => item.productId);
         const products = await tx.product.findMany({
-            where: {
-                id: { in: productId }
-            }
+            where: { id: { in: productIds } }
         });
+
         const productsMap = new Map(products.map(p => [p.id, p]))
+
         let serverTotalPrice = 0;
 
         for (const item of items) {
@@ -46,19 +45,21 @@ const createOrder = async (data: ExtendedOrderBody) => {
             if (product.stock - product.reserved_qnt < item.quantity)
                 throw new AppError(`Insufficient stock for product ${product.title}.`);
 
-
-            await tx.product.update({
-                where: { id: product.id },
-                data: { reserved_qnt: { increment: item.quantity } },
-            });
-
             const finalPrice = product.discount
                 ? product.price * (1 - product.discount)
                 : product.price;
 
             serverTotalPrice += finalPrice * item.quantity;
-
         }
+
+        await Promise.all(
+            items.map(item =>
+                tx.product.update({
+                    where: { id: item.productId },
+                    data: { reserved_qnt: { increment: item.quantity } },
+                })
+            )
+        )
 
         const order = await tx.order.create({
             data: {
@@ -82,8 +83,6 @@ const createOrder = async (data: ExtendedOrderBody) => {
             }
         });
         return order
-    }, {
-        timeout: 5000,
     })
 
     const paymentUrl = await createTransaction(tx_ref, newOrder.totalAmount, newOrder.id)
@@ -91,75 +90,70 @@ const createOrder = async (data: ExtendedOrderBody) => {
 }
 
 
-const verifyPaymentAndHandleOrder = async (id: string) => {
+const verifyPaymentAndHandleOrder = async (tx_ref: string) => {
 
-    const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${id}`, {
+    const verify = await fetch(`https://api.chapa.co/v1/transaction/verify/${tx_ref}`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${process.env.CHAPA_SECRET_KEY}`,
         }
-    });
-    const result = await verifyRes.json();
-    const paymentStatus = result.status;
+    }).then(res => res.json());
 
+    const status = verify.status
 
-    if (paymentStatus === "success") {
-        return await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async tx => {
 
-            const order = await tx.order.findUnique({
-                where: { tx_ref: id },
-                include: { items: true }
-            })
-            if (!order) throw new AppError("Order not found.");
+        const order = await tx.order.findUnique({
+            where: { tx_ref },
+            include: { items: true }
+        })
 
-            for (const item of order.items) {
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: {
-                        reserved_qnt: { decrement: item.quantity },
-                        stock: { decrement: item.quantity }
-                    }
-                })
-            }
+        if (!order) return
 
-            return await tx.order.update({
-                where: { tx_ref: id },
+        if (status === "success") {
+
+            await Promise.all(
+                order.items.map(item =>
+                    tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            reserved_qnt: { decrement: item.quantity },
+                            stock: { decrement: item.quantity }
+                        }
+                    })))
+
+            await tx.order.update({
+                where: { tx_ref },
                 data: {
                     paymentStatus: PaymentStatus.COMPLETED,
                     orderStatus: OrderStatus.PROCESSING,
                 },
                 include: { shipping: true, items: true }
-            });
-
-        }, { timeout: 10000 });
-    } else {
-
-        return await prisma.$transaction(async (tx) => {
-            const order = await tx.order.findUnique({
-                where: { tx_ref: id },
-                include: { items: true }
             })
-            if (!order) throw new AppError("Order not found.");
 
-            for (const item of order.items) {
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: { reserved_qnt: { decrement: item.quantity } }
-                });
-            }
+        } else {
 
-            return await tx.order.update({
-                where: { tx_ref: id },
+            await Promise.all(
+                order.items.map(item =>
+                    tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            reserved_qnt: { decrement: item.quantity },
+                        }
+                    })))
+
+            await tx.order.update({
+                where: { tx_ref },
                 data: {
                     paymentStatus: PaymentStatus.FAILED,
                     orderStatus: OrderStatus.PENDING_PAYMENT,
                 },
                 include: { shipping: true, items: true }
-            });
-
-        }, { timeout: 10000 });
-    }
+            })
+        }
+    })
 }
+
 
 
 const orderStatus = async (txRef: string, userId: number) => {
@@ -213,51 +207,66 @@ const getOrdersByUserId = async (userId: number) => {
 }
 
 const updateOrderStatus = async (orderId: number, userId: number) => {
-    return prisma.$transaction(async (tx) => {
-        const order = await tx.order.findUnique({
-            where: { id: orderId },
-            include: { items: true }
-        });
 
-        if (order?.userId !== userId) throw new AppError("Unauthorized", 403);
 
-        if (!order) throw new AppError("Order not found", 404);
-        if (!["PENDING_PAYMENT", "PROCESSING"].includes(order.orderStatus)) {
-            throw new AppError("Cannot cancel", 400);
-        }
+    const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: { items: true }
+    });
 
-        for (const item of order.items) {
-            const updateData: any = {
-                reserved_qnt: { decrement: item.quantity }
-            };
-            if (order.orderStatus === "PROCESSING") {
-                updateData.stock = { increment: item.quantity };
-            }
-            await tx.product.update({
-                where: { id: item.productId },
-                data: updateData
-            });
-        }
+    if (!order) throw new AppError("Order not found", 404);
+    if (order?.userId !== userId) throw new AppError("Unauthorized", 403);
 
-        let paymentStatus = order.paymentStatus;
-        if (order.orderStatus === "PROCESSING") {
-            try {
-                await chapaRefund(order.tx_ref);
-                paymentStatus = "REFUNDED";
-            } catch (e) {
-                throw new AppError("Refund failed", 500);
-            }
-        }
+    if (!["PENDING_PAYMENT", "PROCESSING"].includes(order.orderStatus)) {
+        throw new AppError("Cannot cancel", 400);
+    }
+
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+
+        await Promise.all(
+            order.items.map((item) => {
+                const updateData: any = {
+                    reserved_qnt: { decrement: item.quantity }
+                };
+                if (order.orderStatus === "PROCESSING") {
+                    updateData.stock = { increment: item.quantity };
+                }
+
+                return tx.product.update({
+                    where: { id: item.productId },
+                    data: updateData
+                });
+            })
+        )
 
         return tx.order.update({
             where: { id: orderId },
             data: {
                 orderStatus: "CANCELLED",
-                paymentStatus
             }
         });
-    }, { timeout: 10000 });
-};
+
+
+
+    });
+
+    let paymentStatus = order.paymentStatus
+
+    if (order.orderStatus === "PROCESSING") {
+        try {
+            await chapaRefund(order.tx_ref);
+            paymentStatus = "REFUNDED";
+        } catch {
+        }
+
+        await prisma.order.update({
+            where: { id: orderId },
+            data: { paymentStatus },
+        });
+    }
+
+    return {...updatedOrder, paymentStatus}
+}
 
 const removeOrder = async (orderId: number, userId: number) => {
 

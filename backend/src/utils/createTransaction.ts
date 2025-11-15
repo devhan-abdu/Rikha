@@ -16,7 +16,7 @@ export const createTransaction = async (tx_ref: string, amount: number, orderId:
                 orderId: orderId,
                 tx_ref,
                 "callback_url": `${process.env.BACKEND_URL}/api/verify-payment/${tx_ref}`,
-                "return_url": `${process.env.FRONTEND_URL}/order-status?tx_ref=${tx_ref}`,
+                "return_url": `${process.env.FRONTEND_URL}/account/orders`,
                 customization: {
                     title: "Rikha",
                     description: `Payment`,
