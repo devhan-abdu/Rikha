@@ -60,12 +60,12 @@ const Header = () => {
   w-10 h-10 rounded-full transition duration-150 ease-in-out hover:bg-gray-100">
 
           <span className="absolute -top-1.5 flex items-center justify-center 
-    -right-1 w-6 h-6  bg-[#C7326A] text-white rounded-full font-medium text-sm">
+    -right-1 w-4 h-4  bg-[#C7326A] text-white rounded-full font-medium text-sm">
             {totalQnt}
           </span>
 
           <svg
-            className="h-9 w-9 text-gray-600"
+            className="h-8 w-8 text-gray-600"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
