@@ -51,8 +51,8 @@ export default function OrderCard({ order }: { order: Order }) {
     }[order.orderStatus];
 
     return (
-        <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-5 border-b border-gray-200">
+        <div className="bg-white rounded-sm shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <div className=" p-5 border-b border-slate-300">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <Package className="w-5 h-5 text-primary" />
@@ -120,7 +120,7 @@ export default function OrderCard({ order }: { order: Order }) {
                 ))}
             </div>
 
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-t border-gray-200">
+            <div className=" p-6 border-t border-slate-300">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="text-right">
                         <p className="text-sm text-gray-600">Total Amount</p>
