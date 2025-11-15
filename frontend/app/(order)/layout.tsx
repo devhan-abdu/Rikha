@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { fetchMe } from "@/lib/auth/fetchme";
 import { TabletSmartphone } from "lucide-react";
 import { redirect } from "next/navigation";
