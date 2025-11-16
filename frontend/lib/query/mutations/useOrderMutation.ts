@@ -1,6 +1,7 @@
 import { OrderData } from "@/interface";
 import api from "@/lib/api";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 
 export const useCreate = () => {
@@ -14,9 +15,10 @@ export const useCreate = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["my-orders"] });
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to create order");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
@@ -33,9 +35,10 @@ export const useRemove = () => {
             queryClient.invalidateQueries({ queryKey: ["my-orders"] })
             toast.success("Order removed")
         },
-        onError: (error) => {
-            console.log(error, "from the review")
-            toast.error("Failed to remove the order");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
@@ -51,9 +54,10 @@ export const useUpdateOrder = () => {
             queryClient.invalidateQueries({ queryKey: ["my-orders"] })
             toast.success("Order cancelled")
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to cancel order status");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }

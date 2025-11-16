@@ -1,6 +1,7 @@
 import { ShippingData } from "@/interface";
 import api from "@/lib/api";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 
 export const useCreate = () => {
@@ -15,9 +16,10 @@ export const useCreate = () => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["address/default"] });
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to create address");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
@@ -33,9 +35,10 @@ export const useSetDefault = () => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["address/default"] });
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to set default address");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
@@ -51,9 +54,10 @@ export const useUpdate = () => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["address/default"] });
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to update address");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
@@ -69,9 +73,10 @@ export const useDelete = () => {
             queryClient.invalidateQueries({ queryKey: ["addresses"] });
             queryClient.invalidateQueries({ queryKey: ["address/default"] });
         },
-        onError: (error) => {
-            console.log(error)
-            toast.error("Failed to set delete address");
+        onError: (err) => {
+            const error = err as AxiosError<{ success: boolean, message: string }>
+            const message = error?.response?.data?.message || "Something went wrong";
+            toast.error(`${message}`);
         }
     })
 }
