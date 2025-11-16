@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -29,6 +29,10 @@ const CartPage = () => {
             dispatch(selectAll(selectableIds));
         }
     }
+
+    useEffect(() => {
+        dispatch(selectAll(selectableIds))
+    }, [])
 
     if (cartItems.length === 0) {
         return <Empty />
