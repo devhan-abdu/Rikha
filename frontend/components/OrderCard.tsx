@@ -51,7 +51,7 @@ export default function OrderCard({ order }: { order: Order }) {
     }[order.orderStatus];
 
     return (
-        <div className="bg-white rounded-sm shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md hover:shadow-sm transition-all duration-300 border border-gray-100 overflow-hidden">
             <div className=" p-5 border-b border-slate-300">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default function OrderCard({ order }: { order: Order }) {
                 {order.items.map((item, index) => (
                     <div
                         key={index}
-                        className="flex gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                        className="flex gap-4 p-4 bg-gray-50 rounded-xl  transition-colors"
                     >
                         <div className="relative flex-shrink-0">
                             <div className="w-20 h-20 bg-white rounded-lg shadow-sm border border-gray-200 p-2">
