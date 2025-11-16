@@ -38,8 +38,10 @@ export const FloatingNav = ({
       if (scrollYProgress.get() < 0.05) {
         setVisible(false);
       } else {
-        if (direction < 0 || direction >= 0) {
+        if (direction < 0 ) {
           setVisible(true);
+        } else {
+          setVisible(false)
         }
       }
     }
@@ -50,10 +52,10 @@ export const FloatingNav = ({
       <motion.div
         initial={{
           opacity: 1,
-          y: -20,
+          y: -100,
         }}
         animate={{
-          y: visible ? 0 : -20,
+          y: visible ? 0 : -100,
           opacity: visible ? 1 : 0,
         }}
         transition={{
