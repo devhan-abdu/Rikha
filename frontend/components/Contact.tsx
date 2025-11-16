@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
 import { InputField } from "./ui/InputField";
+import { Mail, Phone } from "lucide-react";
 
 
 
@@ -40,7 +41,7 @@ const Contact = () => {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mt-8 md:mt-12 max-w-5xl mx-auto">
-                <form className="flex flex-col gap-5 w-lg mx-auto md:w-full " onSubmit={handleSubmit(onSubmit)}>
+                <form className="flex flex-col gap-5 max-w-lg w-full mx-auto " onSubmit={handleSubmit(onSubmit)}>
 
                     <InputField
                         label="name *"
@@ -84,19 +85,27 @@ const Contact = () => {
                     </Button>
                 </form>
 
-                <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-6">
+                <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-6 self-start">
                     <h6 className="text-xl font-bold text-center">Contact Info</h6>
 
                     <div className="space-y-2">
-                        <h6 className="text-md font-semibold">Phone Number</h6>
-                        <p className="ml-2 text-sm text-gray-700">+25195234125</p>
-                        <p className="ml-2 text-sm text-gray-700">+251743567212</p>
+                        <h6 className="text-md font-semibold flex items-center gap-2">
+                            <Phone size={18} className="text-gray-600" />
+                            Phone Number
+                        </h6>
+
+                        <p className="ml-6 text-sm text-gray-700">+25195234125</p>
+                        <p className="ml-6 text-sm text-gray-700">+251743567212</p>
                     </div>
 
                     <div className="space-y-2">
-                        <h6 className="text-md font-semibold">Email</h6>
-                        <p className="ml-2 text-sm text-gray-700">rikha12@gmail.com</p>
-                        <p className="ml-2 text-sm text-gray-700">rikhahan@gmail.com</p>
+                        <h6 className="text-md font-semibold flex items-center gap-2">
+                            <Mail size={18} className="text-gray-600" />
+                            Email
+                        </h6>
+
+                        <p className="ml-6 text-sm text-gray-700">rikha12@gmail.com</p>
+                        <p className="ml-6 text-sm text-gray-700">rikhahan@gmail.com</p>
                     </div>
                 </div>
             </div>

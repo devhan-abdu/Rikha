@@ -16,7 +16,7 @@ export const CategorySection = async ({
             ) : (
                 categories.map((category) => (
                     <div
-                        className="mx-auto rounded-2xl flex flex-col items-center justify-center w-[200px]"
+                        className="mx-auto rounded-2xl flex flex-col items-center justify-center "
                         key={category.id}
                     >
                         <div className="flex items-center justify-center h-[100px] w-full">
