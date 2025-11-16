@@ -66,17 +66,6 @@ const handleMerge = catchAsync(async (req: Request, res: Response, next: NextFun
 
 })
 
-const handleDeleteSelectedCartItems = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = Number(req.user?.userId);
-    const productIds: number[] = req.body.productIds;
 
-    if (!Array.isArray(productIds) || productIds.length === 0) {
-        return res.status(400).json({ success: false, message: "No productIds provided" });
-    }
-    const cartItems = await cartServices.deleteSelectedCartItems(userId, productIds);
-    res.status(200).json({ success: true, data: cartItems })
-
-})
-
-export { handleAdd, handleGet, handleUpdate, handleDelete, handleClear, handleMerge, handleDeleteSelectedCartItems }
+export { handleAdd, handleGet, handleUpdate, handleDelete, handleClear, handleMerge }
 

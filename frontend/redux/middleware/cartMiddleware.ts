@@ -7,7 +7,6 @@ import {
     removeCartItem,
     updateCartQuantity,
     setCartItem,
-    removeSelectedCartItems,
 } from "../slices/cartSlice";
 import api from "@/lib/api";
 import { toast } from "react-toastify";
@@ -82,19 +81,6 @@ export const cartMiddleware: Middleware = (store) => (next) => async (action: an
             }
             break;
         }
-        case removeSelectedCartItems.type: {
-            next(action);
-            const productIds: number[] = action.payload;
-
-            try {
-                const response = await api.delete('/cart/items', {data: productIds});
-                next(setCartItem(response.data.data));
-            } catch {
-                toast.error("Failed to remove cart item");
-            }
-            break;
-        }
-
         case clearCart.type: {
             next(action);
             try {

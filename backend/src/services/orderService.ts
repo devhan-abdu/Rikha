@@ -2,8 +2,9 @@ import { OrderStatus, PaymentStatus } from "@prisma/client";
 import prisma from "../config/prisma";
 import { ExtendedOrderBody } from "../validators/order.schema";
 import { AppError } from "../utils/AppError";
-import { randomUUID } from 'crypto'
+import { randomInt, randomUUID } from 'crypto'
 import { chapaRefund, createTransaction } from "../utils/createTransaction";
+import { deleteSelectedCartItems } from "./cartServices";
 
 const createOrder = async (data: ExtendedOrderBody) => {
     const { userId, items, paymentMethod, addressId } = data;
@@ -27,10 +28,10 @@ const createOrder = async (data: ExtendedOrderBody) => {
     };
 
     const tx_ref = `order-${randomUUID()}`;
+    let productIds: number[] = [];
 
     const newOrder = await prisma.$transaction(async (tx) => {
-
-        const productIds = items.map(item => item.productId);
+        productIds = items.map(item => item.productId);
         const products = await tx.product.findMany({
             where: { id: { in: productIds } }
         });
@@ -38,12 +39,13 @@ const createOrder = async (data: ExtendedOrderBody) => {
         const productsMap = new Map(products.map(p => [p.id, p]))
 
         let serverTotalPrice = 0;
-
         for (const item of items) {
             const product = productsMap.get(item.productId)
-            if (!product) throw new AppError(`Product with ID ${item.productId} not found.`);
-            if (product.stock - product.reserved_qnt < item.quantity)
-                throw new AppError(`Insufficient stock for product ${product.title}.`);
+            if (!product) throw new AppError(`Product with ID ${item.productId} not found.`, 404);
+            if (product.stock - product.reserved_qnt < item.quantity) {
+                console.log(product.title, "updateQuantity", product.reserved_qnt)
+                throw new AppError(`Insufficient stock for product ${product.title}.`, 409);
+            }
 
             const finalPrice = product.discount
                 ? product.price * (1 - product.discount)
@@ -57,12 +59,15 @@ const createOrder = async (data: ExtendedOrderBody) => {
                 tx.product.update({
                     where: { id: item.productId },
                     data: { reserved_qnt: { increment: item.quantity } },
+                    select: { id: true, stock: true, reserved_qnt: true, title: true }
                 })
             )
         )
 
+        const id = randomInt(1, 2_147_483_647);
         const order = await tx.order.create({
             data: {
+                id,
                 userId: userId,
                 tx_ref: tx_ref,
                 totalAmount: serverTotalPrice,
@@ -82,10 +87,15 @@ const createOrder = async (data: ExtendedOrderBody) => {
                 shipping: true,
             }
         });
+
         return order
+    }, {
+        timeout: 100000,
+        maxWait: 5000
     })
 
     const paymentUrl = await createTransaction(tx_ref, newOrder.totalAmount, newOrder.id)
+    await deleteSelectedCartItems(userId, productIds)
     return paymentUrl;
 }
 
@@ -265,7 +275,7 @@ const updateOrderStatus = async (orderId: number, userId: number) => {
         });
     }
 
-    return {...updatedOrder, paymentStatus}
+    return { ...updatedOrder, paymentStatus }
 }
 
 const removeOrder = async (orderId: number, userId: number) => {

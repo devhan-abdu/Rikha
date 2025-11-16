@@ -139,7 +139,6 @@ const deleteSelectedCartItems = async (userId: number , productIds: number[]) =>
             productId: {in: productIds},
         }
     })
-    return await getCart(userId)
 }
 
 

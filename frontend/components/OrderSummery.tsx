@@ -1,13 +1,13 @@
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { decreaseCartQuantity, increaseCartQuantity, removeSelectedCartItems } from "@/redux/slices/cartSlice"
+import { decreaseCartQuantity, increaseCartQuantity } from "@/redux/slices/cartSlice"
 import { Button } from "./ui/button"
 import { useCreate } from "@/lib/query/mutations/useOrderMutation"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { selectCheckoutItems, selectCheckoutTotals } from "@/redux/selectors"
 import { Minus, Plus } from "lucide-react"
-import { clearSelcted, selectSelectedIds } from "@/redux/slices/selectedItemsSlice"
+import {  selectSelectedIds } from "@/redux/slices/selectedItemsSlice"
 
 
 type Props = {
@@ -42,8 +42,7 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
 
     try {
       const url = await mutateAsync(orderData);
-      dispatch(removeSelectedCartItems(selectedIds))
-      dispatch(clearSelcted())
+
       if (url) {
         router.push(url);
       } else {
@@ -124,7 +123,7 @@ export const OrderSummery = ({ paymentMethod, addressId }: Props) => {
         </div>
 
         <Button className="text-white text-lg bg-primary w-full mt-6" disabled={isPending || !addressId || checkoutItems.length === 0} onClick={handlePlaceOrder} >
-          Place Order
+           {isPending ? "Placing Order ..." : "Place Order"}
         </Button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </div>
