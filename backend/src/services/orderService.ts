@@ -161,6 +161,9 @@ const verifyPaymentAndHandleOrder = async (tx_ref: string) => {
                 include: { shipping: true, items: true }
             })
         }
+    }, {
+        timeout: 100000,
+        maxWait: 5000
     })
 }
 
