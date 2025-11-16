@@ -59,8 +59,8 @@ const Header = () => {
         <Link href="/cart" className="relative flex items-center justify-center 
   w-10 h-10 rounded-full transition duration-150 ease-in-out hover:bg-gray-100">
 
-          <span className="absolute -top-1.5 flex items-center justify-center 
-    -right-1 w-4 h-4  bg-[#C7326A] text-white rounded-full font-medium text-sm">
+           <span className="absolute -top-1 flex items-center justify-center 
+    -right-0.5 w-5 h-5  bg-[#C7326A] text-white rounded-full font-medium text-sm">
             {totalQnt}
           </span>
 

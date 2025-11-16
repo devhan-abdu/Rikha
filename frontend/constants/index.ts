@@ -8,21 +8,26 @@ export const navData: NavItem[] = [
         id: 1,
         name: 'Home',
         path: '/',
+        link: '/',
     },
     {
         id: 2,
         name: 'Catagory',
         path: '/category',
+        link: '/category',
+
     },
     {
         id: 3,
         name: 'About',
         path: '/about',
+        link: '/about',
     },
     {
         id: 4,
         name: 'Contact',
         path: '/contact',
+        link: '/contact',
     },
 ]
 

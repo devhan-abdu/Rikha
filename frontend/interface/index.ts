@@ -13,6 +13,7 @@ export interface NavItem {
   id: number;
   name: string;
   path: string;
+  link: string;
 }
 
 export interface Product {
