@@ -31,7 +31,7 @@ const Footer = () => {
           }
         </ul>
         <div className="flex space-x-4 ">
-          <Link href="#" target="_blank" rel="noopener noreferrer">
+          <Link href="#" target="_blank"  rel="noopener noreferrer">
             <LucideFacebook className="text-blue-600 text-2xl hover:text-blue-800 hover:scale-110 duration-300" />
           </Link>
           <Link href="#" target="_blank" rel="noopener noreferrer">
