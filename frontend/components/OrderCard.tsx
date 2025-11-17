@@ -14,8 +14,8 @@ export default function OrderCard({ order }: { order: Order }) {
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector(selectCartItems);
     const router = useRouter();
-    const { mutate: removeOrder } = useRemove();
-    const { mutate: updateOrder } = useUpdateOrder();
+    const { mutate: removeOrder, isPending: removepending } = useRemove();
+    const { mutate: updateOrder, isPending: updatePending } = useUpdateOrder();
 
     const handleAddToCart = () => {
         for (const item of order.items) {
@@ -51,12 +51,12 @@ export default function OrderCard({ order }: { order: Order }) {
     }[order.orderStatus];
 
     return (
-        <div className="bg-white rounded-xl shadow-md hover:shadow-sm transition-all duration-300 border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md  hover:shadow-primary/10  transition-all duration-300  overflow-hidden">
             <div className=" p-5 border-b border-slate-300">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                         <Package className="w-5 h-5 text-primary" />
-                        <span className="font-bold text-lg text-gray-800">
+                        <span className="font-semibold text-lg text-gray-800">
                             Order #{order.id}
                         </span>
                     </div>
@@ -138,15 +138,16 @@ export default function OrderCard({ order }: { order: Order }) {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:scale-105 transition-all"
+                                    className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:scale-105 transition-all duration-300"
                                     onClick={() => removeOrder(order.id)}
+                                    disabled={removepending}
                                 >
                                     <Trash2 className="w-4 h-4" />
-                                    Remove
+                                    {removepending ? "Removing" : "Remove"}
                                 </Button>
                                 <Button
                                     size="sm"
-                                    className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all shadow-lg"
+                                    className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg"
                                     onClick={handleAddToCart}
                                 >
                                     <ShoppingCart className="w-4 h-4" />
@@ -156,21 +157,23 @@ export default function OrderCard({ order }: { order: Order }) {
                         )}
 
                         {(order.orderStatus === "PENDING_PAYMENT" || order.orderStatus === "PROCESSING") && (
+
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="gap-2 border-gray-400 text-gray-700 hover:bg-gray-100 hover:scale-105 transition-all"
+                                disabled={updatePending}
+                                className="gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:scale-105 transition-all duration-300"
                                 onClick={() => updateOrder(order.id)}
                             >
                                 <XCircle className="w-4 h-4" />
-                                Cancel Order
+                                {updatePending ? "Canceling Order" : "Cancel Order"}
                             </Button>
                         )}
 
                         {order.orderStatus === "PENDING_PAYMENT" && (
                             <Button
                                 size="sm"
-                                className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-110 transition-all shadow-xl font-bold"
+                                className="gap-2 bg-primary text-white hover:bg-primary/90 hover:scale-110 transition-all duration-300 shadow-xl font-bold"
                                 onClick={handlePay}
                             >
                                 <CreditCard className="w-4 h-4" />

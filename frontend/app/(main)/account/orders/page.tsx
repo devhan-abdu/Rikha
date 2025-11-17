@@ -27,9 +27,9 @@ export default function OrdersPage() {
 
     return (
         <div className="px-6 pt-8 pb-12 bg-white rounded-lg shadow-sm max-w-5xl mx-auto min-h-screen">
-            <h2 className="text-3xl font-semibold font-cinzel text-center mb-6">
-                My Orders
-            </h2>
+       
+            <h2 className="text-2xl sm:text-3xl font-semibold font-cinzel text-center mb-6"> My Orders</h2>
+
 
             <div className="flex gap-4 overflow-x-auto scrollbar-hide  p-4 rounded-lg shadow-sm mb-8">
                 {orderTab.map((t) => (
@@ -53,27 +53,27 @@ export default function OrdersPage() {
                     isLoading ? Array.from({ length: 3 }).map((_, i) => (
                         <OrderCardSkeleton key={i} />
                     )) : sortedOrders.length === 0 ? (
-                            <div className="text-center py-20">
-                                <div className="bg-gray-50 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-6" />
-                                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                                    No orders yet
-                                </h3>
-                                <p className="text-gray-500 max-w-xs mx-auto mb-6">
-                                    Your order history will appear here once you make a purchase.
-                                </p>
-                                <Link
-                                    href="/category"
-                                    className="inline-block px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition font-medium"
-                                >
-                                    Start Shopping
-                                </Link>
-                            </div>
-                        ) : (
+                        <div className="text-center py-20">
+                            <div className="bg-gray-50 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-6" />
+                            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                                No orders yet
+                            </h3>
+                            <p className="text-gray-500 max-w-xs mx-auto mb-6">
+                                Your order history will appear here once you make a purchase.
+                            </p>
+                            <Link
+                                href="/category"
+                                className="inline-block px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition font-medium"
+                            >
+                                Start Shopping
+                            </Link>
+                        </div>
+                    ) : (
 
-                            sortedOrders.map((order) => (
-                                <OrderCard key={order.id} order={order} />
-                            ))
-                        )}
+                        sortedOrders.map((order) => (
+                            <OrderCard key={order.id} order={order} />
+                        ))
+                    )}
             </div>
         </div>
     );

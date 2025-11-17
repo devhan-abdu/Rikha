@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { CldUploadWidget } from 'next-cloudinary';
 import type { CloudinaryUploadWidgetResults } from "next-cloudinary";
+import { AxiosError } from "axios";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
@@ -27,31 +28,32 @@ export default function ProfilePage() {
   } = useForm<ProfileData>({
     resolver: zodResolver(ProfileSchema),
     defaultValues: {
-      firstName:  "",
-      lastName:"",
+      firstName: "",
+      lastName: "",
       email: "",
-      username:"",
-      phoneNumber:"",
+      username: "",
+      phoneNumber: "",
     },
-  values: user ? {
+    values: user ? {
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       email: user.email ?? "",
       username: user.username ?? "",
       phoneNumber: user.phoneNumber ?? ""
-  } : undefined,
+    } : undefined,
 
   });
 
   const [newAvatarUrl, setNewAvatarUrl] = useState<string | null>(null);
   const currentAvatar = newAvatarUrl ?? user?.avatarUrl ?? null
-
+  console.log(newAvatarUrl, "new Avater url")
 
 
 
 
   const handleCloudinaryUpload = (result: CloudinaryUploadWidgetResults) => {
     if (result.event === "success" && result.info && typeof result.info !== "string") {
+      console.log("the image url")
       const url = result.info.secure_url
       setNewAvatarUrl(url)
     }
@@ -76,17 +78,19 @@ export default function ProfilePage() {
 
       toast.success("Profile updated successfully");
     } catch (err) {
-      console.error(err);
-      toast.error(`${err}`);
+      const error = err as AxiosError<{ success: boolean, message: string }>
+      const message = error?.response?.data?.message || "Something went wrong";
+      toast.error(`${message}`);
     }
 
   };
 
 
   return (
-    <div className="shadow-xl p-6 py-16  min-h-screen">
+    <div className=" p-6 py-16  min-h-screen">
       <div className="rounded-xl  space-y-10 max-w-2xl mx-auto">
-        <h2 className="text-3xl font-semibold font-cinzel text-center ">Profile Settings</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold font-cinzel text-center ">Profile Settings</h2>
+
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 ">
           <div className="flex flex-col items-center gap-3 mb-4">
