@@ -18,7 +18,14 @@ const Contact = () => {
         reset,
         formState: { isSubmitting, errors }
     } = useForm<ContactData>({
-        resolver: zodResolver(ContactSchema)
+        resolver: zodResolver(ContactSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            phoneNumber: "",
+            subject: "",
+            message: ""
+        },
     })
 
 
@@ -48,24 +55,28 @@ const Contact = () => {
                         name="name"
                         register={register("name")}
                         error={errors.name?.message}
+                        placeholder="demekech"
                     />
                     <InputField
                         label="Email *"
                         name="email"
                         register={register("email")}
                         error={errors.email?.message}
+                        placeholder="demekech@gmail.com"
                     />
                     <InputField
                         label="phoneNumber *"
                         name="phoneNumber"
                         register={register("phoneNumber")}
                         error={errors.phoneNumber?.message}
+                         placeholder="0911******/0711******"
                     />
                     <InputField
                         label="subject *"
                         name="subject"
                         register={register("subject")}
                         error={errors.subject?.message}
+                        placeholder="subject"
                     />
                     <div className="flex flex-col gap-1">
                         <textarea
@@ -73,7 +84,7 @@ const Contact = () => {
                             rows={5}
                             {...register("message")}
                             placeholder="Message"
-                            className="rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none border border-slate-200 placeholder:text-black/60 outline-none focus:ring-1 focus:ring-black w-full resize-none"
+                            className="rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none border border-slate-200 w-full resize-none focus:ring-2 focus:ring-gray-200 focus:border-gray-200"
                         />
                         {errors.message && <p className="text-red-500 text-xs">{errors.message?.message}</p>}
                     </div>
