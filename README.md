@@ -527,4 +527,3 @@ Runs on: http://localhost:3000
 ## License
 This project is licensed under the **MIT License**.
 Copyright &copy; 2025 Hanan Abdulshikur.
-  and then give i will and paste
