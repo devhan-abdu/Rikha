@@ -1,8 +1,9 @@
 import Search from '@/components/Search';
 import { Frown } from 'lucide-react';
 import { fetchFeaturedProducts, fetchSearchProducts } from '@/lib/fetchers';
-import SearchProductCard from '@/components/SearchProductCard';
 import { Suspense } from 'react';
+import ProductWrapper from '@/components/ProductWrapper';
+import { ProductCardsSkeleton } from '@/components/skeletons';
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -13,7 +14,6 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const query = (searchParams?.query || '').trim();
   const products = query === "" ? [] : await fetchSearchProducts(query);
-  const featured = await fetchFeaturedProducts()
 
 
   if (query === "") {
@@ -22,17 +22,12 @@ export default async function Page(props: {
         <Suspense fallback={<div>Loading ....</div>}>
           <Search />
         </Suspense>
-        <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
+        <main className='px-6 lg:px-12 mb-12 mt-16 '>
           <div className=" flex flex-col gap-12 w-full ">
-            <h1 className="text-[24px] font-cinzel font-light text-center ">Get to know
-              Rikha Bestsellers</h1>
-            <div className='space-y-4 md:space-y-2  '>
-              {featured?.map(product => (
-                <SearchProductCard product={product} key={product.id} />
-              ))
-
-              }
-            </div>
+            <h1 className="text-[24px] font-cinzel font-light text-left "> GET TO KNOW RIKHA BESTSELLERS</h1>
+            <Suspense fallback={<ProductCardsSkeleton />}>
+              <ProductWrapper fetchProduct={fetchFeaturedProducts} />
+            </Suspense>
           </div>
         </main>
       </div>
@@ -45,22 +40,17 @@ export default async function Page(props: {
         <Suspense fallback={<div>Loading ....</div>}>
           <Search />
         </Suspense>
-        <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
+        <main className='px-6 lg:px-12 mb-12 mt-16 '>
           <div className="flex flex-col items-center justify-center gap-12 ">
             <div className="text-xl  w-max p-8 pb-0 flex flex-wrap items-center justify-center gap-1">
               <p className="">  Oops, No results to match your search. </p>
               <Frown className="text-4xl" />
             </div>
             <div className=" flex flex-col gap-12 w-full ">
-              <h1 className="text-[24px] font-cinzel font-light text-center ">Get to know
-                Rikha Bestsellers</h1>
-              <div className='space-y-4 md:space-y-2  '>
-                {featured?.map(product => (
-                  <SearchProductCard product={product} key={product.id} />
-                ))
-
-                }
-              </div>
+              <h1 className="text-[24px] font-cinzel font-light text-left ">GET TO KNOW RIKHA BESTSELLERS</h1>
+              <Suspense fallback={<ProductCardsSkeleton />}>
+                <ProductWrapper fetchProduct={fetchFeaturedProducts} />
+              </Suspense>
             </div>
           </div>
         </main>
@@ -73,13 +63,13 @@ export default async function Page(props: {
       <Suspense fallback={<div>Loading ....</div>}>
         <Search />
       </Suspense>
-      <main className='px-6 lg:px-12 mb-12 mt-8 max-w-[1000px] mx-auto'>
-        <div className='space-y-4 md:space-y-2  '>
-          {products?.map(product => (
-            <SearchProductCard product={product} key={product.id} />
-          ))
-          }
-        </div>
+      <main className='px-6 lg:px-12 mb-12 mt-16 '>
+        <div className=" flex flex-col gap-12 w-full ">
+          <h1 className="text-[24px] font-cinzel font-light text-left ">SEARCH RESULT</h1>
+          <Suspense fallback={<ProductCardsSkeleton />}>
+            <ProductWrapper fetchProduct={() => fetchSearchProducts(query)} />
+          </Suspense>
+          </div>
       </main>
     </div>
   )
