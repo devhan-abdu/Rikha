@@ -35,7 +35,7 @@ export default function RootLayout({
       >
         <StoreProvider>
           <ReactQueryProvider>
-            <ToastContainer position="bottom-right" theme="dark" />
+            <ToastContainer position="bottom-right" theme="light" />
             <UserProvider>
               <CartProvider>
                 {children}
