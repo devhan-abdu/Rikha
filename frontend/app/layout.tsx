@@ -18,10 +18,57 @@ const cinzel = Cinzel({
 
 
 
-export const metadata: Metadata = {
-  title: "Rikha",
-  description: "E-commerce website",
+export const metadata = {
+  metadataBase: new URL("https://rikha.store"),
+
+  title: {
+    default: "Rikha – Premium Apple Products in Ethiopia",
+    template: "%s | Rikha",
+  },
+
+  description:
+    "Rikha is a premium ecommerce website offering authentic Apple products. Explore iPhones, MacBooks, AirPods, and more. Fast delivery and professional service.",
+
+  keywords: [
+    "Apple Ethiopia",
+    "Buy iPhone Ethiopia",
+    "Rikha",
+    "Apple reseller Ethiopia",
+    "MacBook Ethiopia",
+    "AirPods Ethiopia",
+    "Ecommerce Ethiopia",
+  ],
+
+  openGraph: {
+    title: "Rikha – Premium Apple Products in Ethiopia",
+    description:
+      "Authentic Apple devices with warranty. Explore our ecommerce store and personal portfolio projects.",
+    url: "https://rikha.store",
+    siteName: "Rikha",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rikha Apple Store",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Rikha – Premium Apple Products",
+    description:
+      "Ecommerce website offering the latest Apple products with fast delivery.",
+    images: ["/images/og-image.jpg"],
+  },
+
+
 };
+
+
 
 export default function RootLayout({
   children,
